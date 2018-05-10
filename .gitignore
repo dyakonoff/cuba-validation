@@ -1,4 +1,5 @@
 */.gradle
+*/.gitignore
 */.studio
 */*.ipr
 */*.iml
