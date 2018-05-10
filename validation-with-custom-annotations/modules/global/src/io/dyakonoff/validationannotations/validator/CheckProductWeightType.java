@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ProductWeightValidator.class)
 public @interface CheckProductWeightType {
-    String message() default "{msg://io.dyakonoff.cargoload.validator/CheckProductWeightType.message}";
+    String message() default "{msg://io.dyakonoff.validationannotations.validator/CheckProductWeightType.message}";
 
     Class<?>[] groups() default {};
 
