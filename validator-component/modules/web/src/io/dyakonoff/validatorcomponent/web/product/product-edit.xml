@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="io.dyakonoff.validatorcomponent.web.product.ProductEdit"
+        datasource="productDs"
+        focusComponent="fieldGroup"
+        messagesPack="io.dyakonoff.validatorcomponent.web.product">
+    <dsContext>
+        <datasource id="productDs"
+                    class="io.dyakonoff.validatorcomponent.entity.Product"
+                    view="_local"/>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <fieldGroup id="fieldGroup"
+                    datasource="productDs">
+            <column width="250px">
+                <field property="name">
+                    <validator class="io.dyakonoff.validatorcomponent.validation.ProductNameValidator"
+                               message="msg://badNameInProductName"/>
+                </field>
+                <field property="measure"/>
+                <field property="weightPerMeasure"/>
+                <field property="pricePerMeasure"/>
+                <field property="vendorEmail">
+                    <validator class="com.haulmont.cuba.gui.components.validators.EmailValidator"/>
+                </field>
+                <field property="vendorSiteUrl">
+                    <validator>
+                        try
+                        {
+                        def instr = new java.net.URL( value ).openStream()
+                        instr.close()
+                        return true
+                        }
+                        catch( Exception e )
+                        {
+                        return false
+                        }
+</validator>
+                </field>
+            </column>
+        </fieldGroup>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>
