@@ -11,8 +11,8 @@ create table VALIDATIONANNOTATIONS_PRODUCT (
     --
     NAME varchar(100) not null,
     MEASURE integer not null,
-    WEIGHT_PER_UNIT decimal(19, 2) not null,
-    PRICE_PER_UNIT decimal(19, 2) not null,
+    WEIGHT_PER_MEASURE decimal(19, 2) not null,
+    PRICE_PER_MEASURE decimal(19, 2) not null,
     --
     primary key (ID)
 )^

@@ -19,11 +19,11 @@ public class ProductWeightValidator implements ConstraintValidator<CheckProductW
 
         switch (product.getMeasure()) {
             case Unit:
-                return product.getWeightPerUnit().compareTo(BigDecimal.ZERO) >= 0;
+                return product.getWeightPerMeasure().compareTo(BigDecimal.ZERO) >= 0;
             case Ton:
-                return product.getWeightPerUnit().compareTo(new BigDecimal(1000)) == 0;
+                return product.getWeightPerMeasure().compareTo(new BigDecimal(1000)) == 0;
             case Kilogram:
-                return product.getWeightPerUnit().compareTo(BigDecimal.ONE) == 0;
+                return product.getWeightPerMeasure().compareTo(BigDecimal.ONE) == 0;
             default:
                 throw new IllegalArgumentException("Unexpected value of ProductMeasure type");
         }

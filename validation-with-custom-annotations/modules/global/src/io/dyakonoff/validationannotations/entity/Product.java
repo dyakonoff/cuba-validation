@@ -28,13 +28,31 @@ public class Product extends StandardEntity {
 
     @DecimalMin("0")
     @NotNull
-    @Column(name = "WEIGHT_PER_UNIT", nullable = false)
-    protected BigDecimal weightPerUnit;
+    @Column(name = "WEIGHT_PER_MEASURE", nullable = false)
+    protected BigDecimal weightPerMeasure;
 
     @DecimalMin("0")
     @NotNull
-    @Column(name = "PRICE_PER_UNIT", nullable = false)
-    protected BigDecimal pricePerUnit;
+    @Column(name = "PRICE_PER_MEASURE", nullable = false)
+    protected BigDecimal pricePerMeasure;
+
+    public void setPricePerMeasure(BigDecimal pricePerMeasure) {
+        this.pricePerMeasure = pricePerMeasure;
+    }
+
+    public BigDecimal getPricePerMeasure() {
+        return pricePerMeasure;
+    }
+
+
+    public void setWeightPerMeasure(BigDecimal weightPerMeasure) {
+        this.weightPerMeasure = weightPerMeasure;
+    }
+
+    public BigDecimal getWeightPerMeasure() {
+        return weightPerMeasure;
+    }
+
 
     public void setName(String name) {
         this.name = name;
@@ -50,22 +68,6 @@ public class Product extends StandardEntity {
 
     public ProductMeasure getMeasure() {
         return measure == null ? null : ProductMeasure.fromId(measure);
-    }
-
-    public void setWeightPerUnit(BigDecimal weightPerUnit) {
-        this.weightPerUnit = weightPerUnit;
-    }
-
-    public BigDecimal getWeightPerUnit() {
-        return weightPerUnit;
-    }
-
-    public void setPricePerUnit(BigDecimal pricePerUnit) {
-        this.pricePerUnit = pricePerUnit;
-    }
-
-    public BigDecimal getPricePerUnit() {
-        return pricePerUnit;
     }
 
 }

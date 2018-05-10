@@ -33,8 +33,8 @@
             <columns>
                 <column id="name"/>
                 <column id="measure"/>
-                <column id="weightPerUnit"/>
-                <column id="pricePerUnit"/>
+                <column id="weightPerMeasure"/>
+                <column id="pricePerMeasure"/>
             </columns>
             <rows datasource="productsDs"/>
             <rowsCount/>
