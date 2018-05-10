@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <screen-config xmlns="http://schemas.haulmont.com/cuba/screens.xsd">
-
     <include file="io/dyakonoff/validationannotations/screens.xml"/>
-
+    <screen id="validationannotations$Product.browse"
+            template="io/dyakonoff/validationannotations/web/product/product-browse.xml"/>
+    <screen id="validationannotations$Product.edit"
+            template="io/dyakonoff/validationannotations/web/product/product-edit.xml"/>
 </screen-config>
