@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://browseCaption"
+        class="io.dyakonoff.controllersvalidation.web.vendor.VendorBrowse"
+        focusComponent="vendorsTable"
+        lookupComponent="vendorsTable"
+        messagesPack="io.dyakonoff.controllersvalidation.web.vendor">
+    <dsContext>
+        <groupDatasource id="vendorsDs"
+                         class="io.dyakonoff.controllersvalidation.entity.Vendor"
+                         view="_local">
+            <query>
+                <![CDATA[select e from controllersvalidation$Vendor e]]>
+            </query>
+        </groupDatasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="vendorsTable"
+            spacing="true">
+        <filter id="filter"
+                applyTo="vendorsTable"
+                datasource="vendorsDs">
+            <properties include=".*"/>
+        </filter>
+        <groupTable id="vendorsTable"
+                    width="100%">
+            <actions>
+                <action id="create"/>
+                <action id="edit"/>
+                <action id="remove"/>
+            </actions>
+            <columns>
+                <column id="name"/>
+                <column id="contactPerson"/>
+                <column id="contactEmail"/>
+                <column id="contactPhone"/>
+            </columns>
+            <rows datasource="vendorsDs"/>
+            <rowsCount/>
+            <buttonsPanel id="buttonsPanel"
+                          alwaysVisible="true">
+                <button id="createBtn"
+                        action="vendorsTable.create"/>
+                <button id="editBtn"
+                        action="vendorsTable.edit"/>
+                <button id="removeBtn"
+                        action="vendorsTable.remove"/>
+            </buttonsPanel>
+        </groupTable>
+    </layout>
+</window>
