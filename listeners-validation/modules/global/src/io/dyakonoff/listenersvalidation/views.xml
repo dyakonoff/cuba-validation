@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <views xmlns="http://schemas.haulmont.com/cuba/view.xsd">
-
+    <view class="io.dyakonoff.listenersvalidation.entity.PrintJob"
+          extends="_local"
+          name="printJob-view">
+        <property name="file"
+                  view="_minimal"/>
+        <property name="printer"
+                  view="_minimal"/>
+    </view>
+    <view class="io.dyakonoff.listenersvalidation.entity.PrintJob"
+          extends="_local"
+          name="printJob-view_1">
+        <property name="file"
+                  view="_minimal"/>
+        <property name="printer"
+                  view="_minimal"/>
+    </view>
 </views>
