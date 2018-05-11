@@ -1,7 +1,7 @@
 # CUBA platform validation examples
 
 This repository contains a set of projects that demonstrate validation examples
-in CUBA platform based applications.
+in [CUBA platform](https://www.cuba-platform.com/) based applications.
 
 **Examples cover the next validation methods:**
 1. [Bean validation that CUBA Studio offers for entities.](simple-validation/)
