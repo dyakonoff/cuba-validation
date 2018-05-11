@@ -28,6 +28,9 @@ public class Printer extends StandardEntity {
     @Column(name = "LOCATION")
     protected String location;
 
+    @Column(name = "DUPLEX_SUPPORT")
+    protected Boolean duplexSupport;
+
     @Pattern(message = "Incorrect IP address format", regexp = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$")
     @NotNull
     @Column(name = "IP_ADDRESS", nullable = false, length = 40)
@@ -39,6 +42,15 @@ public class Printer extends StandardEntity {
     @NotNull
     @Column(name = "PORT", nullable = false)
     protected Integer port;
+
+    public void setDuplexSupport(Boolean duplexSupport) {
+        this.duplexSupport = duplexSupport;
+    }
+
+    public Boolean getDuplexSupport() {
+        return duplexSupport;
+    }
+
 
     public void setName(String name) {
         this.name = name;

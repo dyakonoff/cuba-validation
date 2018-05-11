@@ -64,6 +64,7 @@
                         <column id="location"/>
                         <column id="ipAddress"/>
                         <column id="port"/>
+                        <column id="duplexSupport"/>
                     </columns>
                     <rows datasource="printersDs"/>
                     <rowsCount/>
@@ -93,6 +94,7 @@
                             <field id="ipAddressField"
                                    property="ipAddress"/>
                             <field property="port"/>
+                            <field property="duplexSupport"/>
                         </column>
                     </fieldGroup>
                 </scrollBox>

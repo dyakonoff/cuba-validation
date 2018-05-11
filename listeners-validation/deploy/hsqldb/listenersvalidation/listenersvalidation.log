@@ -1,580 +1,423 @@
-/*C2*/SET SCHEMA PUBLIC
+/*C93*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C3*/SET SCHEMA PUBLIC
+/*C94*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C4*/SET SCHEMA PUBLIC
+/*C95*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C5*/SET SCHEMA PUBLIC
+/*C96*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C6*/SET SCHEMA PUBLIC
-create table SYS_DB_CHANGELOG (SCRIPT_NAME varchar(300) not null primary key, CREATE_TS timestamp default current_timestamp, IS_INIT integer default 0)
-------------------------------------------------------------------------------------------------------------\u000a-- table for selecting sequence values in HSQL\u000acreate table DUAL (ID integer)
-INSERT INTO DUAL VALUES(0)
-COMMIT
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_SERVER (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    --\u000a    NAME varchar(255),\u000a    IS_RUNNING boolean,\u000a    DATA longvarchar,\u000a    --\u000a    primary key (ID),\u000a    constraint IDX_SYS_SERVER_UNIQ_NAME unique (NAME)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_CONFIG (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    --\u000a    NAME varchar(255),\u000a    VALUE longvarchar,\u000a    --\u000a    primary key (ID),\u000a    constraint IDX_SYS_CONFIG_UNIQ_NAME unique (NAME)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_FILE (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    NAME varchar(500) not null,\u000a    EXT varchar(20),\u000a    FILE_SIZE bigint,\u000a    CREATE_DATE timestamp,\u000a    --\u000a    primary key (ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_LOCK_CONFIG (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    --\u000a    NAME varchar(100),\u000a    TIMEOUT_SEC integer,\u000a    --\u000a    primary key (ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_ENTITY_STATISTICS (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    --\u000a    NAME varchar(50),\u000a    INSTANCE_COUNT bigint,\u000a    FETCH_UI integer,\u000a    MAX_FETCH_UI integer,\u000a    LAZY_COLLECTION_THRESHOLD integer,\u000a    LOOKUP_SCREEN_THRESHOLD integer,\u000a    --\u000a    primary key (ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_SCHEDULED_TASK (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    BEAN_NAME varchar(50),\u000a    METHOD_NAME varchar(50),\u000a    METHOD_PARAMS varchar(1000),\u000a    DEFINED_BY varchar(1) default 'B',\u000a    CLASS_NAME varchar(500),\u000a    SCRIPT_NAME varchar(500),\u000a    USER_NAME varchar(50),\u000a    IS_SINGLETON boolean,\u000a    IS_ACTIVE boolean,\u000a    PERIOD integer,\u000a    TIMEOUT integer,\u000a    START_DATE timestamp,\u000a    TIME_FRAME integer,\u000a    START_DELAY integer,\u000a    PERMITTED_SERVERS varchar(4096),\u000a    LOG_START boolean,\u000a    LOG_FINISH boolean,\u000a    LAST_START_TIME timestamp,\u000a    LAST_START_SERVER varchar(512),\u000a    DESCRIPTION varchar(1000),\u000a    CRON varchar(100),\u000a    SCHEDULING_TYPE varchar(1) default 'P',\u000a    --\u000a    primary key (ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_SCHEDULED_EXECUTION (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    --\u000a    TASK_ID varchar(36),\u000a    SERVER varchar(512),\u000a    START_TIME timestamp,\u000a    FINISH_TIME timestamp,\u000a    RESULT longvarchar,\u000a    --\u000a    primary key (ID),\u000a    constraint SYS_SCHEDULED_EXECUTION_TASK foreign key (TASK_ID) references SYS_SCHEDULED_TASK(ID)\u000a)
-\u000acreate index IDX_SYS_SCHEDULED_EXECUTION_TASK_START_TIME  on SYS_SCHEDULED_EXECUTION (TASK_ID, START_TIME)
-\u000acreate index IDX_SYS_SCHEDULED_EXECUTION_TASK_FINISH_TIME on SYS_SCHEDULED_EXECUTION (TASK_ID, FINISH_TIME)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_ROLE (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    NAME varchar(255) not null,\u000a    LOC_NAME varchar(255),\u000a    DESCRIPTION varchar(1000),\u000a    IS_DEFAULT_ROLE boolean,\u000a    ROLE_TYPE integer,\u000a    --\u000a    primary key (ID)\u000a)
-\u000aalter table SEC_ROLE add constraint IDX_SEC_ROLE_UNIQ_NAME unique (NAME, DELETE_TS)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_GROUP (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    NAME varchar(255) not null,\u000a    PARENT_ID varchar(36),\u000a    --\u000a    primary key (ID),\u000a    constraint SEC_GROUP_PARENT foreign key (PARENT_ID) references SEC_GROUP(ID)\u000a)
-\u000aalter table SEC_GROUP add constraint IDX_SEC_GROUP_UNIQ_NAME unique (NAME, DELETE_TS)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_GROUP_HIERARCHY (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    --\u000a    GROUP_ID varchar(36),\u000a    PARENT_ID varchar(36),\u000a    HIERARCHY_LEVEL integer,\u000a    --\u000a    primary key (ID),\u000a    constraint SEC_GROUP_HIERARCHY_GROUP foreign key (GROUP_ID) references SEC_GROUP(ID),\u000a    constraint SEC_GROUP_HIERARCHY_PARENT foreign key (PARENT_ID) references SEC_GROUP(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_USER (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    LOGIN varchar(50) not null,\u000a    LOGIN_LC varchar(50) not null,\u000a    PASSWORD varchar(255),\u000a    NAME varchar(255),\u000a    FIRST_NAME varchar(255),\u000a    LAST_NAME varchar(255),\u000a    MIDDLE_NAME varchar(255),\u000a    POSITION_ varchar(255),\u000a    EMAIL varchar(100),\u000a    LANGUAGE_ varchar(20),\u000a    TIME_ZONE varchar(50),\u000a    TIME_ZONE_AUTO boolean,\u000a    ACTIVE boolean,\u000a    GROUP_ID varchar(36) not null,\u000a    IP_MASK varchar(200),\u000a    CHANGE_PASSWORD_AT_LOGON boolean,\u000a    --\u000a    primary key (ID),\u000a    constraint IDX_SEC_USER_UNIQ_LOGIN unique (LOGIN_LC, DELETE_TS),\u000a    constraint SEC_USER_GROUP foreign key (GROUP_ID) references SEC_GROUP(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_USER_ROLE (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    USER_ID varchar(36),\u000a    ROLE_ID varchar(36),\u000a    --\u000a    primary key (ID),\u000a    constraint SEC_USER_ROLE_USER foreign key (USER_ID) references SEC_USER(ID),\u000a    constraint SEC_USER_ROLE_ROLE foreign key (ROLE_ID) references SEC_ROLE(ID),\u000a    constraint IDX_SEC_USER_ROLE_UNIQ_ROLE unique (USER_ID, ROLE_ID, DELETE_TS)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_PERMISSION (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    PERMISSION_TYPE integer,\u000a    TARGET varchar(100),\u000a    VALUE integer,\u000a    ROLE_ID varchar(36),\u000a    --\u000a    primary key (ID),\u000a    constraint SEC_PERMISSION_ROLE foreign key (ROLE_ID) references SEC_ROLE(ID),\u000a    constraint IDX_SEC_PERMISSION_UNIQUE unique (ROLE_ID, PERMISSION_TYPE, TARGET, DELETE_TS)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_CONSTRAINT (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    CODE varchar(255),\u000a    CHECK_TYPE varchar(50) default 'db',\u000a    OPERATION_TYPE varchar(50) default 'read',\u000a    ENTITY_NAME varchar(255) not null,\u000a    JOIN_CLAUSE varchar(500),\u000a    WHERE_CLAUSE varchar(1000),\u000a    GROOVY_SCRIPT longvarchar,\u000a    FILTER_XML longvarchar,\u000a    IS_ACTIVE boolean default true,\u000a    GROUP_ID varchar(36),\u000a    --\u000a    primary key (ID),\u000a    constraint SEC_CONSTRAINT_GROUP foreign key (GROUP_ID) references SEC_GROUP(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_LOCALIZED_CONSTRAINT_MSG (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    ENTITY_NAME varchar(255) not null,\u000a    OPERATION_TYPE varchar(50) not null,\u000a    VALUES_ longvarchar,\u000a    --\u000a    primary key (ID)\u000a)
-\u000acreate unique index IDX_SEC_LOC_CNSTRNT_MSG_UNIQUE\u000a  on SEC_LOCALIZED_CONSTRAINT_MSG (ENTITY_NAME, OPERATION_TYPE, DELETE_TS)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_SESSION_ATTR (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    NAME varchar(50),\u000a    STR_VALUE varchar(1000),\u000a    DATATYPE varchar(20),\u000a    GROUP_ID varchar(36),\u000a    --\u000a    primary key (ID),\u000a    constraint SEC_SESSION_ATTR_GROUP foreign key (GROUP_ID) references SEC_GROUP(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_USER_SETTING (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    --\u000a    USER_ID varchar(36),\u000a    CLIENT_TYPE char(1),\u000a    NAME varchar(255),\u000a    VALUE longvarchar,\u000a    --\u000a    primary key (ID),\u000a    constraint SEC_USER_SETTING_USER foreign key (USER_ID) references SEC_USER(ID),\u000a    constraint SEC_USER_SETTING_UNIQ unique (USER_ID, NAME, CLIENT_TYPE)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_USER_SUBSTITUTION (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    USER_ID varchar(36) not null,\u000a    SUBSTITUTED_USER_ID varchar(36) not null,\u000a    START_DATE timestamp,\u000a    END_DATE timestamp,\u000a    --\u000a    primary key (ID),\u000a    constraint FK_SEC_USER_SUBSTITUTION_USER foreign key (USER_ID) references SEC_USER(ID),\u000a    constraint FK_SEC_USER_SUBSTITUTION_SUBSTITUTED_USER foreign key (SUBSTITUTED_USER_ID)\u000a        references SEC_USER(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_LOGGED_ENTITY (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    --\u000a    NAME varchar(100),\u000a    AUTO boolean,\u000a    MANUAL boolean,\u000a    --\u000a    primary key (ID),\u000a    constraint SEC_LOGGED_ENTITY_UNIQ_NAME unique (NAME)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_LOGGED_ATTR (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    --\u000a    ENTITY_ID varchar(36),\u000a    NAME varchar(50),\u000a    --\u000a    primary key (ID),\u000a    constraint FK_SEC_LOGGED_ATTR_ENTITY foreign key (ENTITY_ID) references SEC_LOGGED_ENTITY(ID),\u000a    constraint SEC_LOGGED_ATTR_UNIQ_NAME unique (ENTITY_ID, NAME)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_ENTITY_LOG (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    --\u000a    EVENT_TS timestamp,\u000a    USER_ID varchar(36),\u000a    CHANGE_TYPE char(1),\u000a    ENTITY varchar(100),\u000a    ENTITY_ID varchar(36),\u000a    STRING_ENTITY_ID varchar(255),\u000a    INT_ENTITY_ID integer,\u000a    LONG_ENTITY_ID bigint,\u000a    CHANGES longvarchar,\u000a    --\u000a    primary key (ID),\u000a    constraint FK_SEC_ENTITY_LOG_USER foreign key (USER_ID) references SEC_USER(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_FILTER (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    COMPONENT varchar(200),\u000a    NAME varchar(255),\u000a    CODE varchar(200),\u000a    XML longvarchar,\u000a    USER_ID varchar(36),\u000a    GLOBAL_DEFAULT boolean,\u000a    --\u000a    primary key (ID),\u000a    constraint FK_SEC_FILTER_USER foreign key (USER_ID) references SEC_USER(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_FOLDER (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    FOLDER_TYPE char(1),\u000a    PARENT_ID varchar(36),\u000a    NAME varchar(100),\u000a    TAB_NAME varchar(100),\u000a    SORT_ORDER integer,\u000a    --\u000a    primary key (ID),\u000a    constraint FK_SYS_FOLDER_PARENT foreign key (PARENT_ID) references SYS_FOLDER(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_APP_FOLDER (\u000a    FOLDER_ID varchar(36) not null,\u000a    FILTER_COMPONENT varchar(200),\u000a    FILTER_XML varchar(7000),\u000a    VISIBILITY_SCRIPT longvarchar,\u000a    QUANTITY_SCRIPT longvarchar,\u000a    APPLY_DEFAULT boolean,\u000a    --\u000a    primary key (FOLDER_ID),\u000a    constraint FK_SYS_APP_FOLDER_FOLDER foreign key (FOLDER_ID) references SYS_FOLDER(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_PRESENTATION (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    --\u000a    COMPONENT varchar(200),\u000a    NAME varchar(255),\u000a    XML varchar(7000),\u000a    USER_ID varchar(36),\u000a    IS_AUTO_SAVE boolean,\u000a    --\u000a    primary key (ID),\u000a    constraint SEC_PRESENTATION_USER foreign key (USER_ID) references SEC_USER(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_SEARCH_FOLDER (\u000a    FOLDER_ID varchar(36) not null,\u000a    FILTER_COMPONENT varchar(200),\u000a    FILTER_XML varchar(7000),\u000a    USER_ID varchar(36),\u000a    PRESENTATION_ID varchar(36),\u000a    APPLY_DEFAULT boolean,\u000a    IS_SET boolean,\u000a    ENTITY_TYPE varchar(50),\u000a    --\u000a    primary key (FOLDER_ID),\u000a    constraint FK_SEC_SEARCH_FOLDER_FOLDER foreign key (FOLDER_ID) references SYS_FOLDER(ID),\u000a    constraint FK_SEC_SEARCH_FOLDER_USER foreign key (USER_ID) references SEC_USER(ID),\u000a    constraint FK_SEC_SEARCH_FOLDER_PRESENTATION foreign key (PRESENTATION_ID)\u000a        references SEC_PRESENTATION(ID)\u000a        on delete set null\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_FTS_QUEUE (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    --\u000a    ENTITY_ID varchar(36),\u000a    STRING_ENTITY_ID varchar(255),\u000a    INT_ENTITY_ID integer,\u000a    LONG_ENTITY_ID bigint,\u000a    ENTITY_NAME varchar(200),\u000a    CHANGE_TYPE char(1),\u000a    SOURCE_HOST varchar(255),\u000a    INDEXING_HOST varchar(255),\u000a    FAKE boolean,\u000a    --\u000a    primary key (ID)\u000a)
-\u000acreate index IDX_SYS_FTS_QUEUE_IDXHOST_CRTS on SYS_FTS_QUEUE (INDEXING_HOST, CREATE_TS)
-\u000a--------------------------------------------------------------------------------------------------------------\u000acreate table SEC_SCREEN_HISTORY (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    USER_ID varchar(36),\u000a    CAPTION varchar(255),\u000a    URL varchar(4000),\u000a    ENTITY_ID varchar(36),\u000a    SUBSTITUTED_USER_ID varchar(36),\u000a    --\u000a    primary key (ID),\u000a    constraint FK_SEC_HISTORY_USER foreign key (USER_ID) references SEC_USER (ID),\u000a    constraint FK_SEC_HISTORY_SUBSTITUTED_USER foreign key (SUBSTITUTED_USER_ID) references SEC_USER (ID)\u000a)
-\u000acreate index IDX_SEC_SCREEN_HIST_SUB_USER on SEC_SCREEN_HISTORY (SUBSTITUTED_USER_ID)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_SENDING_MESSAGE (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    ADDRESS_TO longvarchar,\u000a    ADDRESS_FROM varchar(100),\u000a    CAPTION varchar(500),\u000a    EMAIL_HEADERS varchar(500),\u000a    CONTENT_TEXT longvarchar,\u000a    CONTENT_TEXT_FILE_ID varchar(36),\u000a    DEADLINE timestamp,\u000a    STATUS integer,\u000a    DATE_SENT timestamp,\u000a    ATTEMPTS_COUNT integer,\u000a    ATTEMPTS_MADE integer,\u000a    ATTACHMENTS_NAME longvarchar,\u000a    --\u000a    primary key (ID)\u000a)
-\u000aalter table SYS_SENDING_MESSAGE add constraint FK_SYS_SENDING_MESSAGE_CONTENT_FILE foreign key (CONTENT_TEXT_FILE_ID) references SYS_FILE(ID)
-\u000acreate table SYS_SENDING_ATTACHMENT (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    MESSAGE_ID varchar(36),\u000a    CONTENT longvarbinary,\u000a    CONTENT_FILE_ID varchar(36),\u000a    CONTENT_ID varchar(50),\u000a    NAME varchar(500),\u000a    DISPOSITION varchar(50),\u000a    TEXT_ENCODING varchar(50),\u000a    --\u000a    primary key (ID)\u000a)
-\u000aalter table SYS_SENDING_ATTACHMENT add constraint FK_SYS_SENDING_ATTACHMENT_SENDING_MESSAGE foreign key (MESSAGE_ID) references SYS_SENDING_MESSAGE (ID)
-\u000aalter table SYS_SENDING_ATTACHMENT add constraint FK_SYS_SENDING_ATTACHMENT_CONTENT_FILE foreign key (CONTENT_FILE_ID) references SYS_FILE (ID)
-\u000aCREATE INDEX SYS_SENDING_ATTACHMENT_MESSAGE_IDX\u000a  ON SYS_SENDING_ATTACHMENT(MESSAGE_ID )
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_ENTITY_SNAPSHOT (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    --\u000a    ENTITY_META_CLASS varchar(50),\u000a    ENTITY_ID varchar(36),\u000a    STRING_ENTITY_ID varchar(255),\u000a    INT_ENTITY_ID integer,\u000a    LONG_ENTITY_ID bigint,\u000a    AUTHOR_ID varchar(36) not null,\u000a    VIEW_XML longvarchar,\u000a    SNAPSHOT_XML longvarchar,\u000a    SNAPSHOT_DATE timestamp,\u000a    --\u000a    primary key (ID),\u000a    constraint FK_SYS_ENTITY_SNAPSHOT_AUTHOR_ID foreign key (AUTHOR_ID) references SEC_USER(ID)\u000a)
-\u000a-------------------------------------------------------------------------------------------------------------\u000acreate table SYS_CATEGORY(\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    NAME varchar(255) not null,\u000a    SPECIAL varchar(50),\u000a    ENTITY_TYPE varchar(100) not null,\u000a    IS_DEFAULT boolean,\u000a    DISCRIMINATOR integer,\u000a    LOCALE_NAMES varchar(1000),\u000a    --\u000a    primary key (ID)\u000a)
-\u000acreate unique index IDX_SYS_CATEGORY_UNIQ_NAME_ENTITY_TYPE on SYS_CATEGORY (NAME, ENTITY_TYPE, DELETE_TS)
-\u000acreate table SYS_CATEGORY_ATTR(\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    CATEGORY_ENTITY_TYPE varchar(4000),\u000a    NAME varchar(255),\u000a    CODE varchar(100) not null,\u000a    CATEGORY_ID varchar(36) not null,\u000a    ENTITY_CLASS varchar(500),\u000a    DATA_TYPE varchar(200),\u000a    DEFAULT_STRING varchar(4000),\u000a    DEFAULT_INT integer,\u000a    DEFAULT_DOUBLE numeric(36,6),\u000a    DEFAULT_DATE date,\u000a    DEFAULT_DATE_IS_CURRENT boolean,\u000a    DEFAULT_BOOLEAN boolean,\u000a    DEFAULT_ENTITY_VALUE varchar(36),\u000a    DEFAULT_STR_ENTITY_VALUE varchar(255),\u000a    DEFAULT_INT_ENTITY_VALUE integer,\u000a    DEFAULT_LONG_ENTITY_VALUE bigint,\u000a    ENUMERATION varchar(500),\u000a    ORDER_NO integer,\u000a    SCREEN varchar(255),\u000a    REQUIRED boolean,\u000a    LOOKUP boolean,\u000a    TARGET_SCREENS varchar(4000),\u000a    WIDTH varchar(20),\u000a    ROWS_COUNT integer,\u000a    IS_COLLECTION boolean,\u000a    JOIN_CLAUSE varchar(4000),\u000a    WHERE_CLAUSE varchar(4000),\u000a    FILTER_XML longvarchar,\u000a    LOCALE_NAMES varchar(1000),\u000a    ENUMERATION_LOCALES varchar(5000),\u000a    --\u000a    primary key (ID)\u000a)
-\u000acreate unique index IDX_CAT_ATTR_ENT_TYPE_AND_CODE on SYS_CATEGORY_ATTR (CATEGORY_ENTITY_TYPE, CODE)
-alter table SYS_CATEGORY_ATTR add constraint SYS_CATEGORY_ATTR_CATEGORY_ID foreign key (CATEGORY_ID) references SYS_CATEGORY(ID)
-\u000acreate table SYS_ATTR_VALUE (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    CATEGORY_ATTR_ID varchar(36) not null,\u000a    ENTITY_ID varchar(36),\u000a    STRING_ENTITY_ID varchar(255),\u000a    INT_ENTITY_ID integer,\u000a    LONG_ENTITY_ID bigint,\u000a    STRING_VALUE varchar(4000),\u000a    INTEGER_VALUE integer,\u000a    DOUBLE_VALUE numeric(36,6),\u000a    DATE_VALUE date,\u000a    BOOLEAN_VALUE boolean,\u000a    ENTITY_VALUE varchar(36),\u000a    STRING_ENTITY_VALUE varchar(255),\u000a    INT_ENTITY_VALUE integer,\u000a    LONG_ENTITY_VALUE bigint,\u000a    PARENT_ID varchar(36),\u000a    CODE varchar(100),\u000a    --\u000a    primary key (ID)\u000a)
-\u000aalter table SYS_ATTR_VALUE add constraint SYS_ATTR_VALUE_CATEGORY_ATTR_ID foreign key (CATEGORY_ATTR_ID) references SYS_CATEGORY_ATTR(ID)
-\u000aalter table SYS_ATTR_VALUE add constraint SYS_ATTR_VALUE_ATTR_VALUE_PARENT_ID foreign key (PARENT_ID) references SYS_ATTR_VALUE(ID)
-\u000a-------------------------------------------------------------------------------------------------------------\u000acreate table SYS_QUERY_RESULT (\u000a    ID identity not null,\u000a    SESSION_ID varchar(36) not null,\u000a    QUERY_KEY integer not null,\u000a    ENTITY_ID varchar(36),\u000a    STRING_ENTITY_ID varchar(255),\u000a    INT_ENTITY_ID integer,\u000a    LONG_ENTITY_ID bigint,\u000a)
-\u000a--------------------------------------------------------------------------------------------------------------\u000acreate table SYS_JMX_INSTANCE (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    NODE_NAME varchar(255),\u000a    ADDRESS varchar(500) not null,\u000a    LOGIN varchar(50) not null,\u000a    PASSWORD varchar(255) not null,\u000a    --\u000a    primary key (ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_REMEMBER_ME (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    VERSION integer,\u000a    --\u000a    USER_ID varchar(36) not null,\u000a    TOKEN varchar(32) not null,\u000a    --\u000a    primary key (ID),\u000a    constraint FK_SEC_REMEMBER_ME_USER foreign key (USER_ID) references SEC_USER(ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_ACCESS_TOKEN (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    --\u000a    TOKEN_VALUE varchar(255),\u000a    TOKEN_BYTES longvarbinary,\u000a    AUTHENTICATION_KEY varchar(255),\u000a    AUTHENTICATION_BYTES longvarbinary,\u000a    EXPIRY timestamp,\u000a    USER_LOGIN varchar(50),\u000a    LOCALE varchar(200),\u000a    REFRESH_TOKEN_VALUE varchar(255),\u000a    --\u000a    primary key (ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SYS_REFRESH_TOKEN (\u000a    ID varchar(36) not null,\u000a    CREATE_TS timestamp,\u000a    --\u000a    TOKEN_VALUE varchar(255),\u000a    TOKEN_BYTES longvarbinary,\u000a    AUTHENTICATION_BYTES longvarbinary,\u000a    EXPIRY timestamp,\u000a    USER_LOGIN varchar(50),\u000a    --\u000a    primary key (ID)\u000a)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate table SEC_SESSION_LOG (\u000a    ID varchar(36) not null,\u000a    VERSION integer not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    SESSION_ID varchar(36) not null,\u000a    SUBSTITUTED_USER_ID varchar(36),\u000a    USER_ID varchar(36) not null,\u000a    USER_DATA longvarchar,\u000a    LAST_ACTION integer not null,\u000a    CLIENT_INFO varchar(512),\u000a    ADDRESS varchar(255),\u000a    STARTED_TS timestamp,\u000a    FINISHED_TS timestamp,\u000a    CLIENT_TYPE varchar(10),\u000a    SERVER_ID varchar(128),\u000a    --\u000a    primary key (ID)\u000a)
-\u000aalter table SEC_SESSION_LOG add constraint FK_SEC_SESSION_LOG_USER foreign key (USER_ID) references SEC_USER(ID)
-\u000acreate index IDX_SEC_SESSION_LOG_USER on SEC_SESSION_LOG (USER_ID)
-\u000aalter table SEC_SESSION_LOG add constraint FK_SEC_SESSION_LOG_SUBUSER foreign key (SUBSTITUTED_USER_ID) references SEC_USER(ID)
-\u000acreate index IDX_SEC_SESSION_LOG_SUBUSER on SEC_SESSION_LOG (SUBSTITUTED_USER_ID)
-\u000acreate index IDX_SESSION_LOG_STARTED_TS on SEC_SESSION_LOG (STARTED_TS DESC)
-\u000a------------------------------------------------------------------------------------------------------------\u000acreate function NEWID() returns varchar(36)\u000a   return uuid(uuid())
-INSERT INTO SEC_GROUP VALUES('0fa2b1a5-1d68-4d69-9fbd-dff348347f93','2018-05-11 23:25:13.734000',NULL,0,NULL,NULL,NULL,NULL,'Company',NULL)
-COMMIT
-INSERT INTO SEC_USER VALUES('60885987-1b61-4247-94c7-dff348347f93','2018-05-11 23:25:13.734000',NULL,0,NULL,NULL,NULL,NULL,'admin','admin','cc2229d1b8a052423d9e1c9ef0113b850086586a','Administrator',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,TRUE,'0fa2b1a5-1d68-4d69-9fbd-dff348347f93',NULL,NULL)
-COMMIT
-INSERT INTO SEC_USER VALUES('a405db59-e674-4f63-8afe-269dda788fe8','2018-05-11 23:25:13.734000',NULL,0,NULL,NULL,NULL,NULL,'anonymous','anonymous',NULL,'Anonymous',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,TRUE,'0fa2b1a5-1d68-4d69-9fbd-dff348347f93',NULL,NULL)
-COMMIT
-INSERT INTO SEC_ROLE VALUES('0c018061-b26f-4de2-a5be-dff348347f93','2018-05-11 23:25:13.734000',NULL,0,NULL,NULL,NULL,NULL,'Administrators',NULL,NULL,NULL,10)
-COMMIT
-INSERT INTO SEC_USER_ROLE VALUES('c838be0a-96d0-4ef4-a7c0-dff348347f93','2018-05-11 23:25:13.734000',NULL,0,NULL,NULL,NULL,NULL,'60885987-1b61-4247-94c7-dff348347f93','0c018061-b26f-4de2-a5be-dff348347f93')
-COMMIT
-INSERT INTO SEC_FILTER VALUES('b61d18cb-e79a-46f3-b16d-eaf4aebb10dd','2010-03-01 11:14:06.830000','admin',2,'2010-03-01 11:52:53.170000','admin',NULL,NULL,'[sec$User.browse].genericFilter','Search by role',NULL,'<?xml version="1.0" encoding="UTF-8"?>\u000a<filter>\u000a  <and>\u000a    <c name="UrMxpkfMGn" class="com.haulmont.cuba.security.entity.Role" type="CUSTOM" locCaption="Role" entityAlias="u" join="join u.userRoles ur">ur.role.id = :component$genericFilter.UrMxpkfMGn32565\u000a          <param name="component$genericFilter.UrMxpkfMGn32565">NULL</param>\u000a    </c>\u000a  </and>\u000a</filter>','60885987-1b61-4247-94c7-dff348347f93',FALSE)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/init/hsql/create-db.sql','2018-05-11 23:25:13.735000',1)
-COMMIT
--- begin LISTENERSVALIDATION_PRINTER\u000acreate table LISTENERSVALIDATION_PRINTER (\u000a    ID varchar(36) not null,\u000a    VERSION integer not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    NAME varchar(255) not null,\u000a    LOCATION longvarchar,\u000a    IP_ADDRESS varchar(40) not null,\u000a    PORT integer not null,\u000a    --\u000a    primary key (ID)\u000a)
-INSERT INTO SYS_DB_CHANGELOG VALUES('50-listenersvalidation/init/hsql/10.create-db.sql','2018-05-11 23:25:13.736000',1)
-COMMIT
--- begin LISTENERSVALIDATION_PRINTER\u000acreate unique index IDX_LISTENERSVALIDATION_PRINTER_UNIQ_NAME on LISTENERSVALIDATION_PRINTER (NAME) 
-INSERT INTO SYS_DB_CHANGELOG VALUES('50-listenersvalidation/init/hsql/20.create-db.sql','2018-05-11 23:25:13.737000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('50-listenersvalidation/init/hsql/30.create-db.sql','2018-05-11 23:25:13.737000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/14/140313-ftsQueueIndexingHost.sql','2018-05-11 23:25:13.741000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/14/140405-changeTypeForSysConfigValue.sql','2018-05-11 23:25:13.742000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/14/140708-addRememberMeTable.sql','2018-05-11 23:25:13.743000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/14/140716-changeSysFileSizeType.sql','2018-05-11 23:25:13.743000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/14/141203-setNotNullSysFileName.sql','2018-05-11 23:25:13.744000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/150203-sendingMessageEmailHeaders.sql','2018-05-11 23:25:13.744000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/150203-userTimeZone.sql','2018-05-11 23:25:13.745000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/150205-addSubstituteUserInScreenHistory.sql','2018-05-11 23:25:13.745000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/150226-addIndexInScreenHistory.sql','2018-05-11 23:25:13.746000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/150310-alterFilterXml.sql','2018-05-11 23:25:13.746000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/150417-runtimePropertiesChanges.sql','2018-05-11 23:25:13.747000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/150514-categoryEntityTypeInAttribute.sql','2018-05-11 23:25:13.747000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/150630-entityClassToCategoryAttribute.sql','2018-05-11 23:25:13.748000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/150805-fakeFtsQueue.sql','2018-05-11 23:25:13.748000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/151106-extendScheduledTaskFields.sql','2018-05-11 23:25:13.748000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/151116-rowLevelSecurity.sql','2018-05-11 23:25:13.749000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/151228-sendingMessagesExtendFields.sql','2018-05-11 23:25:13.750000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/15/1512282-addIsActiveToConstraint.sql','2018-05-11 23:25:13.750000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/160322-dropUniqSysScheduledTaskBeanMethodConstraint.sql','2018-05-11 23:25:13.751000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/160405-createUniqSysCategory.sql','2018-05-11 23:25:13.751000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/160616-addSizeCategoryAttribute.sql','2018-05-11 23:25:13.752000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/160626-createIndexOnFinishTimeScheduledExecution.sql','2018-05-11 23:25:13.752000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/160725-anonymousLogin.sql','2018-05-11 23:25:13.753000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/160916-addEntityIdToFtsQueue.sql','2018-05-11 23:25:13.753000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/161024-collectionDynamicAttributes.sql','2018-05-11 23:25:13.754000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/161025-sysAttrValueParentConstraint.sql','2018-05-11 23:25:13.754000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/161102-setIsCollectionForExistingCategoryAttrs.sql','2018-05-11 23:25:13.755000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/161124-FilterXmlInCategoryAttr.sql','2018-05-11 23:25:13.755000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/161124-joinAndWhereInCategoryAttr.sql','2018-05-11 23:25:13.756000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/270916-addEntityIdToQueryResult.sql','2018-05-11 23:25:13.757000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/16/280916-removeNotNullEntityOnQueryResult.sql','2018-05-11 23:25:13.757000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/170214-addEntityIdToSnapshot.sql','2018-05-11 23:25:13.758000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/170215-addEntityIdToEntityLog.sql','2018-05-11 23:25:13.758000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/170221-addEntityIdToAttributeValue.sql','2018-05-11 23:25:13.759000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/170228-createRestApiTokenTable.sql','2018-05-11 23:25:13.760000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/170502-createSessionHistoryTable.sql','2018-05-11 23:25:13.760000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/170620-alterConstraints.sql','2018-05-11 23:25:13.761000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/170712-createLocalizedConstraintMessageTable.sql','2018-05-11 23:25:13.761000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/170829-addLocaleNameColumnToCategory.sql','2018-05-11 23:25:13.762000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/171002-addUserLoginToRestApiToken.sql','2018-05-11 23:25:13.763000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/171116-addGlobalDefaultToFilterEntity.sql','2018-05-11 23:25:13.763000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/171121-addLocaleToRestApiToken.sql','2018-05-11 23:25:13.764000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/1712011000-createRestApiRefreshTokenTable.sql','2018-05-11 23:25:13.765000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/1712011010-renameRestApiTokenColumns.sql','2018-05-11 23:25:13.765000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/1712011010-renameRestApiTokenTable.sql','2018-05-11 23:25:13.765000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/171227-createIndexStartedTsDescToSessionLog.sql','2018-05-11 23:25:13.766000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/17/171229-addRefreshTokenColumnToAccessTokenTable.sql','2018-05-11 23:25:13.767000',1)
-COMMIT
-INSERT INTO SYS_DB_CHANGELOG VALUES('10-cuba/update/hsql/18/180112-alterDynamicAttributeDoubleType.sql','2018-05-11 23:25:13.767000',1)
-COMMIT
+/*C97*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C7*/SET SCHEMA PUBLIC
+/*C98*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C8*/SET SCHEMA PUBLIC
+/*C100*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C9*/SET SCHEMA PUBLIC
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:26:10.139000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-INSERT INTO LISTENERSVALIDATION_PRINTER VALUES('83bfa329-a7c8-568b-127a-6aa3aecb2063',1,'2018-05-11 23:26:13.225000','admin','2018-05-11 23:26:13.225000',NULL,NULL,NULL,'HP 1000',NULL,'10.10.10.10',1234)
+/*C99*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C101*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C102*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C103*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C104*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C105*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C106*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C108*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C107*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C109*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C110*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C111*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C112*/SET SCHEMA PUBLIC
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:09:37.878000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:27:10.140000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:28:10.141000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:29:10.146000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:30:10.148000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:31:10.151000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-/*C10*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C11*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C12*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C13*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C15*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C14*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C16*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C17*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C9*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:31:12.432000',NULL,'localhost:8080/app-core',FALSE,NULL)
-COMMIT
-DISCONNECT
-/*C18*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C19*/SET SCHEMA PUBLIC
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:32:04.342000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:10:37.877000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM LISTENERSVALIDATION_PRINTER WHERE ID='83bfa329-a7c8-568b-127a-6aa3aecb2063'
-INSERT INTO LISTENERSVALIDATION_PRINTER VALUES('83bfa329-a7c8-568b-127a-6aa3aecb2063',2,'2018-05-11 23:26:13.225000','admin','2018-05-11 23:32:14.071000','admin',NULL,NULL,'HP 1000',NULL,'10.10.10.1',1234)
+INSERT INTO LISTENERSVALIDATION_PRINTER VALUES('83bfa329-a7c8-568b-127a-6aa3aecb2063',3,'2018-05-11 23:26:13.225000','admin','2018-05-12 02:11:30.142000','admin',NULL,NULL,'HP 1000',NULL,'10.10.10.11',1234)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:33:04.342000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:11:37.878000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+/*C113*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C114*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C115*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C116*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C118*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C117*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C119*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C120*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C112*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:12:16.339000',NULL,'localhost:8080/app-core',FALSE,NULL)
+COMMIT
+DISCONNECT
+/*C121*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C122*/SET SCHEMA PUBLIC
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:13:18.148000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM LISTENERSVALIDATION_PRINTER WHERE ID='83bfa329-a7c8-568b-127a-6aa3aecb2063'
+INSERT INTO LISTENERSVALIDATION_PRINTER VALUES('83bfa329-a7c8-568b-127a-6aa3aecb2063',4,'2018-05-11 23:26:13.225000','admin','2018-05-12 02:13:18.159000','admin',NULL,NULL,'HP 1000',NULL,'10.10.10.12',1234)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:34:04.343000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:14:22.409000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM LISTENERSVALIDATION_PRINTER WHERE ID='83bfa329-a7c8-568b-127a-6aa3aecb2063'
+INSERT INTO LISTENERSVALIDATION_PRINTER VALUES('83bfa329-a7c8-568b-127a-6aa3aecb2063',5,'2018-05-11 23:26:13.225000','admin','2018-05-12 02:14:33.133000','admin',NULL,NULL,'HP 1000',NULL,'192.160.0.1',1234)
+COMMIT
+DELETE FROM LISTENERSVALIDATION_PRINTER WHERE ID='83bfa329-a7c8-568b-127a-6aa3aecb2063'
+INSERT INTO LISTENERSVALIDATION_PRINTER VALUES('83bfa329-a7c8-568b-127a-6aa3aecb2063',6,'2018-05-11 23:26:13.225000','admin','2018-05-12 02:14:55.778000','admin',NULL,NULL,'HP 1000',NULL,'192.160.0.11',1234)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:35:04.345000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:15:22.409000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM LISTENERSVALIDATION_PRINTER WHERE ID='83bfa329-a7c8-568b-127a-6aa3aecb2063'
+INSERT INTO LISTENERSVALIDATION_PRINTER VALUES('83bfa329-a7c8-568b-127a-6aa3aecb2063',7,'2018-05-11 23:26:13.225000','admin','2018-05-12 02:16:02.850000','admin',NULL,NULL,'HP 1000',NULL,'10.10.10.10',1234)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:36:04.350000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:16:22.413000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM LISTENERSVALIDATION_PRINTER WHERE ID='83bfa329-a7c8-568b-127a-6aa3aecb2063'
+INSERT INTO LISTENERSVALIDATION_PRINTER VALUES('83bfa329-a7c8-568b-127a-6aa3aecb2063',8,'2018-05-11 23:26:13.225000','admin','2018-05-12 02:17:22.345000','admin',NULL,NULL,'HP 1000',NULL,'10.10.10.101',1234)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:37:04.352000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:17:22.412000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SEC_USER_SETTING WHERE ID='463cd770-9317-f8b6-9377-35439dd6d398'
+INSERT INTO SEC_USER_SETTING VALUES('463cd770-9317-f8b6-9377-35439dd6d398',NULL,NULL,'60885987-1b61-4247-94c7-dff348347f93','W','listenersvalidation$Printer.browse','<?xml version="1.0" encoding="UTF-8"?>\u000a\u000a<settings> \u000a  <components> \u000a    <component name="split"> \u000a      <position value="50.0" unit="%"/> \u000a    </component>  \u000a    <component name="filter"> \u000a      <defaultFilter/>  \u000a      <groupBoxExpanded>true</groupBoxExpanded> \u000a    </component>  \u000a    <component name="table"> \u000a      <columns>\u000a        <columns id="name" visible="true"/>\u000a        <columns id="location" visible="true"/>\u000a        <columns id="ipAddress" visible="true"/>\u000a        <columns id="port" visible="true"/>\u000a      </columns>\u000a      <groupProperties/>\u000a    </component> \u000a  </components> \u000a</settings>\u000a')
+COMMIT
+/*C123*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C124*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C125*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C126*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C128*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C127*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C129*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C130*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C131*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C122*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:18:03.871000',NULL,'localhost:8080/app-core',FALSE,NULL)
+COMMIT
+/*C132*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C133*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C134*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C122*/DISCONNECT
+/*C136*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C135*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C137*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C138*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C139*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C140*/SET SCHEMA PUBLIC
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:18:54.101000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:38:04.354000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:19:54.101000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:39:04.357000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:20:54.103000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:40:04.356000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:21:54.103000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:41:04.356000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-/*C20*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C21*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C22*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C23*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C25*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C24*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C26*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C27*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C29*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C28*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C19*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:41:58.520000',NULL,'localhost:8080/app-core',FALSE,NULL)
-COMMIT
-DISCONNECT
-/*C30*/SET SCHEMA PUBLIC
-create table LISTENERSVALIDATION_PRINT_JOB (\u000a    ID varchar(36) not null,\u000a    VERSION integer not null,\u000a    CREATE_TS timestamp,\u000a    CREATED_BY varchar(50),\u000a    UPDATE_TS timestamp,\u000a    UPDATED_BY varchar(50),\u000a    DELETE_TS timestamp,\u000a    DELETED_BY varchar(50),\u000a    --\u000a    FILE_ID varchar(36) not null,\u000a    PRINTER_ID varchar(36) not null,\u000a    COPIES_COUNT integer not null,\u000a    PRINT_ON_BOTH_SIDES boolean,\u000a    --\u000a    primary key (ID)\u000a)
-INSERT INTO SYS_DB_CHANGELOG VALUES('50-listenersvalidation/update/hsql/18/180511-1-createPrintJob.sql','2018-05-11 23:41:59.953000',0)
-COMMIT
-alter table LISTENERSVALIDATION_PRINT_JOB add constraint FK_LISTENERSVALIDATION_PRINT_JOB_FILE foreign key (FILE_ID) references SYS_FILE(ID)
-alter table LISTENERSVALIDATION_PRINT_JOB add constraint FK_LISTENERSVALIDATION_PRINT_JOB_PRINTER foreign key (PRINTER_ID) references LISTENERSVALIDATION_PRINTER(ID)
-create index IDX_LISTENERSVALIDATION_PRINT_JOB_FILE on LISTENERSVALIDATION_PRINT_JOB (FILE_ID)
-create index IDX_LISTENERSVALIDATION_PRINT_JOB_PRINTER on LISTENERSVALIDATION_PRINT_JOB (PRINTER_ID)
-INSERT INTO SYS_DB_CHANGELOG VALUES('50-listenersvalidation/update/hsql/18/180511-2-createPrintJob.sql','2018-05-11 23:41:59.955000',0)
-COMMIT
-DISCONNECT
-/*C31*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C32*/SET SCHEMA PUBLIC
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:42:51.429000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:22:54.106000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:43:51.430000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:23:54.111000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:44:51.432000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-/*C33*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C34*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C35*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C36*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C38*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C37*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C39*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C40*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C32*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:45:02.544000',NULL,'localhost:8080/app-core',FALSE,NULL)
-COMMIT
-DISCONNECT
-/*C41*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C42*/SET SCHEMA PUBLIC
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:45:52.506000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-/*C43*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C44*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C45*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C46*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C48*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C47*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C49*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C50*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C42*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:46:16.910000',NULL,'localhost:8080/app-core',FALSE,NULL)
-COMMIT
-DISCONNECT
-/*C51*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C52*/SET SCHEMA PUBLIC
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:47:08.224000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:24:54.112000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:48:08.223000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:25:54.111000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:49:08.228000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:26:54.111000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:50:08.231000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:27:54.115000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:51:08.233000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-INSERT INTO SEC_USER_SETTING VALUES('1da3ea5b-3345-449a-05b3-d8bf1c14946c',NULL,NULL,'60885987-1b61-4247-94c7-dff348347f93','W','listenersvalidation$PrintJob.browse','<?xml version="1.0" encoding="UTF-8"?>\u000a\u000a<settings>\u000a  <components>\u000a    <component name="split">\u000a      <position value="50.0" unit="%"/>\u000a    </component>\u000a    <component name="filter">\u000a      <defaultFilter/>\u000a      <groupBoxExpanded>true</groupBoxExpanded>\u000a    </component>\u000a    <component name="table">\u000a      <columns>\u000a        <columns id="file" visible="true"/>\u000a        <columns id="copiesCount" visible="true"/>\u000a        <columns id="printOnBothSides" visible="true"/>\u000a        <columns id="printer" visible="true"/>\u000a      </columns>\u000a      <groupProperties/>\u000a    </component>\u000a  </components>\u000a</settings>\u000a')
-COMMIT
-INSERT INTO SEC_USER_SETTING VALUES('463cd770-9317-f8b6-9377-35439dd6d398',NULL,NULL,'60885987-1b61-4247-94c7-dff348347f93','W','listenersvalidation$Printer.browse','<?xml version="1.0" encoding="UTF-8"?>\u000a\u000a<settings>\u000a  <components>\u000a    <component name="split">\u000a      <position value="50.0" unit="%"/>\u000a    </component>\u000a    <component name="filter">\u000a      <defaultFilter/>\u000a      <groupBoxExpanded>true</groupBoxExpanded>\u000a    </component>\u000a    <component name="table">\u000a      <columns>\u000a        <columns id="name" visible="true"/>\u000a        <columns id="location" visible="true"/>\u000a        <columns id="ipAddress" visible="true"/>\u000a        <columns id="port" visible="true"/>\u000a      </columns>\u000a      <groupProperties/>\u000a    </component>\u000a  </components>\u000a</settings>\u000a')
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:28:54.115000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:52:08.233000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:29:54.116000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:53:08.237000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:30:54.116000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:54:08.237000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-/*C53*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C54*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C55*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C56*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C58*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C57*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C59*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C60*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C52*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:54:46.036000',NULL,'localhost:8080/app-core',FALSE,NULL)
-COMMIT
-DISCONNECT
-/*C61*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C62*/SET SCHEMA PUBLIC
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:55:39.375000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:31:54.116000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:56:39.375000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:32:54.117000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:57:39.378000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-/*C63*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C64*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C65*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C66*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C68*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C67*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C69*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C70*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C62*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:57:58.119000',NULL,'localhost:8080/app-core',FALSE,NULL)
-COMMIT
-DISCONNECT
-/*C71*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C72*/SET SCHEMA PUBLIC
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:58:47.595000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:33:54.121000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-11 23:59:47.586000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:34:54.122000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:00:47.591000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:35:54.123000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:01:47.596000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-/*C73*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C74*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C75*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C76*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C78*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C77*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C79*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C80*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C72*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:01:51.100000',NULL,'localhost:8080/app-core',FALSE,NULL)
-COMMIT
-DISCONNECT
-/*C81*/SET SCHEMA PUBLIC
-DISCONNECT
-/*C82*/SET SCHEMA PUBLIC
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:02:39.975000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:36:54.124000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:03:39.971000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-INSERT INTO SYS_FILE VALUES('e751db60-44c6-b2ce-666c-81f01f492787','2018-05-12 00:04:38.926000','admin',1,'2018-05-12 00:04:38.926000',NULL,NULL,NULL,'doc_brown_can_be_sexy_by_lithrael.jpg','jpg',203850,'2018-05-12 00:04:38.900000')
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:37:54.125000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:04:39.973000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-INSERT INTO LISTENERSVALIDATION_PRINT_JOB VALUES('864735c6-085b-1423-8855-5fbd378504ab',1,'2018-05-12 00:04:44.767000','admin','2018-05-12 00:04:44.767000',NULL,NULL,NULL,'e751db60-44c6-b2ce-666c-81f01f492787','83bfa329-a7c8-568b-127a-6aa3aecb2063',1,NULL)
-COMMIT
-DELETE FROM LISTENERSVALIDATION_PRINT_JOB WHERE ID='864735c6-085b-1423-8855-5fbd378504ab'
-INSERT INTO LISTENERSVALIDATION_PRINT_JOB VALUES('864735c6-085b-1423-8855-5fbd378504ab',2,'2018-05-12 00:04:44.767000','admin','2018-05-12 00:04:44.767000',NULL,'2018-05-12 00:05:16.548000','admin','e751db60-44c6-b2ce-666c-81f01f492787','83bfa329-a7c8-568b-127a-6aa3aecb2063',1,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:38:54.128000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:05:39.974000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-INSERT INTO SYS_FILE VALUES('4606eb29-1b7a-975f-0b90-68e16f831848','2018-05-12 00:05:46.469000','admin',1,'2018-05-12 00:05:46.469000',NULL,NULL,NULL,'430px-MillenniumFalconInterior.jpg','jpg',103954,'2018-05-12 00:05:46.465000')
-COMMIT
-INSERT INTO LISTENERSVALIDATION_PRINT_JOB VALUES('fe9ca735-1810-e77d-44b7-4c0a88bffe5d',1,'2018-05-12 00:05:52.131000','admin','2018-05-12 00:05:52.131000',NULL,NULL,NULL,'4606eb29-1b7a-975f-0b90-68e16f831848','83bfa329-a7c8-568b-127a-6aa3aecb2063',1,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:39:54.130000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:06:39.980000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:40:54.134000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:07:39.984000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:41:54.138000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:08:39.986000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:42:54.142000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:09:39.991000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:43:54.143000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:10:39.995000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:44:54.146000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
-/*C83*/SET SCHEMA PUBLIC
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:45:54.147000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:46:54.149000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:47:54.149000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:48:54.154000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:49:54.157000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:50:54.161000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:51:54.167000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:52:54.173000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:53:54.175000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:54:54.179000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:55:54.181000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:56:54.185000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:57:54.187000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:58:54.189000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 02:59:54.190000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:00:54.193000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+/*C141*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C84*/SET SCHEMA PUBLIC
+/*C142*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C85*/SET SCHEMA PUBLIC
+/*C143*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C86*/SET SCHEMA PUBLIC
+/*C144*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C88*/SET SCHEMA PUBLIC
+/*C146*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C87*/SET SCHEMA PUBLIC
+/*C145*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C89*/SET SCHEMA PUBLIC
+/*C147*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C90*/SET SCHEMA PUBLIC
+/*C148*/SET SCHEMA PUBLIC
 DISCONNECT
-/*C82*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:11:23.476000',NULL,'localhost:8080/app-core',FALSE,NULL)
+/*C149*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C150*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C152*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C151*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C140*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:01:54.198000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+/*C153*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C154*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C156*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C155*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C140*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:02:07.289000',NULL,'localhost:8080/app-core',FALSE,NULL)
 COMMIT
 DISCONNECT
-/*C91*/SET SCHEMA PUBLIC
+/*C157*/SET SCHEMA PUBLIC
+alter table LISTENERSVALIDATION_PRINTER add column DUPLEX_SUPPORT boolean 
+INSERT INTO SYS_DB_CHANGELOG VALUES('50-listenersvalidation/update/hsql/18/180512-2-updatePrinter.sql','2018-05-12 03:02:09.090000',0)
+COMMIT
 DISCONNECT
-/*C92*/SET SCHEMA PUBLIC
-DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:12:14.075000',NULL,'localhost:8080/app-core',TRUE,NULL)
+/*C158*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C159*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C161*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C160*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C162*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C163*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C164*/SET SCHEMA PUBLIC
+DELETE FROM SEC_USER_SETTING WHERE ID='463cd770-9317-f8b6-9377-35439dd6d398'
+INSERT INTO SEC_USER_SETTING VALUES('463cd770-9317-f8b6-9377-35439dd6d398',NULL,NULL,'60885987-1b61-4247-94c7-dff348347f93','W','listenersvalidation$Printer.browse','<?xml version="1.0" encoding="UTF-8"?>\u000a\u000a<settings> \u000a  <components> \u000a    <component name="split"> \u000a      <position value="50.0" unit="%"/> \u000a    </component>  \u000a    <component name="filter"> \u000a      <defaultFilter/>  \u000a      <groupBoxExpanded>true</groupBoxExpanded> \u000a    </component>  \u000a    <component name="table"> \u000a      <columns>\u000a        <columns id="name" visible="true"/>\u000a        <columns id="location" visible="true"/>\u000a        <columns id="ipAddress" visible="true"/>\u000a        <columns id="port" visible="true"/>\u000a        <columns id="duplexSupport" visible="true"/>\u000a      </columns>\u000a      <groupProperties/>\u000a    </component> \u000a  </components> \u000a</settings>\u000a')
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:13:14.073000',NULL,'localhost:8080/app-core',TRUE,NULL)
-COMMIT
-DELETE FROM SEC_USER_SETTING WHERE ID='1da3ea5b-3345-449a-05b3-d8bf1c14946c'
-INSERT INTO SEC_USER_SETTING VALUES('1da3ea5b-3345-449a-05b3-d8bf1c14946c',NULL,NULL,'60885987-1b61-4247-94c7-dff348347f93','W','listenersvalidation$PrintJob.browse','<?xml version="1.0" encoding="UTF-8"?>\u000a\u000a<settings> \u000a  <components> \u000a    <component name="split"> \u000a      <position value="50.0" unit="%"/> \u000a    </component>  \u000a    <component name="filter"> \u000a      <defaultFilter/>  \u000a      <groupBoxExpanded>true</groupBoxExpanded> \u000a    </component>  \u000a    <component name="table"> \u000a      <columns>\u000a        <columns id="file" visible="true"/>\u000a        <columns id="copiesCount" visible="true"/>\u000a        <columns id="printOnBothSides" visible="true"/>\u000a        <columns id="printer" visible="true"/>\u000a      </columns>\u000a      <groupProperties/>\u000a    </component> \u000a  </components> \u000a</settings>\u000a')
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:02:59.938000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:14:14.076000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:03:59.940000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:15:14.078000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:04:59.943000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:16:14.080000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:05:59.944000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:17:14.083000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:06:59.946000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:18:14.087000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:07:59.951000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:19:14.088000',NULL,'localhost:8080/app-core',TRUE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:08:59.955000',NULL,'localhost:8080/app-core',TRUE,NULL)
 COMMIT
 DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
-INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 00:19:20.009000',NULL,'localhost:8080/app-core',FALSE,NULL)
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:09:59.955000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:10:59.958000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:11:59.959000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+/*C165*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C166*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C167*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C168*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C170*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C169*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C171*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C172*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C173*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C164*/DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:12:05.725000',NULL,'localhost:8080/app-core',FALSE,NULL)
+COMMIT
+/*C174*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C175*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C176*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C178*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C164*/DISCONNECT
+/*C177*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C179*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C180*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C181*/SET SCHEMA PUBLIC
+DISCONNECT
+/*C182*/SET SCHEMA PUBLIC
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:12:56.737000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM LISTENERSVALIDATION_PRINTER WHERE ID='83bfa329-a7c8-568b-127a-6aa3aecb2063'
+INSERT INTO LISTENERSVALIDATION_PRINTER VALUES('83bfa329-a7c8-568b-127a-6aa3aecb2063',9,'2018-05-11 23:26:13.225000','admin','2018-05-12 03:13:26.042000','admin',NULL,NULL,'HP 1000',NULL,'127.0.0.1',1234,TRUE)
+COMMIT
+DELETE FROM LISTENERSVALIDATION_PRINT_JOB WHERE ID='fe9ca735-1810-e77d-44b7-4c0a88bffe5d'
+INSERT INTO LISTENERSVALIDATION_PRINT_JOB VALUES('fe9ca735-1810-e77d-44b7-4c0a88bffe5d',2,'2018-05-12 00:05:52.131000','admin','2018-05-12 03:13:36.373000','admin',NULL,NULL,'4606eb29-1b7a-975f-0b90-68e16f831848','83bfa329-a7c8-568b-127a-6aa3aecb2063',1,TRUE)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:13:56.736000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:14:56.741000',NULL,'localhost:8080/app-core',TRUE,NULL)
+COMMIT
+DELETE FROM SYS_SERVER WHERE ID='23b00423-a6fa-8820-4bfc-bb8a40e6a1ba'
+INSERT INTO SYS_SERVER VALUES('23b00423-a6fa-8820-4bfc-bb8a40e6a1ba','2018-05-11 23:26:10.139000',NULL,'2018-05-12 03:15:56.371000',NULL,'localhost:8080/app-core',FALSE,NULL)
 COMMIT
 DISCONNECT

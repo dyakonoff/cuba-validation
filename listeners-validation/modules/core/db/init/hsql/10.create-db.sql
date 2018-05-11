@@ -11,6 +11,7 @@ create table LISTENERSVALIDATION_PRINTER (
     --
     NAME varchar(255) not null,
     LOCATION longvarchar,
+    DUPLEX_SUPPORT boolean,
     IP_ADDRESS varchar(40) not null,
     PORT integer not null,
     --
