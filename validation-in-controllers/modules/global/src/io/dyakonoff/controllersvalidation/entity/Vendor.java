@@ -10,6 +10,7 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.chile.core.annotations.NamePattern;
+import org.hibernate.validator.constraints.Length;
 
 @NamePattern("%s|name")
 @Table(name = "CONTROLLERSVALIDATION_VENDOR")
@@ -17,7 +18,9 @@ import com.haulmont.chile.core.annotations.NamePattern;
 public class Vendor extends StandardEntity {
     private static final long serialVersionUID = 5181389044072122559L;
 
-    @Column(name = "NAME")
+    @Length(min = 1)
+    @NotNull
+    @Column(name = "NAME", nullable = false)
     protected String name;
 
     @OneToOne(fetch = FetchType.LAZY)

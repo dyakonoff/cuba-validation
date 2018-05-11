@@ -8,19 +8,40 @@
     <dsContext>
         <datasource id="productDs"
                     class="io.dyakonoff.controllersvalidation.entity.Product"
-                    view="_local"/>
+                    view="product-view"/>
+        <collectionDatasource id="vendorsDs"
+                              class="io.dyakonoff.controllersvalidation.entity.Vendor"
+                              view="_minimal">
+            <query>
+                <![CDATA[select e from controllersvalidation$Vendor e]]>
+            </query>
+        </collectionDatasource>
     </dsContext>
     <dialogMode height="600"
                 width="800"/>
     <layout expand="windowActions"
             spacing="true">
-        <fieldGroup id="fieldGroup"
-                    datasource="productDs">
-            <column width="250px">
-                <field property="name"/>
-                <field property="price"/>
-            </column>
-        </fieldGroup>
+        <flowBox expand="productImage"
+                 spacing="true">
+            <fieldGroup id="fieldGroup"
+                        datasource="productDs">
+                <column width="250px">
+                    <field id="nameField"
+                           property="name"/>
+                    <field id="priceField"
+                           property="price"/>
+                    <field property="retail"/>
+                    <field optionsDatasource="vendorsDs"
+                           property="vendor"/>
+                    <field property="image"/>
+                </column>
+            </fieldGroup>
+            <image id="productImage"
+                   datasource="productDs"
+                   height="150px"
+                   property="image"
+                   scaleMode="SCALE_DOWN"/>
+        </flowBox>
         <frame id="windowActions"
                screen="editWindowActions"/>
     </layout>

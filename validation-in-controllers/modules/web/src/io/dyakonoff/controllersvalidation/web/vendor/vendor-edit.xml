@@ -8,21 +8,33 @@
     <dsContext>
         <datasource id="vendorDs"
                     class="io.dyakonoff.controllersvalidation.entity.Vendor"
-                    view="_local"/>
+                    view="vendor-view"/>
     </dsContext>
     <dialogMode height="600"
                 width="800"/>
     <layout expand="windowActions"
             spacing="true">
-        <fieldGroup id="fieldGroup"
-                    datasource="vendorDs">
-            <column width="250px">
-                <field property="name"/>
-                <field property="contactPerson"/>
-                <field property="contactEmail"/>
-                <field property="contactPhone"/>
-            </column>
-        </fieldGroup>
+        <flowBox expand="image"
+                 spacing="true">
+            <fieldGroup id="fieldGroup"
+                        datasource="vendorDs">
+                <column width="250px">
+                    <field property="name"/>
+                    <field property="contactPerson"/>
+                    <field property="contactEmail">
+                        <validator class="com.haulmont.cuba.gui.components.validators.EmailValidator"/>
+                    </field>
+                    <field mask="+# (###) ### ## ##"
+                           property="contactPhone"/>
+                    <field property="logo"/>
+                </column>
+            </fieldGroup>
+            <image id="image"
+                   datasource="vendorDs"
+                   height="150px"
+                   property="logo"
+                   scaleMode="SCALE_DOWN"/>
+        </flowBox>
         <frame id="windowActions"
                screen="editWindowActions"/>
     </layout>

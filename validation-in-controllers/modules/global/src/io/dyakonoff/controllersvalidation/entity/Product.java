@@ -12,6 +12,7 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.chile.core.annotations.NamePattern;
+import javax.validation.constraints.DecimalMin;
 
 @NamePattern("%s|name")
 @Table(name = "CONTROLLERSVALIDATION_PRODUCT")
@@ -24,6 +25,11 @@ public class Product extends StandardEntity {
     protected String name;
 
     @NotNull
+    @Column(name = "RETAIL", nullable = false)
+    protected Boolean retail = false;
+
+    @DecimalMin("0")
+    @NotNull
     @Column(name = "PRICE", nullable = false)
     protected BigDecimal price;
 
@@ -35,6 +41,15 @@ public class Product extends StandardEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "VENDOR_ID")
     protected Vendor vendor;
+
+
+    public void setRetail(Boolean retail) {
+        this.retail = retail;
+    }
+
+    public Boolean getRetail() {
+        return retail;
+    }
 
     public void setName(String name) {
         this.name = name;

@@ -8,7 +8,7 @@
     <dsContext>
         <groupDatasource id="productsDs"
                          class="io.dyakonoff.controllersvalidation.entity.Product"
-                         view="_local">
+                         view="product-browse-view">
             <query>
                 <![CDATA[select e from controllersvalidation$Product e]]>
             </query>
@@ -33,6 +33,8 @@
             <columns>
                 <column id="name"/>
                 <column id="price"/>
+                <column id="vendor"/>
+                <column id="retail"/>
             </columns>
             <rows datasource="productsDs"/>
             <rowsCount/>
