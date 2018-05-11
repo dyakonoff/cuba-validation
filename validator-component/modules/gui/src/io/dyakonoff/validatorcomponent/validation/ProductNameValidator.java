@@ -95,7 +95,7 @@ public class ProductNameValidator implements Field.Validator {
         for (String swearWord : swearWords) {
             Pattern pat = Pattern.compile(swearWord, Pattern.CASE_INSENSITIVE);
             Matcher mat = pat.matcher(productName);
-            while (mat.find()) {
+            if (mat.find()) {
                 log.warn("Bad word found in a product name: " +  productName);
 
                 String msgFormat = message != null ? messages.getTools().loadString(messagesPack, message) : "Bad word is detected '%s'";
