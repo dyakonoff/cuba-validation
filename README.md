@@ -311,3 +311,36 @@ public class ProductEdit extends AbstractEditor<Product> {
 Another example of adding Field.Validator in runtime can be found [here](https://www.cuba-platform.com/discuss/t/how-to-implement-error-display-when-using-custom-validator/2870/6).
 
 ## Validation in UI screen controllers
+
+This is a simple and intuitive approach that wold allow you perform quite complex checks of your screen data. Here are pros and cons of this way:
+
+**Pros:**
+* Easy to implement: you just need to override `postValidate` method in your screen controller.
+* Has access to entity, screen controls, middleware services etc...
+* Can do checks of arbitrary complexity.
+* Easy to debug.
+
+**Cons:**
+* Acts only on one UI layer, so you'd need to repeat yourself if you have more than one UI clients (web and desktop, for example).
+* Can't help with REST calls validation, even for [Generic REST](https://doc.cuba-platform.com/manual-6.5/rest_api_v2.html).
+* Has difficulties with highlighting fields/components that contains incorrect data. (You'd have to do some CSS/JS magic to achieve that result.)
+
+Let's look at the code:
+```java
+public class ProductEdit extends AbstractEditor<Product> {
+
+...
+
+    @Override
+    protected void postValidate(ValidationErrors errors) {
+        super.postValidate(errors);
+        Product product = getItem();
+        if (product.getRetail() && product.getPrice().compareTo(new BigDecimal(10000)) > 0) {
+            errors.add("Retail product can not have price greater than 10,000");
+        }
+    }
+}
+```
+[ProductEdit.java](validation-in-controllers/modules/web/src/io/dyakonoff/controllersvalidation/web/product/ProductEdit.java)
+
+However, combining this approach with static and dynamically added `Field.Validator` checks would negate the last flaw.
