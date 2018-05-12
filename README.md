@@ -7,12 +7,12 @@ Input validation is one of common tasks for everyday developer’s life. We need
 In this article I want to touch the main approaches of data validation that CUBA.platform offers.
 
 Here are the approaches I’d like to discuss:
-1. [Bean validation that CUBA Studio offers for entities](#Bean-Validation) / _[Example](simple-validation/)_
-1. [Validation with custom annotations](#Validation-with-custom-annotations) / _[Example 1](validation-with-custom-annotations/), [Example 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)_
-1. [Defining custom Validator class and groovy scripts for UI components.](#Custom-validator-classes-and-scripts) [ _[Example](validator-component/)_ ]
-1. [Validation in UI screen controllers.]() [ _[Example](validation-in-controllers/)_ ]
-1. [Using Entity listeners for validation.]() [ _[Example](listeners-validation)_ ]
-1. [Using Transaction listeners to validate your data model.]() [ _[Example](listeners-validation)_ ]
+1. **[Bean validation that CUBA Studio offers for entities](#bean-Validation)** / _[Example](simple-validation/)_
+1. **[Validation with custom annotations](#validation-with-custom-annotations)** / _[Example 1](validation-with-custom-annotations/), [Example 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)_
+1. **[Defining custom Validator class and groovy scripts for UI components.](#Custom-validator-classes-and-scripts)** / _[Example](validator-component/)_
+1. **Validation in UI screen controllers.**  / _[Example](validation-in-controllers/)_
+1. **Using Entity listeners for validation.** / _[Example](listeners-validation)_ ]
+1. **Using Transaction listeners to validate your data model.** / _[Example](listeners-validation)_
 
 ## [Bean Validation](simple-validation/)
 
