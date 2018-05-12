@@ -347,7 +347,7 @@ public class ProductEdit extends AbstractEditor<Product> {
 
 However, combining this approach with static and dynamically added `Field.Validator` checks would negate the last flaw.
 
-
+[Top](#introduction)
 
 ## Using middleware listeners for data validation
 
@@ -371,6 +371,8 @@ Let's look at examples.
 Assume that we have a small print jobs management system with two entities: `Printers` and `ProntJobs`. We want to check that each printer has accessible IP-address before saving it's parameters to the database. Also we want to ensure that two-sided documents can be assigned only to printers that support duplex (two-sided) printing.
 
 We will implement the first constraint using Entity Listener and the second one using Transaction Listener.
+
+[Top](#introduction)
 
 ### Validating with Entity Listeners
 
@@ -455,6 +457,7 @@ public class PrintingValidationExceptionHandler extends AbstractGenericException
 ```
 [PrintingValidationExceptionHandler.java](listeners-validation/modules/web/src/io/dyakonoff/listenersvalidation/exception/PrintingValidationExceptionHandler.java)
 
+[Top](#introduction)
 
 ### Validating with Transaction Listeners
 
