@@ -11,8 +11,8 @@ Here are the approaches I’d like to discuss:
 1. **[Validation with custom annotations.](#validation-with-custom-annotations)** / _[Example 1](validation-with-custom-annotations/), [Example 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)_
 1. **[Defining custom Validator class and groovy scripts for UI components.](#Custom-validator-classes-and-scripts)** / _[Example](validator-component/)_
 1. **[Validation in UI screen controllers.](#validation-in-ui-screen-controllers)**  / _[Example](validation-in-controllers/)_
-1. **Using Entity listeners for validation.** / _[Example](listeners-validation)_
-1. **Using Transaction listeners to validate your data model.** / _[Example](listeners-validation)_
+1. **[Using Entity listeners for validation.](#using-middleware-listeners-for-data-validation)** / _[Example](listeners-validation)_
+1. **[Using Transaction listeners to validate your data model.](#using-middleware-listeners-for-data-validation)** / _[Example](listeners-validation)_
 
 ## [Bean Validation](simple-validation/)
 
@@ -310,6 +310,8 @@ public class ProductEdit extends AbstractEditor<Product> {
 
 Another example of adding Field.Validator in runtime can be found [here](https://www.cuba-platform.com/discuss/t/how-to-implement-error-display-when-using-custom-validator/2870/6).
 
+[Top](#introduction)
+
 ## Validation in UI screen controllers
 
 This is a simple and intuitive approach that wold allow you perform quite complex checks of your screen data. Here are pros and cons of this way:
@@ -344,3 +346,157 @@ public class ProductEdit extends AbstractEditor<Product> {
 [ProductEdit.java](validation-in-controllers/modules/web/src/io/dyakonoff/controllersvalidation/web/product/ProductEdit.java)
 
 However, combining this approach with static and dynamically added `Field.Validator` checks would negate the last flaw.
+
+
+
+## Using middleware listeners for data validation
+
+Let's discuss the last two ways of validating the data that [CUBA platform](https://www.cuba-platform.com/) offers: [entity listeners](https://doc.cuba-platform.com/manual-6.8/entity_listeners.html) and [transaction listeners](https://doc.cuba-platform.com/manual-6.8/transaction_listeners.html).
+These listeners act on the middle tier and allow you to intercept validate data before the changes be passed to a database. Power of this approach is that incorrect data would not be able to pass your checks, doesn't matter from where they came.
+
+Also, [transaction listeners](https://doc.cuba-platform.com/manual-6.8/transaction_listeners.html) seems to be the best way to perform complex data checks that should involve analysis of more than one just entity object. So, you'd like to use them when you had to validate the state of your objects graph before committing it to the database.
+
+In both cases, you'd need to define your custom `RuntimeException` class in global module and mark it with [@SupportedByClient](https://doc.cuba-platform.com/manual-6.8/remoteException.html) annotation to have your error messages traversing from middleware to client tier.
+
+Also, it seems to be a good idea to implement custom [client-level exception handlers](https://doc.cuba-platform.com/manual-6.8/exceptionHandlers.html) to have your error messages displayed properly. However, if you don't care much about how your errors are displayed to a user, you can skip this step.
+
+Error message without implementing custom client-level exception handlers | Error message after implementing custom client-level exception handlers
+---------------------------------------------------------------------------------------------------------------------------------------------------
+![without implementing client-level exception handlers](resources/figure_6.png) | ![after implementing custom client-level exception handlers](resources/figure_7.png)
+
+Let's look at examples.
+
+Assume that we have a small print jobs management system with two entities: `Printers` and `ProntJobs`. We want to check that each printer has accessible IP-address before saving it's parameters to the database. Also we want to ensure that two-sided documents can be assigned only to printers that support duplex (two-sided) printing.
+
+We will implement the first constraint using Entity Listener and the second one using Transaction Listener.
+
+### Validating with Entity Listeners
+
+For the start we need to create an Entity Listener for Printer entity. The simplest way is to do that using CUBA studio and in **Middleware** section pick **New / Entity Listener**.
+
+![Figure 8: Creating Entity Listener with CUBA studio](resources/figure_8.png)
+_Figure 8: Creating Entity Listener with CUBA studio_
+
+1. Give proper name to the Listener class,
+1. Check `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` interfaces to be implemented
+1. Specify that entity `Printer` need  to be handled by the listener
+
+![Figure 9: Setting parameters for Entity Listener](resources/figure_9.png)
+_Figure 9: Setting parameters for Entity Listener_
+
+Before starting working on our Entity Listener class, let's define custom `RuntimeException` and mark it with `@SupportedByClient`.
+
+```java
+@SupportedByClient
+public class PrinterValidationException extends RuntimeException {
+    public PrinterValidationException() {
+    }
+    public PrinterValidationException(String message) {
+        super(message);
+    }
+    public PrinterValidationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    protected PrinterValidationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+}
+```
+[PrinterValidationException.java](listeners-validation/modules/global/src/io/dyakonoff/listenersvalidation/exception/PrinterValidationException.java)
+
+
+Then wee need to open our Entity Listener class in IDE and implement both handlers. In our case they are identical and use a [middleware service](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/IpAddressCheckerServiceBean.java) to check if IP address is reachable.
+
+```java
+@Component("listenersvalidation_PrinterEntityListener")
+public class PrinterEntityListener implements BeforeInsertEntityListener<Printer>, BeforeUpdateEntityListener<Printer> {
+
+    @Inject
+    private IpAddressCheckerService ipAddressCheckerService;
+
+    @Override
+    public void onBeforeInsert(Printer entity, EntityManager entityManager) {
+        checkPrinterIsReachable(entity);
+    }
+
+    @Override
+    public void onBeforeUpdate(Printer entity, EntityManager entityManager) {
+        checkPrinterIsReachable(entity);
+    }
+
+    private void checkPrinterIsReachable(Printer printer) {
+        String ipAddr = printer.getIpAddress();
+        if (!ipAddressCheckerService.checkIpAddrIsReacheble(ipAddr, 2000)) {
+            throw new PrinterValidationException("Printer at " + ipAddr + " is not reachable");
+        }
+    }
+}
+```
+[PrinterEntityListener.java](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/PrinterEntityListener.java)
+
+The last step will be implementing client-level exception handler that we will be using for both Entity and Transaction listeners errors processing.
+
+```java
+@Component("listenersvalidation_PrintingValidationExceptionHandler")
+public class PrintingValidationExceptionHandler extends AbstractGenericExceptionHandler {
+
+    public PrintingValidationExceptionHandler() {
+        super(PrintJobValidationException.class.getName(), PrinterValidationException.class.getName());
+    }
+
+    @Override
+    protected void doHandle(String className, String message, @Nullable Throwable throwable, WindowManager windowManager) {
+        windowManager.showNotification(message, Frame.NotificationType.ERROR);
+    }
+}
+```
+[PrintingValidationExceptionHandler.java](listeners-validation/modules/web/src/io/dyakonoff/listenersvalidation/exception/PrintingValidationExceptionHandler.java)
+
+
+### Validating with Transaction Listeners
+
+Handling `PrintJob` entity validation with Transaction Listener is quite similar:
+
+* Create new TransactionListener with CUBA studio.
+* Give it a proper class name if needed.
+* Specify that `BeforeCommitTransactionListener` need to be implemented in [this bean](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/TransactionListener.java).
+* Define custom runtime exception: [PrintJobValidationException](listeners-validation/modules/global/src/io/dyakonoff/listenersvalidation/exception/PrintJobValidationException.java)
+* Implement validation logic in your transaction listener.
+
+```java
+@Component("listenersvalidation_TransactionListener")
+public class TransactionListener implements BeforeCommitTransactionListener {
+
+    private Logger log = LoggerFactory.getLogger(TransactionListener.class);
+
+    @Inject
+    private PersistenceTools persistenceTools;
+
+    @Inject
+    private IpAddressCheckerService ipAddressCheckerService;
+
+    @Override
+    public void beforeCommit(EntityManager entityManager, Collection<Entity> managedEntities) {
+        for (Entity entity : managedEntities) {
+            if (!persistenceTools.isDirty(entity))
+                continue;
+
+            if (entity instanceof  PrintJob) {
+                PrintJob pj = (PrintJob)entity;
+                Printer printer = pj.getPrinter();
+                if ((pj.getPrintOnBothSides() != null && pj.getPrintOnBothSides())
+                        && (printer.getDuplexSupport() == null || !printer.getDuplexSupport())
+                        ) {
+                    String msg = "File " + pj.getFile().getName() + " can't be printed on printer " + printer.getName() +
+                            ", this printer does not support duplex printing";
+                    throw new PrintJobValidationException(msg);
+
+                }
+            }
+        }
+    }
+}
+```
+_[TransactionListener.java]((listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/TransactionListener.java)_
+
+[Top](#introduction)
