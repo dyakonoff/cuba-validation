@@ -385,7 +385,6 @@ _Figure 8: Creating Entity Listener with CUBA studio_
 1. Specify that entity `Printer` need  to be handled by the listener
 
 ![Figure 9: Setting parameters for Entity Listener](resources/figure_9.png)
-
 _Figure 9: Setting parameters for Entity Listener_
 
 Before starting working on our Entity Listener class, let's define custom `RuntimeException` and mark it with `@SupportedByClient`.
@@ -501,6 +500,21 @@ public class TransactionListener implements BeforeCommitTransactionListener {
     }
 }
 ```
-_[TransactionListener.java]((listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/TransactionListener.java)_
+_[TransactionListener.java](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/TransactionListener.java)_
+
+[Top](#introduction)
+
+## Conclusion
+
+We have covered most of the mechanisms that [CUBA platform](https://www.cuba-platform.com/) offers for input data validation. Let's recap:
+1. Bean validation could use standard and custom annotations. It works on all tiers, so offers the best level of data security. Besides that it is reusable and gives good UI feedback to a user. The limitations of that approach:
+    1. It can't be used for validating the whole data graph when you need to check state of more than one entity.
+    1. Business logic at middleware level can change the entities directly and they will not be validated by this mechanism even before saving to DB.
+1. Defining custom Validator class and groovy scripts for UI components. Since it works at UI level only, this mechanism offers nice UI integration suppoty (highlighting and pretty error essages formatting) nut drawbacks are the same as for annotations plus:
+    1. It offers more standard checks that come out of the box than annotations mechanism;
+    1. It won't be able to check Generic REST calls.
+    1. Groovy scripts are hard to debug.
+1. Validation in UI screen controllers - it is the simplest way to do validation if there are no standard annotations or `Validator` classes to do the same, however you will get the checks done only at UI level and the code reusability is not at the best level.
+1. Entity and Transaction listeners give the best security level. Transaction listeners are capable to check the whole object graph. But this approach requires more coding, has not that good UI integration and doing data validation right before commit might lead to inability to fix the data because is too late to do something with data error. Also, complex listeners can degrade the system performance as they happen for **every** data commit.
 
 [Top](#introduction)
