@@ -510,7 +510,7 @@ We have covered most of the mechanisms that [CUBA platform](https://www.cuba-pla
 1. Bean validation could use standard and custom annotations. It works on all tiers, so offers the best level of data security. Besides that it is reusable and gives good UI feedback to a user. The limitations of that approach:
     1. It can't be used for validating the whole data graph when you need to check state of more than one entity.
     1. Business logic at middleware level can change the entities directly and they will not be validated by this mechanism even before saving to DB.
-1. Defining custom Validator class and groovy scripts for UI components. Since it works at UI level only, this mechanism offers nice UI integration suppoty (highlighting and pretty error essages formatting) nut drawbacks are the same as for annotations plus:
+1. Defining custom Validator class and groovy scripts for UI components. Since it works at UI level only, this mechanism offers nice UI integration suppoty (highlighting and pretty error messages formatting) nut drawbacks are the same as for annotations plus:
     1. It offers more standard checks that come out of the box than annotations mechanism;
     1. It won't be able to check Generic REST calls.
     1. Groovy scripts are hard to debug.
