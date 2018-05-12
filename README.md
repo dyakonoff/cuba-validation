@@ -360,9 +360,11 @@ In both cases, you'd need to define your custom `RuntimeException` class in glob
 
 Also, it seems to be a good idea to implement custom [client-level exception handlers](https://doc.cuba-platform.com/manual-6.8/exceptionHandlers.html) to have your error messages displayed properly. However, if you don't care much about how your errors are displayed to a user, you can skip this step.
 
-Error message without implementing custom client-level exception handlers | Error message after implementing custom client-level exception handlers
----------------------------------------------------------------------------------------------------------------------------------------------------
-![without implementing client-level exception handlers](resources/figure_6.png) | ![after implementing custom client-level exception handlers](resources/figure_7.png)
+![without implementing client-level exception handlers](resources/figure_6.png)
+_Figure 6: Error message without implementing custom client-level exception handlers_
+
+![after implementing custom client-level exception handlers](resources/figure_7.png)
+_Figure 7: Error message after implementing custom client-level exception handlers_
 
 Let's look at examples.
 
@@ -375,6 +377,7 @@ We will implement the first constraint using Entity Listener and the second one 
 For the start we need to create an Entity Listener for Printer entity. The simplest way is to do that using CUBA studio and in **Middleware** section pick **New / Entity Listener**.
 
 ![Figure 8: Creating Entity Listener with CUBA studio](resources/figure_8.png)
+
 _Figure 8: Creating Entity Listener with CUBA studio_
 
 1. Give proper name to the Listener class,
@@ -382,6 +385,7 @@ _Figure 8: Creating Entity Listener with CUBA studio_
 1. Specify that entity `Printer` need  to be handled by the listener
 
 ![Figure 9: Setting parameters for Entity Listener](resources/figure_9.png)
+
 _Figure 9: Setting parameters for Entity Listener_
 
 Before starting working on our Entity Listener class, let's define custom `RuntimeException` and mark it with `@SupportedByClient`.
