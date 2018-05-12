@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class ProductNameValidator implements Field.Validator {
 
     private Logger log = LoggerFactory.getLogger(ProductNameValidator.class);
@@ -106,3 +105,4 @@ public class ProductNameValidator implements Field.Validator {
         }
     }
 }
+

@@ -31,15 +31,15 @@
                     <validator>
                         try
                         {
-                        def instr = new java.net.URL( value ).openStream()
-                        instr.close()
-                        return true
+                            def instr = new java.net.URL(value).openStream()
+                            instr.close()
+                            return true
                         }
-                        catch( Exception e )
+                        catch (Exception e)
                         {
-                        return false
+                            return false
                         }
-</validator>
+                    </validator>
                 </field>
             </column>
         </fieldGroup>

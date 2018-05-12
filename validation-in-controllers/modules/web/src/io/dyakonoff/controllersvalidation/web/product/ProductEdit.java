@@ -18,7 +18,6 @@ public class ProductEdit extends AbstractEditor<Product> {
     @Inject
     private BadWordsDetectionService badWordsDetectionService;
 
-
     @Override
     public void init(Map<String, Object> params) {
         super.init(params);
@@ -34,9 +33,7 @@ public class ProductEdit extends AbstractEditor<Product> {
                 throw new ValidationException("Product name should not contain a word '" + badWord + "'");
             }
         });
-
     }
-
 
     @Override
     protected void postValidate(ValidationErrors errors) {
