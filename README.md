@@ -12,8 +12,8 @@ Here are the approaches we will discuss:
 1. **[Defining custom Validator class and groovy validation scripts for UI components.](#Custom-validator-classes-and-scripts)** / _[Example](validator-component/)_
 1. **[Validation in UI screen controllers.](#validation-in-ui-screen-controllers)**  / _[Example](validation-in-controllers/)_
 1. **[Using Entity and Transaction listeners for validation.](#using-middleware-listeners-for-data-validation)** / _[Example](listeners-validation)_
-    1. [Validating with Entity Listeners](#validating-with-entity-listeners)
-    1. [Validating with Transaction Listeners](#validating-with-transaction-listeners)
+    1. [Validating with Entity Listeners.](#validating-with-entity-listeners)
+    1. [Validating with Transaction Listeners.](#validating-with-transaction-listeners)
 
 ## [Bean Validation](simple-validation/)
 
