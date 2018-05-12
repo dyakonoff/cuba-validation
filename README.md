@@ -2,21 +2,22 @@
 
 ## Introduction
 
-Input validation is one of common tasks for everyday developer’s life. We need to check our data in many different situations: after getting data from UI, from API calls, before saving your model to the DB etc, etc
+Input validation is one of common tasks in everyday developer’s life. We need to check our data in many different situations: after getting data from UI, from API calls, before saving your model to the DB etc, etc.
 
-In this article I want to touch the main approaches of data validation that CUBA.platform offers.
+In this article I want to touch the main approaches of data validation that [CUBA platform](https://www.cuba-platform.com/) offers.
 
-Here are the approaches I’d like to discuss:
+Here are the approaches we will discuss:
 1. **[Bean validation that CUBA Studio offers for entities.](#bean-Validation)** / _[Example](simple-validation/)_
 1. **[Validation with custom annotations.](#validation-with-custom-annotations)** / _[Example 1](validation-with-custom-annotations/), [Example 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)_
-1. **[Defining custom Validator class and groovy scripts for UI components.](#Custom-validator-classes-and-scripts)** / _[Example](validator-component/)_
+1. **[Defining custom Validator class and groovy validation scripts for UI components.](#Custom-validator-classes-and-scripts)** / _[Example](validator-component/)_
 1. **[Validation in UI screen controllers.](#validation-in-ui-screen-controllers)**  / _[Example](validation-in-controllers/)_
-1. **[Using Entity listeners for validation.](#using-middleware-listeners-for-data-validation)** / _[Example](listeners-validation)_
-1. **[Using Transaction listeners to validate your data model.](#using-middleware-listeners-for-data-validation)** / _[Example](listeners-validation)_
+1. **[Using Entity and Transaction listeners for validation.](#using-middleware-listeners-for-data-validation)** / _[Example](listeners-validation)_
+    1. [Validating with Entity Listeners](#validating-with-entity-listeners)
+    1. [Validating with Transaction Listeners](#validating-with-transaction-listeners)
 
 ## [Bean Validation](simple-validation/)
 
-This is, without any doubt, the first type of validation that new users of the platform can see in [CUBA studio IDE.](https://www.cuba-platform.com/download) It gives users an easy way to annotate entity fields through the editor screen with the most common validators.
+This is, without any doubt, the first type of validation that new users of the platform can see in [CUBA studio IDE.](https://www.cuba-platform.com/download) It gives users an easy way to annotate entity fields through the editor screen with the common validators.
 
 ![Figure 1: Standard entity validators in CUBA studio](resources/figure_1.png)
 _Figure 1: Standard entity validators in CUBA studio_
@@ -77,7 +78,7 @@ protected String ipAddress;
 ```
 [Printer.java](listeners-validation/modules/global/src/io/dyakonoff/listenersvalidation/entity/Printer.java)
 
-Although these annotations are simple to use and well documented, they can cover only simple cases. However, sometimes we want to express more complex limitations while keeping the expressiveness and reusability of annotations-based approach. This is feaseble with custom validation annotations.
+Although these annotations are simple to use and well documented, they can cover only simple cases. But sometimes we need to express more complex limitations while keeping the expressiveness and reusability of annotations-based approach. This is feaseble with custom validation annotations.
 
 [Top](#introduction)
 
@@ -85,15 +86,17 @@ Although these annotations are simple to use and well documented, they can cover
 
 [Custom annotations](https://doc.cuba-platform.com/manual-6.8/bean_validation_constraints.html#bean_validation_custom_constraints) could be defined not just for entities fields but also for Entity classes, POJOs and service methods. Let’s check out how to do that.
 
-Assume we are building a products management system and an entity Product could have different measures:
+Assume we are building a products management system and an entity `Product` could have different measures:
 * Units
 * Kilograms
 * Tons
+
 On the other hand, `Product` class has `weightPerMeasure` field, which displays the weight of one product item. It’s quite obvious that only if product item’s measure is `ProductMeasure.Unit` then this `weightPerMeasure` can have arbitrary value (but still non-negative). If `product.measure == Kilograms` then `product.weightPerMeasure` should be equal 1 (one kilogram weights one kilogram exactly). The same is for Tons (1 ton = 1000 kilograms).
 
 So, having the annotation expressing this just in one source code line looks quite appealing.
 
 Following the [documentation](https://doc.cuba-platform.com/manual-6.8/bean_validation_constraints.html#bean_validation_custom_constraints) let's declare `@CheckProductWeightType` annotation that we want to be able to link to `weightPerMeasure` field but to be called when entity editor commits data as well.
+This mean that this annotation shall be used to annotate classes and fields.
 
 ```java
 @Target({ ElementType.FIELD, ElementType.TYPE })
@@ -141,9 +144,22 @@ public class ProductWeightValidator implements ConstraintValidator<CheckProductW
 
 So, we can see that defining custom annotations gives you an elegant, stable reusable way of doing complex validation logic in most number of cases that works for both UI, middleware and REST.
 
+```java
+@CheckProductWeightType(groups = UiCrossFieldChecks.class)
+@NamePattern("%s|name")
+@Table(name = "VALIDATIONANNOTATIONS_PRODUCT")
+@Entity(name = "validationannotations$Product")
+public class Product extends StandardEntity {
+
+...
+
+}
+```
+[Product.java](validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)
+
 It would be a good point to finish this article at this stage, and if you are in a hurry you can stop reading here. However, this tutorial won't be complete if I didn't touch other ways that can be used for data validation:
 
-1.	Defining a custom `Validator` class or groovy script for the field.
+1.	Defining a custom `Validator` class or groovy validation script for UI components.
 1.	Overriding `postValidate` method of a screen editor controller.
 1.	Setting up an entity listener.
 1.	Providing a transaction listener which to do validation before committing data into your database (which is the only way when many different entities are involved into the check).
@@ -164,7 +180,7 @@ Let's look at these cases:
 
 **Using of pre-defined Field.Validator class**
 
-[CUBA studio](https://www.cuba-platform.com/download) giving a simple UI that allows user to specify what class need to be used as a `Field.Validator` for the component. This editor is available from **Screen Designer** screen at the component properties tab.
+[CUBA studio](https://www.cuba-platform.com/download) gives a simple UI that allows developers to specify what class need to be used as a `Field.Validator` for the component. This editor is available from **Screen Designer** at the component properties tab.
 
 ![Figure 2: Accessing Validator property for FieldGroup](resources/figure_2.png)
 _Figure 2: Accessing Validator property for FieldGroup_
@@ -172,7 +188,7 @@ _Figure 2: Accessing Validator property for FieldGroup_
 ![Figure 3: Field.Validator editor](resources/figure_3.png)
 _Figure 3: Field.Validator editor_
 
-From the XML layout perspective these validators looks quite simple and straightforward:
+From the XML layout perspective these validators looks quite simple and straightforward. You may wish to edit screen layout XML directly by hands, as for me this is a bit faster and simpler way of linking Validators to UI components.
 ```XML
 <field property="vendorEmail">
     <validator class="com.haulmont.cuba.gui.components.validators.EmailValidator"/>
@@ -182,9 +198,9 @@ From the XML layout perspective these validators looks quite simple and straight
 
 **Creating custom Field.Validator**
 
-Creation of a custom `Field.Validator` is not rocket science. Let's create for our simple product management [sample](validator-component/) a validator that would check the name of a product for swear words and doesn't let users to enter such products in the system. To do that, we need to perform the next steps:
+Creation of a custom `Field.Validator` is not rocket science as well. Let's create for our simple [product management sample](validator-component/) a validator that does check the name of a product for swear words and doesn't let users to enter such bad-named-products into the system. To do that, we need to perform the next steps:
 
-**1.** Create our custom `ProductNameValidator` class iplementing `Field.Validator` interface.
+**1.** Create our custom `ProductNameValidator` class implementing `Field.Validator` interface.
 
 ```java
 public class ProductNameValidator implements Field.Validator {
@@ -223,14 +239,14 @@ public class ProductNameValidator implements Field.Validator {
 ```
 [ProductNameValidator.java](validator-component/modules/gui/src/io/dyakonoff/validatorcomponent/validation/ProductNameValidator.java)
 
-and _optionally_ provide a message in a screen message pack. (If you don't care about localisation and string resources that much, you can just override `validate` method and skip everything else in your`Field.Validator` class).
+_optionally_ provide a message in a screen message pack. (If you don't care about localisation and string resources that much, you can just override `validate` method and skip everything else in your`Field.Validator` class).
 
 ```
 badNameInProductName = '%s' is not an appropriate word to be in a product name
 ```
 [messages.properties](validator-component/modules/web/src/io/dyakonoff/validatorcomponent/web/product/messages.properties)
 
-**2.** Use the just created Validator in your screen.
+**2.** Use the just created `ProductNameValidator` in your screen.
 
 Right through editing your screen XML layout:
 ```XML
@@ -241,15 +257,18 @@ Right through editing your screen XML layout:
 ```
 [product-edit.xml](validator-component/modules/web/src/io/dyakonoff/validatorcomponent/web/product/product-edit.xml)
 
-Or from the Studio component properties visual editor:
+Or by specifying the Validator for the component using CUBA studio IDE:
+
 ![Figure 4: Setting up a custom Field.Validator using studio UI](resources/figure_4.png)
 _Figure 4: Setting up a custom Field.Validator using studio UI_
 
-However, the second way would not let you to specify additional parameters for validator like the `message` one above.
+However, the second way would not let you to give additional parameters for validator like the `message` one above.
 
 **Running a groovy script for a field validation**
 
-Running [groovy](http://groovy-lang.org/) script dynamically with [Scripting interface](https://doc.cuba-platform.com/manual-6.8/scripting.html) looks quite appealing. What you shall do is to write a small groovy script that has access to a named variable `value` and return your check result back to the application. This can be done either from CUBA studio UI
+Running [groovy](http://groovy-lang.org/) script dynamically with [Scripting interface](https://doc.cuba-platform.com/manual-6.8/scripting.html) looks quite appealing from the first glance. What you shall do is to write a small groovy script that has access to a named variable `value` (which represents the UI component value script needs to check) and return boolean check result back to the application.
+
+This script can be specified either from CUBA studio UI:
 
 ![Figure 4: Setting up a groovy script for field validation](resources/figure_5.png)
 _Figure 4: Setting up a groovy script for field validation_
@@ -273,11 +292,11 @@ or by editing XML screen layout directly:
 </field>
 ```
 
-However, this is not the approach I can recommend for complex cases, mainly because of difficulties with groovy script debugging and lack of support from an IDE. If you still chose to try that way I would say that keeping groovy script in a separate file and giving component it's name would be a better option.
+However, this is not the approach I can recommend for complex cases, mainly because of difficulties with groovy script debugging and lack of support from an IDE. If you still chose to try that way I would say that keeping groovy script in a separate file and giving component reference to it would be a better option.
 
 **Setting screen validator programmatically**
 
-It's also possible to set Validator programmatically to a component (at your screen controller, for example), which could be a good option if you need to modify your validation rules on the fly according to some condition that can be determined only in run-time.
+It's also possible to set Validator programmatically for a component (in your screen controller, for example), which could be a good option if you need to modify your validation rules on the fly according to some condition that can be determined only in run-time.
 
 Here is a small example:
 
@@ -308,22 +327,22 @@ public class ProductEdit extends AbstractEditor<Product> {
 ```
 [ProductEdit.java](validation-in-controllers/modules/web/src/io/dyakonoff/controllersvalidation/web/product/ProductEdit.java)
 
-Another example of adding Field.Validator in runtime can be found [here](https://www.cuba-platform.com/discuss/t/how-to-implement-error-display-when-using-custom-validator/2870/6).
+Another example of adding `Field.Validator` in runtime can be found [here](https://www.cuba-platform.com/discuss/t/how-to-implement-error-display-when-using-custom-validator/2870/6).
 
 [Top](#introduction)
 
 ## Validation in UI screen controllers
 
-This is a simple and intuitive approach that wold allow you perform quite complex checks of your screen data. Here are pros and cons of this way:
+This is a simple and intuitive approach that wold allow you to perform quite complex checks of your screen data. Here are pros and cons of this way:
 
 **Pros:**
 * Easy to implement: you just need to override `postValidate` method in your screen controller.
-* Has access to entity, screen controls, middleware services etc...
+* Has access to Entity object, screen UI controls, middleware services etc...
 * Can do checks of arbitrary complexity.
 * Easy to debug.
 
 **Cons:**
-* Acts only on one UI layer, so you'd need to repeat yourself if you have more than one UI clients (web and desktop, for example).
+* Acts only on one UI layer, so you'd need to repeat yourself if you have two or more UI modules (web and desktop, for example).
 * Can't help with REST calls validation, even for [Generic REST](https://doc.cuba-platform.com/manual-6.5/rest_api_v2.html).
 * Has difficulties with highlighting fields/components that contains incorrect data. (You'd have to do some CSS/JS magic to achieve that result.)
 
@@ -352,9 +371,9 @@ However, combining this approach with static and dynamically added `Field.Valida
 ## Using middleware listeners for data validation
 
 Let's discuss the last two ways of validating the data that [CUBA platform](https://www.cuba-platform.com/) offers: [entity listeners](https://doc.cuba-platform.com/manual-6.8/entity_listeners.html) and [transaction listeners](https://doc.cuba-platform.com/manual-6.8/transaction_listeners.html).
-These listeners act on the middle tier and allow you to intercept validate data before the changes be passed to a database. Power of this approach is that incorrect data would not be able to pass your checks, doesn't matter from where they came.
+These listeners act on the middle tier and allow you to intercept data before the changes be passed to a database. Power of this approach is based on the fact that incorrect data would not be able to pass your checks, doesn't matter from where they came.
 
-Also, [transaction listeners](https://doc.cuba-platform.com/manual-6.8/transaction_listeners.html) seems to be the best way to perform complex data checks that should involve analysis of more than one just entity object. So, you'd like to use them when you had to validate the state of your objects graph before committing it to the database.
+Also, [transaction listeners](https://doc.cuba-platform.com/manual-6.8/transaction_listeners.html) seems to be the best way to perform complex data checks that should involve analysis of more than just one entity object. So, you'd like to use them when you had to validate the state of your objects graph before committing it to the database.
 
 In both cases, you'd need to define your custom `RuntimeException` class in global module and mark it with [@SupportedByClient](https://doc.cuba-platform.com/manual-6.8/remoteException.html) annotation to have your error messages traversing from middleware to client tier.
 
@@ -366,9 +385,9 @@ _Figure 6: Error message without implementing custom client-level exception hand
 ![after implementing custom client-level exception handlers](resources/figure_7.png)
 _Figure 7: Error message after implementing custom client-level exception handlers_
 
-Let's look at examples.
+Let's look at the examples.
 
-Assume that we have a small print jobs management system with two entities: `Printers` and `ProntJobs`. We want to check that each printer has accessible IP-address before saving it's parameters to the database. Also we want to ensure that two-sided documents can be assigned only to printers that support duplex (two-sided) printing.
+Assume that we have a small print jobs management system with two entities: `Printers` and `PrintJobs`. We want to check that each printer has accessible IP address before saving it's parameters to the database. Also we want to ensure that two-sided documents can be assigned only to printers that support duplex (two-sided) printing.
 
 We will implement the first constraint using Entity Listener and the second one using Transaction Listener.
 
@@ -376,7 +395,7 @@ We will implement the first constraint using Entity Listener and the second one 
 
 ### Validating with Entity Listeners
 
-For the start we need to create an Entity Listener for Printer entity. The simplest way is to do that using CUBA studio and in **Middleware** section pick **New / Entity Listener**.
+For the start we need to create an Entity Listener for our `Printer` entity. The simplest way is to do that using CUBA studio and in **Middleware** section pick menu item **New / Entity Listener**.
 
 ![Figure 8: Creating Entity Listener with CUBA studio](resources/figure_8.png)
 
@@ -389,7 +408,19 @@ _Figure 8: Creating Entity Listener with CUBA studio_
 ![Figure 9: Setting parameters for Entity Listener](resources/figure_9.png)
 _Figure 9: Setting parameters for Entity Listener_
 
-Before starting working on our Entity Listener class, let's define custom `RuntimeException` and mark it with `@SupportedByClient`.
+As an alternative it is possible to create [Entity Listener class](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/PrinterEntityListener.java) manually and mark `Printer class` with `@Listeners("listenersvalidation_PrinterEntityListener")` annotation:
+
+```java
+@Listeners("listenersvalidation_PrinterEntityListener")
+@NamePattern("%s|name")
+@Table(name = "LISTENERSVALIDATION_PRINTER")
+@Entity(name = "listenersvalidation$Printer")
+public class Printer extends StandardEntity {
+  ...
+}
+```
+
+Before start working on our Entity Listener class, let's define custom `RuntimeException` and mark it with `@SupportedByClient` annotation to allow this exception to be passed to the client tier.
 
 ```java
 @SupportedByClient
@@ -439,7 +470,7 @@ public class PrinterEntityListener implements BeforeInsertEntityListener<Printer
 ```
 [PrinterEntityListener.java](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/PrinterEntityListener.java)
 
-The last step will be implementing client-level exception handler that we will be using for both Entity and Transaction listeners errors processing.
+The last step will be implementing client-level exception handler that will be used for both Entity and Transaction listeners errors processing.
 
 ```java
 @Component("listenersvalidation_PrintingValidationExceptionHandler")
@@ -461,12 +492,12 @@ public class PrintingValidationExceptionHandler extends AbstractGenericException
 
 ### Validating with Transaction Listeners
 
-Handling `PrintJob` entity validation with Transaction Listener is quite similar:
+Handling `PrintJob` entity validation with Transaction Listener is quite similar, we need to:
 
-* Create new TransactionListener with CUBA studio.
+* Create new `TransactionListener` with CUBA studio.
 * Give it a proper class name if needed.
 * Specify that `BeforeCommitTransactionListener` need to be implemented in [this bean](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/TransactionListener.java).
-* Define custom runtime exception: [PrintJobValidationException](listeners-validation/modules/global/src/io/dyakonoff/listenersvalidation/exception/PrintJobValidationException.java)
+* Define custom runtime exception: [PrintJobValidationException](listeners-validation/modules/global/src/io/dyakonoff/listenersvalidation/exception/PrintJobValidationException.java).
 * Implement validation logic in your transaction listener.
 
 ```java
@@ -510,14 +541,14 @@ _[TransactionListener.java](listeners-validation/modules/core/src/io/dyakonoff/l
 ## Conclusion
 
 We have covered most of the mechanisms that [CUBA platform](https://www.cuba-platform.com/) offers for input data validation. Let's recap:
+
 1. Bean validation could use standard and custom annotations. It works on all tiers, so offers the best level of data security. Besides that it is reusable and gives good UI feedback to a user. The limitations of that approach:
     1. It can't be used for validating the whole data graph when you need to check state of more than one entity.
-    1. Business logic at middleware level can change the entities directly and they will not be validated by this mechanism even before saving to DB.
-1. Defining custom Validator class and groovy scripts for UI components. Since it works at UI level only, this mechanism offers nice UI integration suppoty (highlighting and pretty error messages formatting) nut drawbacks are the same as for annotations plus:
-    1. It offers more standard checks that come out of the box than annotations mechanism;
+    1. Business logic at middleware level can change the entities directly and they will not be validated by this mechanism even before saving them to DB.
+1. Defining custom Validator class and groovy scripts for UI components. Since it works at UI level only, this mechanism offers nice UI integration suppot (highlighting and pretty error messages formatting) but drawbacks are the same as for annotations, plus:
     1. It won't be able to check Generic REST calls.
     1. Groovy scripts are hard to debug.
-1. Validation in UI screen controllers - it is the simplest way to do validation if there are no standard annotations or `Validator` classes to do the same, however you will get the checks done only at UI level and the code reusability is not at the best level.
-1. Entity and Transaction listeners give the best security level. Transaction listeners are capable to check the whole object graph. But this approach requires more coding, has not that good UI integration and doing data validation right before commit might lead to inability to fix the data because is too late to do something with data error. Also, complex listeners can degrade the system performance as they happen for **every** data commit.
+1. Validation in UI screen controllers - it is the simplest way to do validation if there are no standard annotations or `Validator` classes to do it. However, you get the checks done only at UI level and the code reusability is not at the best level.
+1. Entity and Transaction listeners give the best security level. Transaction listeners are capable to check the whole object graph. But this approach requires more coding, has not that good UI integration and doing data validation right before commit might lead to inability to fix the data because it could be too late to do something with data error. Also, complex listeners can degrade the system performance as they happen for **every** data commit.
 
 [Top](#introduction)
