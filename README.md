@@ -18,7 +18,59 @@ Here are the approaches we will discuss:
 
 ## [Database level constraints](validation-with-custom-annotations/)
 
+![Figure 1: Database-level constraints at field creation dialog](resources/figure_1.png)
+_Figure 1: Database-level constraints at field creation dialog
 
+
+![Figure 2: Database-level constraints in field editor](resources/figure_2.png)
+_Figure 2: Database-level constraints in field editor
+
+![Figure 3: Multi-column index on an entity](resources/figure_3.png)
+_Figure 3: Multi-column index for an entity_
+
+```java
+...
+@NamePattern("%s|name")
+@Table(name = "VALIDATIONANNOTATIONS_PRODUCT", uniqueConstraints = {
+    @UniqueConstraint(name = "IDX_VALIDATIONANNOTATIONS_PRODUCT_UNQ", columnNames = {"NAME", "PRICE_PER_MEASURE", "MEASURE"})
+})
+@Entity(name = "validationannotations$Product")
+public class Product extends StandardEntity {
+  private static final long serialVersionUID = 1561721020865033907L;
+
+  @NotNull
+  @Column(name = "NAME", nullable = false, unique = true, length = 100)
+  protected String name;
+
+...
+
+}
+```
+
+```sql
+create table VALIDATIONANNOTATIONS_PRODUCT (
+    ID varchar(36) not null,
+    VERSION integer not null,
+    CREATE_TS timestamp,
+    CREATED_BY varchar(50),
+    UPDATE_TS timestamp,
+    UPDATED_BY varchar(50),
+    DELETE_TS timestamp,
+    DELETED_BY varchar(50),
+    --
+    NAME varchar(100) not null,
+    MEASURE integer not null,
+    WEIGHT_PER_MEASURE decimal(19, 2) not null,
+    PRICE_PER_MEASURE decimal(19, 2) not null,
+    --
+    primary key (ID)
+)^
+
+-- unique indexes
+
+create unique index IDX_VALIDATIONANNOTATIONS_PRODUCT_UNIQ_NAME on VALIDATIONANNOTATIONS_PRODUCT (NAME) ^
+create unique index IDX_VALIDATIONANNOTATIONS_PRODUCT_UNQ on VALIDATIONANNOTATIONS_PRODUCT (NAME, PRICE_PER_MEASURE, MEASURE) ^
+```
 
 ## [Bean Validation](simple-validation/)
 
@@ -384,11 +436,11 @@ In both cases, you'd need to define your custom `RuntimeException` class in glob
 
 Also, it seems to be a good idea to implement custom [client-level exception handlers](https://doc.cuba-platform.com/manual-6.8/exceptionHandlers.html) to have your error messages displayed properly. However, if you don't care much about how your errors are displayed to a user, you can skip this step.
 
-![without implementing client-level exception handlers](resources/figure_7.png)
-_Figure 7: Error message without implementing custom client-level exception handlers_
+![without implementing client-level exception handlers](resources/figure_9.png)
+_Figure 9: Error message without implementing custom client-level exception handlers_
 
-![after implementing custom client-level exception handlers](resources/figure_7.png)
-_Figure 8: Error message after implementing custom client-level exception handlers_
+![after implementing custom client-level exception handlers](resources/figure_10.png)
+_Figure 10: Error message after implementing custom client-level exception handlers_
 
 Let's look at the examples.
 
@@ -402,16 +454,16 @@ We will implement the first constraint using Entity Listener and the second one 
 
 For the start we need to create an Entity Listener for our `Printer` entity. The simplest way is to do that using CUBA studio and in **Middleware** section pick menu item **New / Entity Listener**.
 
-![Figure 9: Creating Entity Listener with CUBA studio](resources/figure_8.png)
+![Figure 11: Creating Entity Listener with CUBA studio](resources/figure_11.png)
 
-_Figure 9: Creating Entity Listener with CUBA studio_
+_Figure 11: Creating Entity Listener with CUBA studio_
 
 1. Give proper name to the Listener class,
 1. Check `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` interfaces to be implemented
 1. Specify that entity `Printer` need  to be handled by the listener
 
-![Figure 10: Setting parameters for Entity Listener](resources/figure_9.png)
-_Figure 10: Setting parameters for Entity Listener_
+![Figure 12: Setting parameters for Entity Listener](resources/figure_12.png)
+_Figure 12: Setting parameters for Entity Listener_
 
 As an alternative it is possible to create [Entity Listener class](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/PrinterEntityListener.java) manually and mark `Printer class` with `@Listeners("listenersvalidation_PrinterEntityListener")` annotation:
 

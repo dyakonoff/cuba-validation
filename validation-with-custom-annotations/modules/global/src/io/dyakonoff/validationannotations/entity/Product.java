@@ -49,10 +49,6 @@ public class Product extends StandardEntity {
     }
 
 
-    public void setWeightPerMeasure(BigDecimal weightPerMeasure) {
-        this.weightPerMeasure = weightPerMeasure;
-    }
-
     public BigDecimal getWeightPerMeasure() {
         return weightPerMeasure;
     }
