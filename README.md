@@ -7,20 +7,25 @@ Input validation is one of common tasks in everyday developer’s life. We need 
 In this article I want to touch the main approaches of data validation that [CUBA platform](https://www.cuba-platform.com/) offers.
 
 Here are the approaches we will discuss:
-1. **[Bean validation that CUBA Studio offers for entities.](#bean-Validation)** / _[Example](simple-validation/)_
-1. **[Validation with custom annotations.](#validation-with-custom-annotations)** / _[Example 1](validation-with-custom-annotations/), [Example 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)_
-1. **[Defining custom Validator class and groovy validation scripts for UI components.](#Custom-validator-classes-and-scripts)** / _[Example](validator-component/)_
-1. **[Validation in UI screen controllers.](#validation-in-ui-screen-controllers)**  / _[Example](validation-in-controllers/)_
-1. **[Using Entity and Transaction listeners for validation.](#using-middleware-listeners-for-data-validation)** / _[Example](listeners-validation)_
+1. [Database level constraints](#database-level-constraints) / [Example]()
+1. [Bean validation that CUBA Studio offers for entities.](#bean-validation) / _[Example](simple-validation/)_
+1. [Validation with custom annotations.](#validation-with-custom-annotations) / _[Example 1](validation-with-custom-annotations/), [Example 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)_
+1. [Defining custom Validator class and groovy validation scripts for UI components.](#Custom-validator-classes-and-scripts) / _[Example](validator-component/)_
+1. [Validation in UI screen controllers.](#validation-in-ui-screen-controllers)  / _[Example](validation-in-controllers/)_
+1. [Using Entity and Transaction listeners for validation.](#using-middleware-listeners-for-data-validation) / _[Example](listeners-validation)_
     1. [Validating with Entity Listeners.](#validating-with-entity-listeners)
     1. [Validating with Transaction Listeners.](#validating-with-transaction-listeners)
 
+## [Database level constraints](validation-with-custom-annotations/)
+
+
+
 ## [Bean Validation](simple-validation/)
 
-This is, without any doubt, the first type of validation that new users of the platform can see in [CUBA studio IDE.](https://www.cuba-platform.com/download) It gives users an easy way to annotate entity fields through the editor screen with the common validators.
+The next validation type that comes with [CUBA studio IDE.](https://www.cuba-platform.com/download) is a [bean validation](https://doc.cuba-platform.com/manual-6.8/bean_validation.html), some of which annotations could be configured from studio UI. This gives users an easy way to mark entity fields through the editor screen with the common validators.
 
-![Figure 1: Standard entity validators in CUBA studio](resources/figure_1.png)
-_Figure 1: Standard entity validators in CUBA studio_
+![Figure 4: Standard entity validators in CUBA studio](resources/figure_4.png)
+_Figure 4: Standard entity validators in CUBA studio_
 
 Annotation-based validation provides uniform validation of data on the middleware, in [Generic UI](https://doc.cuba-platform.com/manual-6.8/gui_framework.html) and [REST API](https://doc.cuba-platform.com/manual-6.8/rest_api_v2.html). It is based on the JSR 349 - Bean Validation 1.1 and its reference implementation: [Hibernate Validator](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/?v=5.3).
 
@@ -182,11 +187,11 @@ Let's look at these cases:
 
 [CUBA studio](https://www.cuba-platform.com/download) gives a simple UI that allows developers to specify what class need to be used as a `Field.Validator` for the component. This editor is available from **Screen Designer** at the component properties tab.
 
-![Figure 2: Accessing Validator property for FieldGroup](resources/figure_2.png)
-_Figure 2: Accessing Validator property for FieldGroup_
+![Figure 5: Accessing Validator property for FieldGroup](resources/figure_5.png)
+_Figure 5: Accessing Validator property for FieldGroup_
 
-![Figure 3: Field.Validator editor](resources/figure_3.png)
-_Figure 3: Field.Validator editor_
+![Figure 6: Field.Validator editor](resources/figure_6.png)
+_Figure 6: Field.Validator editor_
 
 From the XML layout perspective these validators looks quite simple and straightforward. You may wish to edit screen layout XML directly by hands, as for me this is a bit faster and simpler way of linking Validators to UI components.
 ```XML
@@ -259,8 +264,8 @@ Right through editing your screen XML layout:
 
 Or by specifying the Validator for the component using CUBA studio IDE:
 
-![Figure 4: Setting up a custom Field.Validator using studio UI](resources/figure_4.png)
-_Figure 4: Setting up a custom Field.Validator using studio UI_
+![Figure 7: Setting up a custom Field.Validator using studio UI](resources/figure_7.png)
+_Figure 7: Setting up a custom Field.Validator using studio UI_
 
 However, the second way would not let you to give additional parameters for validator like the `message` one above.
 
@@ -270,8 +275,8 @@ Running [groovy](http://groovy-lang.org/) script dynamically with [Scripting int
 
 This script can be specified either from CUBA studio UI:
 
-![Figure 4: Setting up a groovy script for field validation](resources/figure_5.png)
-_Figure 4: Setting up a groovy script for field validation_
+![Figure 8: Setting up a groovy script for field validation](resources/figure_8.png)
+_Figure 8: Setting up a groovy script for field validation_
 
 or by editing XML screen layout directly:
 
@@ -379,11 +384,11 @@ In both cases, you'd need to define your custom `RuntimeException` class in glob
 
 Also, it seems to be a good idea to implement custom [client-level exception handlers](https://doc.cuba-platform.com/manual-6.8/exceptionHandlers.html) to have your error messages displayed properly. However, if you don't care much about how your errors are displayed to a user, you can skip this step.
 
-![without implementing client-level exception handlers](resources/figure_6.png)
-_Figure 6: Error message without implementing custom client-level exception handlers_
+![without implementing client-level exception handlers](resources/figure_7.png)
+_Figure 7: Error message without implementing custom client-level exception handlers_
 
 ![after implementing custom client-level exception handlers](resources/figure_7.png)
-_Figure 7: Error message after implementing custom client-level exception handlers_
+_Figure 8: Error message after implementing custom client-level exception handlers_
 
 Let's look at the examples.
 
@@ -397,16 +402,16 @@ We will implement the first constraint using Entity Listener and the second one 
 
 For the start we need to create an Entity Listener for our `Printer` entity. The simplest way is to do that using CUBA studio and in **Middleware** section pick menu item **New / Entity Listener**.
 
-![Figure 8: Creating Entity Listener with CUBA studio](resources/figure_8.png)
+![Figure 9: Creating Entity Listener with CUBA studio](resources/figure_8.png)
 
-_Figure 8: Creating Entity Listener with CUBA studio_
+_Figure 9: Creating Entity Listener with CUBA studio_
 
 1. Give proper name to the Listener class,
 1. Check `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` interfaces to be implemented
 1. Specify that entity `Printer` need  to be handled by the listener
 
-![Figure 9: Setting parameters for Entity Listener](resources/figure_9.png)
-_Figure 9: Setting parameters for Entity Listener_
+![Figure 10: Setting parameters for Entity Listener](resources/figure_9.png)
+_Figure 10: Setting parameters for Entity Listener_
 
 As an alternative it is possible to create [Entity Listener class](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/PrinterEntityListener.java) manually and mark `Printer class` with `@Listeners("listenersvalidation_PrinterEntityListener")` annotation:
 

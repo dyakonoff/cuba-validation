@@ -28,8 +28,7 @@ public class CargoBay extends StandardEntity {
 
     @Max(message = "Bay number can't be greater than 100", value = 100)
     @Min(message = "Bay number can't be negative", value = 0)
-    @NotNull
-    @Column(name = "BAY_NUMBER", nullable = false, unique = true)
+    @Column(name = "BAY_NUMBER", unique = true)
     protected Integer bayNumber;
 
     @DecimalMax("100000")

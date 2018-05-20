@@ -10,10 +10,14 @@ import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.global.validation.groups.UiCrossFieldChecks;
 import io.dyakonoff.validationannotations.validator.CheckProductWeightType;
+import javax.persistence.Index;
+import javax.persistence.UniqueConstraint;
 
 @CheckProductWeightType(groups = UiCrossFieldChecks.class)
 @NamePattern("%s|name")
-@Table(name = "VALIDATIONANNOTATIONS_PRODUCT")
+@Table(name = "VALIDATIONANNOTATIONS_PRODUCT", uniqueConstraints = {
+    @UniqueConstraint(name = "IDX_VALIDATIONANNOTATIONS_PRODUCT_UNQ", columnNames = {"NAME", "PRICE_PER_MEASURE", "MEASURE"})
+})
 @Entity(name = "validationannotations$Product")
 public class Product extends StandardEntity {
     private static final long serialVersionUID = 1561721020865033907L;
