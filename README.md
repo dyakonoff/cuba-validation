@@ -7,6 +7,7 @@ Input validation is one of common tasks in everyday developer’s life. We need 
 In this article I want to touch the main approaches of data validation that [CUBA platform](https://www.cuba-platform.com/) offers.
 
 Here are the approaches we will discuss:
+1. [Model problem description](#model-problem-description)
 1. [JPA DB level constraints](#jpa-db-level-constraints) / [Example]()
     * [Single-field constraints](#single-field-constraints)
     * [Multi-column indexes](#multi-column-indexes)
@@ -19,6 +20,50 @@ Here are the approaches we will discuss:
     * [Single Entity Context](#single-entity-context)
     * [Transaction Context](#transaction-context)
 1. [Conclusion](#conclusion)
+
+## Model problem description
+
+Before discussing different validation methods available in [CUBA platform](https://www.cuba-platform.com/) let's settle down the model problem that our code example will be solving.
+
+**Note:** If you want to check out code examples and technical details you can skip this section.
+
+As the matter of fact, I'm going to use an example application that includes all validation methods mentioned in this article to demonstrate how they work from different perspectives: code, user interface, CUBA studio IDE, REST endpoints etc.
+
+However, before starting coding exercises, let's discuss the problem, we are going to model with our software.
+
+As you probably know, most of world trade are made with [containers ships](https://en.wikipedia.org/wiki/Container_ship) like this:<br />
+_(all ships and containers images for the article were taken from Wikipedia)_
+
+![APL Post-Panamax container ships Image ID: line0534, America's Coastlines. Collection Location: San Francisco.](resources/ship_and_holds.jpg)
+
+These giant vessels can carry thousands of ISO-containers that can be [different types](https://en.wikipedia.org/wiki/Intermodal_container) but most of the vessels can carry only 20 ft, 40 ft and 45 ft containers of standard end extra height (extra height are called High Cube).
+
+Container ships are divided into set of holds, each of them can hold 20 ft and 40 ft containers below deck level and 20, 40 and 45 ft containers above deck level.
+
+For our task we'll implement a small cargo management system that will keep records of containers that the vessel carries.
+
+Database schema of our application looks like that:
+
+
+
+### Validation rules
+
+1. Only 20, 40 and 45 containers are allowed on a ship.
+1. 45 ft containers are allowed only above deck level.
+1. Only 20 and 40 ft standard height containers can be loaded below deck level.
+1. If hold has 20 ft containers in it, it should be even number of them.
+1. High-cube size containers are allowed only at top level.
+1. No container is allowed to have weight greater than allowed for it's type.
+1. Each container should have a serial number.
+1. This serial number follows [ISO-6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
+1. Each hold has maximum allowed number of levels above deck that should not be exceeded.
+1. Ship should be balanced, in other words it's center of mass should not be further than 10% of the ship's length to the aft or bow side from it's center.
+1. Total weight of containers loaded onto ship should not exceed it's net register tonnage (maximum cargo weight allowed for this ship).
+
+**Note:** For simplicity we are not calculating ship's balance on port-side and bottom-to-top directions.
+
+
+[Top](#introduction)
 
 ## [JPA DB level constraints](validation-with-custom-annotations/)
 [JPA constraints]() that
