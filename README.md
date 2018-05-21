@@ -641,17 +641,17 @@ _**Table 2:** Validation implementation complexity_
 
 _**Table 3:** Validation scope_
 
-                                         | Single Field | Cross Field | DataStore | Transaction |
------------------------------------------|:------------:|:-----------:|:---------:|:-----------:|
-DB level JPA constraints                 |     yes      |   yes\*     |           |             |
-Bean validation (JPA annotations)        |     yes      |             |           |             |
-Bean validation (custom annotations)     |     yes      |    yes      |           |             |
-UI validation (standard Field.Validator) |     yes      |             |           |             |
-Custom Field.Validator (Java class)      |     yes      |             |           |             |
-Custom Field.Validator (Groovy script)   |     yes      |             |           |             |
-Screen controllers validation            |     yes      |    yes      |           |             |
-Entity listeners                         |     yes      |    yes      |    yes    |             |
-Transaction listeners                    |     yes      |    yes      |    yes    |     yes     |
+|                                          | Single Field | Cross Field | DataStore | Transaction |
+|------------------------------------------|:------------:|:-----------:|:---------:|:-----------:|
+| DB level JPA constraints                 |     yes      |   yes\*     |           |             |
+| Bean validation (JPA annotations)        |     yes      |             |           |             |
+| Bean validation (custom annotations)     |     yes      |    yes      |           |             |
+| UI validation (standard Field.Validator) |     yes      |             |           |             |
+| Custom Field.Validator (Java class)      |     yes      |             |           |             |
+| Custom Field.Validator (Groovy script)   |     yes      |             |           |             |
+| Screen controllers validation            |     yes      |    yes      |           |             |
+| Entity listeners                         |     yes      |    yes      |    yes    |             |
+| Transaction listeners                    |     yes      |    yes      |    yes    |     yes     |
 
 \* - for complex indexes (`@UniqueConstraint`)
 
