@@ -10,23 +10,28 @@ Here are the approaches we will discuss:
 1. [Database level constraints](#database-level-constraints) / [Example]()
 1. [Bean validation that CUBA Studio offers for entities.](#bean-validation) / _[Example](simple-validation/)_
 1. [Validation with custom annotations.](#validation-with-custom-annotations) / _[Example 1](validation-with-custom-annotations/), [Example 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)_
-1. [Defining custom Validator class and groovy validation scripts for UI components.](#Custom-validator-classes-and-scripts) / _[Example](validator-component/)_
+1. [Defining custom Validator class and groovy validation scripts for UI components.](#custom-validator-classes-and-scripts) / _[Example](validator-component/)_
 1. [Validation in UI screen controllers.](#validation-in-ui-screen-controllers)  / _[Example](validation-in-controllers/)_
 1. [Using Entity and Transaction listeners for validation.](#using-middleware-listeners-for-data-validation) / _[Example](listeners-validation)_
     1. [Validating with Entity Listeners.](#validating-with-entity-listeners)
     1. [Validating with Transaction Listeners.](#validating-with-transaction-listeners)
+1. [Conclusion](#conclusion)
 
 ## [Database level constraints](validation-with-custom-annotations/)
+Let's start this article with look at one of the most common constraints that [CUBA platform](https://www.cuba-platform.com/) offers. For any field of the entity you can say that this field is unique or mandatory. This can be done either during the entity field creation or after that with entity editor.
+
+These two checkboxes alongside with `@NotNull` constraint (see [figure 2](resources/figure_2.png) ) in studio's UI generate annotation and a DDL (SQL) constraint.
 
 ![Figure 1: Database-level constraints at field creation dialog](resources/figure_1.png)
-_Figure 1: Database-level constraints at field creation dialog
-
+_**Figure 1:** Database-level constraints at field creation dialog_
 
 ![Figure 2: Database-level constraints in field editor](resources/figure_2.png)
-_Figure 2: Database-level constraints in field editor
+_**Figure 2:** Database-level constraints in field editor_
+
+
 
 ![Figure 3: Multi-column index on an entity](resources/figure_3.png)
-_Figure 3: Multi-column index for an entity_
+_**Figure 3:** Multi-column index for an entity_
 
 ```java
 ...
@@ -77,7 +82,7 @@ create unique index IDX_VALIDATIONANNOTATIONS_PRODUCT_UNQ on VALIDATIONANNOTATIO
 The next validation type that comes with [CUBA studio IDE.](https://www.cuba-platform.com/download) is a [bean validation](https://doc.cuba-platform.com/manual-6.8/bean_validation.html), some of which annotations could be configured from studio UI. This gives users an easy way to mark entity fields through the editor screen with the common validators.
 
 ![Figure 4: Standard entity validators in CUBA studio](resources/figure_4.png)
-_Figure 4: Standard entity validators in CUBA studio_
+_**Figure 4:** Standard entity validators in CUBA studio_
 
 Annotation-based validation provides uniform validation of data on the middleware, in [Generic UI](https://doc.cuba-platform.com/manual-6.8/gui_framework.html) and [REST API](https://doc.cuba-platform.com/manual-6.8/rest_api_v2.html). It is based on the JSR 349 - Bean Validation 1.1 and its reference implementation: [Hibernate Validator](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/?v=5.3).
 
@@ -240,10 +245,10 @@ Let's look at these cases:
 [CUBA studio](https://www.cuba-platform.com/download) gives a simple UI that allows developers to specify what class need to be used as a `Field.Validator` for the component. This editor is available from **Screen Designer** at the component properties tab.
 
 ![Figure 5: Accessing Validator property for FieldGroup](resources/figure_5.png)
-_Figure 5: Accessing Validator property for FieldGroup_
+_**Figure 5:** Accessing Validator property for FieldGroup_
 
 ![Figure 6: Field.Validator editor](resources/figure_6.png)
-_Figure 6: Field.Validator editor_
+_**Figure 6:** Field.Validator editor_
 
 From the XML layout perspective these validators looks quite simple and straightforward. You may wish to edit screen layout XML directly by hands, as for me this is a bit faster and simpler way of linking Validators to UI components.
 ```XML
@@ -317,7 +322,7 @@ Right through editing your screen XML layout:
 Or by specifying the Validator for the component using CUBA studio IDE:
 
 ![Figure 7: Setting up a custom Field.Validator using studio UI](resources/figure_7.png)
-_Figure 7: Setting up a custom Field.Validator using studio UI_
+_**Figure 7:** Setting up a custom Field.Validator using studio UI_
 
 However, the second way would not let you to give additional parameters for validator like the `message` one above.
 
@@ -328,7 +333,7 @@ Running [groovy](http://groovy-lang.org/) script dynamically with [Scripting int
 This script can be specified either from CUBA studio UI:
 
 ![Figure 8: Setting up a groovy script for field validation](resources/figure_8.png)
-_Figure 8: Setting up a groovy script for field validation_
+_**Figure 8:** Setting up a groovy script for field validation_
 
 or by editing XML screen layout directly:
 
@@ -432,15 +437,15 @@ These listeners act on the middle tier and allow you to intercept data before th
 
 Also, [transaction listeners](https://doc.cuba-platform.com/manual-6.8/transaction_listeners.html) seems to be the best way to perform complex data checks that should involve analysis of more than just one entity object. So, you'd like to use them when you had to validate the state of your objects graph before committing it to the database.
 
-In both cases, you'd need to define your custom `RuntimeException` class in global module and mark it with [@SupportedByClient](https://doc.cuba-platform.com/manual-6.8/remoteException.html) annotation to have your error messages traversing from middleware to client tier.
+In both cases, you'd need to define your custom `RuntimeException` class in global module and mark it with [@SupportedByClient](https://doc.cuba-platform.com/manual-6.8/remoteException.html) annotation to have your error messages transporting from middleware to client tier.
 
 Also, it seems to be a good idea to implement custom [client-level exception handlers](https://doc.cuba-platform.com/manual-6.8/exceptionHandlers.html) to have your error messages displayed properly. However, if you don't care much about how your errors are displayed to a user, you can skip this step.
 
 ![without implementing client-level exception handlers](resources/figure_9.png)
-_Figure 9: Error message without implementing custom client-level exception handlers_
+_**Figure 9:** Error message without implementing custom client-level exception handlers_
 
 ![after implementing custom client-level exception handlers](resources/figure_10.png)
-_Figure 10: Error message after implementing custom client-level exception handlers_
+_**Figure 10:** Error message after implementing custom client-level exception handlers_
 
 Let's look at the examples.
 
@@ -456,14 +461,14 @@ For the start we need to create an Entity Listener for our `Printer` entity. The
 
 ![Figure 11: Creating Entity Listener with CUBA studio](resources/figure_11.png)
 
-_Figure 11: Creating Entity Listener with CUBA studio_
+_**Figure 11:** Creating Entity Listener with CUBA studio_
 
 1. Give proper name to the Listener class,
 1. Check `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` interfaces to be implemented
 1. Specify that entity `Printer` need  to be handled by the listener
 
 ![Figure 12: Setting parameters for Entity Listener](resources/figure_12.png)
-_Figure 12: Setting parameters for Entity Listener_
+_**Figure 12:** Setting parameters for Entity Listener_
 
 As an alternative it is possible to create [Entity Listener class](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/PrinterEntityListener.java) manually and mark `Printer class` with `@Listeners("listenersvalidation_PrinterEntityListener")` annotation:
 
@@ -597,7 +602,21 @@ _[TransactionListener.java](listeners-validation/modules/core/src/io/dyakonoff/l
 
 ## Conclusion
 
-We have covered most of the mechanisms that [CUBA platform](https://www.cuba-platform.com/) offers for input data validation. Let's recap:
+We have covered most of the mechanisms that [CUBA platform](https://www.cuba-platform.com/) offers for input data validation. Let's group them by
+
+_**Table 1:** Validation levels_
+Level                                  | Generic UI client | Generic REST client | Middleware | DataStore | Transaction | Database
+---------------------------------------|-------------------|---------------------|------------|-----------|-------------|----------
+DB level constraints + Bean Validation |        √          |         √ (\*)      |     √      |           |             |     √    
+Bean validation (annotations)          |        √          |         √ (\*)      |     √      |           |             |   
+UI validation (Field.Validator)        |        √          |                     |            |           |             |   
+Screen controllers validation          |        √          |                     |            |           |             |   
+Entity listeners                       |                   |                     |            |     √     |             |   
+Transaction listeners                  |                   |                     |            |           |      √      |   
+
+
+
+
 
 1. Bean validation could use standard and custom annotations. It works on all tiers, so offers the best level of data security. Besides that it is reusable and gives good UI feedback to a user. The limitations of that approach:
     1. It can't be used for validating the whole data graph when you need to check state of more than one entity.
