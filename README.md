@@ -52,7 +52,7 @@ Database schema of our application looks like that:
 1. 45 ft containers are allowed only above deck level.
 1. Only 20 and 40 ft standard height containers can be loaded below deck level.
 1. If hold has 20 ft containers in it, it should be even number of them.
-1. There should not be more than one high-cube container in any container stack.
+1. There should be no more than one high-cube container in any container stack.
 1. No container is allowed to have weight greater than allowed for it's type.
 1. Each container should have a serial number.
 1. This serial number follows [ISO-6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
@@ -61,10 +61,12 @@ Database schema of our application looks like that:
 1. Similarly, cargo's mass center should not be further than 10% of ship's width from it's centerline.
 1. Total weight of containers loaded onto ship should not exceed it's net register tonnage (maximum cargo weight allowed for this ship).
 1. Containers are stacked on each other without gaps.
-1. For one cargo hold height of neighbour container's stacks should not be bigger than 2.
+1. For one cargo hold height of adjacent container's stacks should not be bigger than 2.
 
 
 **Note:** For simplicity we are not calculating ship's balance in bottom-to-top directions.
+
+![Ship scheme](resources/ship_scheme.jpg)
 
 
 [Top](#introduction)
