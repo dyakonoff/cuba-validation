@@ -607,13 +607,13 @@ We have covered most of the mechanisms that [CUBA platform](https://www.cuba-pla
 _**Table 1:** Validation levels_
 
 Level                                  | Generic UI client | Generic REST client | Middleware | DataStore | Transaction | Database
----------------------------------------|-------------------|---------------------|------------|-----------|-------------|----------
-DB level constraints + Bean Validation |        √          |         √ (\*)      |     √      |           |             |     √    
-Bean validation (annotations)          |        √          |         √ (\*)      |     √      |           |             |   
-UI validation (Field.Validator)        |        √          |                     |            |           |             |   
-Screen controllers validation          |        √          |                     |            |           |             |   
-Entity listeners                       |                   |                     |            |     √     |             |   
-Transaction listeners                  |                   |                     |            |           |      √      |   
+---------------------------------------|:-----------------:|:-------------------:|:----------:|:---------:|:-----------:|:--------:
+DB level constraints + Bean Validation |       yes         |         yes\*       |    yes     |           |             |    yes   
+Bean validation (annotations)          |       yes         |         yes\*       |    yes     |           |             |   
+UI validation (Field.Validator)        |       yes         |                     |            |           |             |   
+Screen controllers validation          |       yes         |                     |            |           |             |   
+Entity listeners                       |                   |                     |            |    yes    |             |   
+Transaction listeners                  |                   |                     |            |           |     yes     |   
 
 
 
