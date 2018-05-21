@@ -606,16 +606,54 @@ We have covered most of the mechanisms that [CUBA platform](https://www.cuba-pla
 
 _**Table 1:** Validation levels_
 
-Level                                  | Generic UI client | Generic REST client | Middleware | DataStore | Transaction | Database
----------------------------------------|:-----------------:|:-------------------:|:----------:|:---------:|:-----------:|:--------:
-DB level constraints + Bean Validation |       yes         |         yes\*       |    yes     |           |             |    yes   
-Bean validation (annotations)          |       yes         |         yes\*       |    yes     |           |             |   
-UI validation (Field.Validator)        |       yes         |                     |            |           |             |   
-Screen controllers validation          |       yes         |                     |            |           |             |   
-Entity listeners                       |                   |                     |            |    yes    |             |   
-Transaction listeners                  |                   |                     |            |           |     yes     |   
+|                                        | Generic UI client | Generic REST client | Middleware | DataStore | Transaction | DB server |
+|----------------------------------------|:-----------------:|:-------------------:|:----------:|:---------:|:-----------:|:---------:|
+| @Table and @Column JPA constraints \*  |                   |                     |            |           |             |    yes    |
+| Other DB level JPA constraints \*\*    |       yes         |       yes\*\*\*     |    yes     |           |             |    yes    |
+| Bean validation (annotations)          |       yes         |       yes\*\*\*     |    yes     |           |             |           |
+| UI validation (Field.Validator)        |       yes         |                     |            |           |             |           |
+| Custom Field.Validator                 |       yes         |                     |            |           |             |           |
+| Screen controllers validation          |       yes         |                     |            |           |             |           |
+| Entity listeners                       |                   |                     |            |    yes    |             |           |
+| Transaction listeners                  |                   |                     |            |           |     yes     |           |
+
+\* - Examples are here: [Product.java](validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)<br />
+\*\* - @NotNull<br />
+\*\*\* - only for fields marked with `@Validated` annotations
 
 
+
+_**Table 2:** Validation implementation complexity_
+
+|                                          | Elementary | Simple | Average | Complex  |
+|------------------------------------------|:----------:|:------:|:-------:|:--------:|
+| DB level JPA constraints                 |    yes     |        |         |          |
+| Bean validation (JPA annotations)        |    yes     |        |         |          |
+| Bean validation (custom annotations)     |            |        |   yes   |          |
+| UI validation (standard Field.Validator) |    yes     |        |         |          |
+| Custom Field.Validator (Java class)      |            |        |   yes   |          |
+| Custom Field.Validator (Groovy script)   |            |  yes   |         |          |
+| Screen controllers validation            |            |  yes   |         |          |
+| Entity listeners                         |            |        |         |   yes    |
+| Transaction listeners                    |            |        |         |   yes    |
+
+
+
+_**Table 3:** Validation scope_
+
+                                         | Single Field | Cross Field | DataStore | Transaction |
+-----------------------------------------|:------------:|:-----------:|:---------:|:-----------:|
+DB level JPA constraints                 |     yes      |   yes\*     |           |             |
+Bean validation (JPA annotations)        |     yes      |             |           |             |
+Bean validation (custom annotations)     |     yes      |    yes      |           |             |
+UI validation (standard Field.Validator) |     yes      |             |           |             |
+Custom Field.Validator (Java class)      |     yes      |             |           |             |
+Custom Field.Validator (Groovy script)   |     yes      |             |           |             |
+Screen controllers validation            |     yes      |    yes      |           |             |
+Entity listeners                         |     yes      |    yes      |    yes    |             |
+Transaction listeners                    |     yes      |    yes      |    yes    |     yes     |
+
+\* - for complex indexes (`@UniqueConstraint`)
 
 
 
