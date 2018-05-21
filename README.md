@@ -30,10 +30,10 @@ These two checkboxes alongside with `@NotNull` constraint that you can set for e
 
 ### Single-field constraints
 
-![Figure 1: Database-level constraints at field creation dialog <](resources/figure_1.png =50%)<br />
+![Figure 1: Database-level constraints at field creation dialog <](resources/figure_1.png)<br />
 _**Figure 1:** Database-level constraints at field creation dialog_
 
-![Figure 2: Database-level constraints in field editor <](resources/figure_2.png =400x)<br />
+![Figure 2: Database-level constraints in field editor <](resources/figure_2.png)<br />
 _**Figure 2:** Database-level constraints in field editor_
 
 [Top](#introduction)
