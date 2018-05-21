@@ -625,17 +625,17 @@ _**Table 1:** Validation levels_
 
 _**Table 2:** Validation implementation complexity_
 
-|                                          | Elementary | Simple | Average | Complex  |
-|------------------------------------------|:----------:|:------:|:-------:|:--------:|
-| DB level JPA constraints                 |    yes     |        |         |          |
-| Bean validation (JPA annotations)        |    yes     |        |         |          |
-| Bean validation (custom annotations)     |            |        |   yes   |          |
-| UI validation (standard Field.Validator) |    yes     |        |         |          |
-| Custom Field.Validator (Java class)      |            |        |   yes   |          |
-| Custom Field.Validator (Groovy script)   |            |  yes   |         |          |
-| Screen controllers validation            |            |  yes   |         |          |
-| Entity listeners                         |            |        |         |   yes    |
-| Transaction listeners                    |            |        |         |   yes    |
+|                                              | Elementary | Simple | Average | Complex  |
+|----------------------------------------------|:----------:|:------:|:-------:|:--------:|
+| **DB level JPA constraints**                 |    yes     |        |         |          |
+| **Bean validation (JPA annotations)**        |    yes     |        |         |          |
+| **Bean validation (custom annotations)**     |            |        |   yes   |          |
+| **UI validation (standard Field.Validator)** |    yes     |        |         |          |
+| **Custom Field.Validator (Java class)**      |            |        |   yes   |          |
+| **Custom Field.Validator (Groovy script)**   |            |  yes   |         |          |
+| **Screen controllers validation**            |            |  yes   |         |          |
+| **Entity listeners**                         |            |        |         |   yes    |
+| **Transaction listeners**                    |            |        |         |   yes    |
 
 
 
