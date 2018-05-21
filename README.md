@@ -16,8 +16,8 @@ Here are the approaches we will discuss:
 1. [Defining custom Validator class and groovy validation scripts for UI components](#custom-validator-classes-and-scripts) / _[Example](validator-component/)_
 1. [Validation in UI screen controllers](#validation-in-ui-screen-controllers)  / _[Example](validation-in-controllers/)_
 1. [Using Entity and Transaction listeners for validation](#using-middleware-listeners-for-data-validation) / _[Example](listeners-validation)_
-    * [Validating with Entity Listeners](#validating-with-entity-listeners)
-    * [Validating with Transaction Listeners](#validating-with-transaction-listeners)
+    * [Single Entity Context](#single-entity-context)
+    * [Transaction Context](#transaction-context)
 1. [Conclusion](#conclusion)
 
 ## [JPA DB level constraints](validation-with-custom-annotations/)
@@ -471,7 +471,7 @@ We will implement the first constraint using Entity Listener and the second one 
 
 [Top](#introduction)
 
-### Validating with Entity Listeners
+### Single Entity Context
 
 For the start we need to create an Entity Listener for our `Printer` entity. The simplest way is to do that using CUBA studio and in **Middleware** section pick menu item **New / Entity Listener**.
 
@@ -567,7 +567,7 @@ public class PrintingValidationExceptionHandler extends AbstractGenericException
 
 [Top](#introduction)
 
-### Validating with Transaction Listeners
+### Transaction Context
 
 Handling `PrintJob` entity validation with Transaction Listener is quite similar, we need to:
 
@@ -656,17 +656,17 @@ _**Table 2:** Validation implementation complexity_
 
 _**Table 3:** Validation scope_
 
-|                                            | Single Field | Cross Field | DataStore | Transaction |
-|--------------------------------------------|:------------:|:-----------:|:---------:|:-----------:|
-| _DB level JPA constraints_                 |     yes      |   yes\*     |           |             |
-| _Bean validation (JPA annotations)_        |     yes      |             |           |             |
-| _Bean validation (custom annotations)_     |     yes      |    yes      |           |             |
-| _UI validation (standard Field.Validator)_ |     yes      |             |           |             |
-| _Custom Field.Validator (Java class)_      |     yes      |             |           |             |
-| _Custom Field.Validator (Groovy script)_   |     yes      |             |           |             |
-| _Screen controllers validation_            |     yes      |    yes      |           |             |
-| _Entity listeners_                         |     yes      |    yes      |    yes    |             |
-| _Transaction listeners_                    |     yes      |    yes      |    yes    |     yes     |
+|                                            | Single Field | Cross Field | DataStore | Transaction Context|
+|--------------------------------------------|:------------:|:-----------:|:---------:|:------------------:|
+| _DB level JPA constraints_                 |     yes      |   yes\*     |           |                    |
+| _Bean validation (JPA annotations)_        |     yes      |             |           |                    |
+| _Bean validation (custom annotations)_     |     yes      |    yes      |           |                    |
+| _UI validation (standard Field.Validator)_ |     yes      |             |           |                    |
+| _Custom Field.Validator (Java class)_      |     yes      |             |           |                    |
+| _Custom Field.Validator (Groovy script)_   |     yes      |             |           |                    |
+| _Screen controllers validation_            |     yes      |    yes      |           |                    |
+| _Entity listeners_                         |     yes      |    yes      |    yes    |                    |
+| _Transaction listeners_                    |     yes      |    yes      |    yes    |         yes        |
 
 \* - for complex indexes (`@UniqueConstraint`), see example: [Product.java](validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)
 
