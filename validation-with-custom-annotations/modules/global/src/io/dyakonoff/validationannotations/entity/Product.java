@@ -10,6 +10,8 @@ import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.global.validation.groups.UiCrossFieldChecks;
 import io.dyakonoff.validationannotations.validator.CheckProductWeightType;
+import org.hibernate.validator.constraints.NotEmpty;
+
 import javax.persistence.Index;
 import javax.persistence.UniqueConstraint;
 
@@ -23,6 +25,7 @@ public class Product extends StandardEntity {
     private static final long serialVersionUID = 1561721020865033907L;
 
     @NotNull
+    @NotEmpty
     @Column(name = "NAME", nullable = false, unique = true, length = 100)
     protected String name;
 
@@ -39,6 +42,11 @@ public class Product extends StandardEntity {
     @NotNull
     @Column(name = "PRICE_PER_MEASURE", nullable = false)
     protected BigDecimal pricePerMeasure;
+
+    public void setWeightPerMeasure(BigDecimal weightPerMeasure) {
+        this.weightPerMeasure = weightPerMeasure;
+    }
+
 
     public void setPricePerMeasure(BigDecimal pricePerMeasure) {
         this.pricePerMeasure = pricePerMeasure;

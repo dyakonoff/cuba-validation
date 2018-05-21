@@ -7,30 +7,40 @@ Input validation is one of common tasks in everyday developer’s life. We need 
 In this article I want to touch the main approaches of data validation that [CUBA platform](https://www.cuba-platform.com/) offers.
 
 Here are the approaches we will discuss:
-1. [Database level constraints](#database-level-constraints) / [Example]()
-1. [Bean validation that CUBA Studio offers for entities.](#bean-validation) / _[Example](simple-validation/)_
-1. [Validation with custom annotations.](#validation-with-custom-annotations) / _[Example 1](validation-with-custom-annotations/), [Example 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)_
-1. [Defining custom Validator class and groovy validation scripts for UI components.](#custom-validator-classes-and-scripts) / _[Example](validator-component/)_
-1. [Validation in UI screen controllers.](#validation-in-ui-screen-controllers)  / _[Example](validation-in-controllers/)_
-1. [Using Entity and Transaction listeners for validation.](#using-middleware-listeners-for-data-validation) / _[Example](listeners-validation)_
-    1. [Validating with Entity Listeners.](#validating-with-entity-listeners)
-    1. [Validating with Transaction Listeners.](#validating-with-transaction-listeners)
+1. [JPA DB level constraints](#jpa-db-level-constraints) / [Example]()
+    * [Single-field constraints](#single-field-constraints)
+    * [Multi-column indexes](#multi-column-indexes)
+1. [JPA validation for entities](#jpa-validation-for-entities) / _[Example](simple-validation/)_
+    * [Generic REST Validation](#generic-rest-validation)
+1. [Bean validation with custom annotations](#bean-validation-with-custom-annotations) / _[Example 1](validation-with-custom-annotations/), [Example 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)_
+1. [Defining custom Validator class and groovy validation scripts for UI components](#custom-validator-classes-and-scripts) / _[Example](validator-component/)_
+1. [Validation in UI screen controllers](#validation-in-ui-screen-controllers)  / _[Example](validation-in-controllers/)_
+1. [Using Entity and Transaction listeners for validation](#using-middleware-listeners-for-data-validation) / _[Example](listeners-validation)_
+    * [Validating with Entity Listeners](#validating-with-entity-listeners)
+    * [Validating with Transaction Listeners](#validating-with-transaction-listeners)
 1. [Conclusion](#conclusion)
 
-## [Database level constraints](validation-with-custom-annotations/)
-Let's start this article with look at one of the most common constraints that [CUBA platform](https://www.cuba-platform.com/) offers. For any field of the entity you can say that this field is unique or mandatory. This can be done either during the entity field creation or after that with entity editor.
+## [JPA DB level constraints](validation-with-custom-annotations/)
+[JPA constraints]() that
+Let's start this article with a look at one of the most common constraints that [CUBA platform](https://www.cuba-platform.com/) offers. For any field of the entity you can say that this field is unique or mandatory. This can be done either during the entity field creation or after that with entity editor.
 
-These two checkboxes alongside with `@NotNull` constraint (see [figure 2](resources/figure_2.png) ) in studio's UI generate annotation and a DDL (SQL) constraint.
+These two checkboxes alongside with `@NotNull` constraint that you can set for entities (see [figure 2](resources/figure_2.png) ) generate both annotations and DDL (SQL) constraints.
 
-![Figure 1: Database-level constraints at field creation dialog](resources/figure_1.png)
+[Top](#introduction)
+
+### Single-field constraints
+
+![Figure 1: Database-level constraints at field creation dialog <](resources/figure_1.png =50%)<br />
 _**Figure 1:** Database-level constraints at field creation dialog_
 
-![Figure 2: Database-level constraints in field editor](resources/figure_2.png)
+![Figure 2: Database-level constraints in field editor <](resources/figure_2.png =400x)<br />
 _**Figure 2:** Database-level constraints in field editor_
 
+[Top](#introduction)
 
+### Multi-column indexes
 
-![Figure 3: Multi-column index on an entity](resources/figure_3.png)
+![Figure 3: Multi-column index on an entity](resources/figure_3.png)<br />
 _**Figure 3:** Multi-column index for an entity_
 
 ```java
@@ -77,11 +87,13 @@ create unique index IDX_VALIDATIONANNOTATIONS_PRODUCT_UNIQ_NAME on VALIDATIONANN
 create unique index IDX_VALIDATIONANNOTATIONS_PRODUCT_UNQ on VALIDATIONANNOTATIONS_PRODUCT (NAME, PRICE_PER_MEASURE, MEASURE) ^
 ```
 
-## [Bean Validation](simple-validation/)
+[Top](#introduction)
+
+## [JPA validation for entities](simple-validation/)
 
 The next validation type that comes with [CUBA studio IDE.](https://www.cuba-platform.com/download) is a [bean validation](https://doc.cuba-platform.com/manual-6.8/bean_validation.html), some of which annotations could be configured from studio UI. This gives users an easy way to mark entity fields through the editor screen with the common validators.
 
-![Figure 4: Standard entity validators in CUBA studio](resources/figure_4.png)
+![Figure 4: Standard entity validators in CUBA studio](resources/figure_4.png)<br />
 _**Figure 4:** Standard entity validators in CUBA studio_
 
 Annotation-based validation provides uniform validation of data on the middleware, in [Generic UI](https://doc.cuba-platform.com/manual-6.8/gui_framework.html) and [REST API](https://doc.cuba-platform.com/manual-6.8/rest_api_v2.html). It is based on the JSR 349 - Bean Validation 1.1 and its reference implementation: [Hibernate Validator](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/?v=5.3).
@@ -144,7 +156,11 @@ Although these annotations are simple to use and well documented, they can cover
 
 [Top](#introduction)
 
-## Validation with custom annotations
+### Generic REST Validation
+
+[Top](#introduction)
+
+## Bean validation with custom annotations
 
 [Custom annotations](https://doc.cuba-platform.com/manual-6.8/bean_validation_constraints.html#bean_validation_custom_constraints) could be defined not just for entities fields but also for Entity classes, POJOs and service methods. Let’s check out how to do that.
 
@@ -244,10 +260,10 @@ Let's look at these cases:
 
 [CUBA studio](https://www.cuba-platform.com/download) gives a simple UI that allows developers to specify what class need to be used as a `Field.Validator` for the component. This editor is available from **Screen Designer** at the component properties tab.
 
-![Figure 5: Accessing Validator property for FieldGroup](resources/figure_5.png)
+![Figure 5: Accessing Validator property for FieldGroup](resources/figure_5.png)<br />
 _**Figure 5:** Accessing Validator property for FieldGroup_
 
-![Figure 6: Field.Validator editor](resources/figure_6.png)
+![Figure 6: Field.Validator editor](resources/figure_6.png)<br />
 _**Figure 6:** Field.Validator editor_
 
 From the XML layout perspective these validators looks quite simple and straightforward. You may wish to edit screen layout XML directly by hands, as for me this is a bit faster and simpler way of linking Validators to UI components.
@@ -321,7 +337,7 @@ Right through editing your screen XML layout:
 
 Or by specifying the Validator for the component using CUBA studio IDE:
 
-![Figure 7: Setting up a custom Field.Validator using studio UI](resources/figure_7.png)
+![Figure 7: Setting up a custom Field.Validator using studio UI](resources/figure_7.png)<br />
 _**Figure 7:** Setting up a custom Field.Validator using studio UI_
 
 However, the second way would not let you to give additional parameters for validator like the `message` one above.
@@ -332,7 +348,7 @@ Running [groovy](http://groovy-lang.org/) script dynamically with [Scripting int
 
 This script can be specified either from CUBA studio UI:
 
-![Figure 8: Setting up a groovy script for field validation](resources/figure_8.png)
+![Figure 8: Setting up a groovy script for field validation](resources/figure_8.png)<br />
 _**Figure 8:** Setting up a groovy script for field validation_
 
 or by editing XML screen layout directly:
@@ -441,10 +457,10 @@ In both cases, you'd need to define your custom `RuntimeException` class in glob
 
 Also, it seems to be a good idea to implement custom [client-level exception handlers](https://doc.cuba-platform.com/manual-6.8/exceptionHandlers.html) to have your error messages displayed properly. However, if you don't care much about how your errors are displayed to a user, you can skip this step.
 
-![without implementing client-level exception handlers](resources/figure_9.png)
+![without implementing client-level exception handlers](resources/figure_9.png)<br />
 _**Figure 9:** Error message without implementing custom client-level exception handlers_
 
-![after implementing custom client-level exception handlers](resources/figure_10.png)
+![after implementing custom client-level exception handlers](resources/figure_10.png)<br />
 _**Figure 10:** Error message after implementing custom client-level exception handlers_
 
 Let's look at the examples.
@@ -459,15 +475,14 @@ We will implement the first constraint using Entity Listener and the second one 
 
 For the start we need to create an Entity Listener for our `Printer` entity. The simplest way is to do that using CUBA studio and in **Middleware** section pick menu item **New / Entity Listener**.
 
-![Figure 11: Creating Entity Listener with CUBA studio](resources/figure_11.png)
-
+![Figure 11: Creating Entity Listener with CUBA studio](resources/figure_11.png)<br />
 _**Figure 11:** Creating Entity Listener with CUBA studio_
 
 1. Give proper name to the Listener class,
 1. Check `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` interfaces to be implemented
 1. Specify that entity `Printer` need  to be handled by the listener
 
-![Figure 12: Setting parameters for Entity Listener](resources/figure_12.png)
+![Figure 12: Setting parameters for Entity Listener](resources/figure_12.png)<br />
 _**Figure 12:** Setting parameters for Entity Listener_
 
 As an alternative it is possible to create [Entity Listener class](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/PrinterEntityListener.java) manually and mark `Printer class` with `@Listeners("listenersvalidation_PrinterEntityListener")` annotation:
@@ -606,54 +621,54 @@ We have covered most of the mechanisms that [CUBA platform](https://www.cuba-pla
 
 _**Table 1:** Validation levels_
 
-|                                        | Generic UI client | Generic REST client | Middleware | DataStore | Transaction | DB server |
-|----------------------------------------|:-----------------:|:-------------------:|:----------:|:---------:|:-----------:|:---------:|
-| @Table and @Column JPA constraints \*  |                   |                     |            |           |             |    yes    |
-| Other DB level JPA constraints \*\*    |       yes         |       yes\*\*\*     |    yes     |           |             |    yes    |
-| Bean validation (annotations)          |       yes         |       yes\*\*\*     |    yes     |           |             |           |
-| UI validation (Field.Validator)        |       yes         |                     |            |           |             |           |
-| Custom Field.Validator                 |       yes         |                     |            |           |             |           |
-| Screen controllers validation          |       yes         |                     |            |           |             |           |
-| Entity listeners                       |                   |                     |            |    yes    |             |           |
-| Transaction listeners                  |                   |                     |            |           |     yes     |           |
+|                                   | Generic UI | Generic REST | Middleware | DataStore | Transaction | DB server |
+|-----------------------------------|:----------:|:------------:|:----------:|:---------:|:-----------:|:---------:|
+| _DB level JPA constraints \*_     |            |              |            |           |             |    yes    |
+| _@NotNull constraint \*\*_        |     yes    |   yes\*\*\*  |    yes     |           |             |    yes    |
+| _Bean validation (annotations)_   |     yes    |   yes\*\*\*  |    yes     |           |             |           |
+| _UI validation (Field.Validator)_ |     yes    |              |            |           |             |           |
+| _Custom Field.Validator_          |     yes    |              |            |           |             |           |
+| _Screen controllers validation_   |     yes    |              |            |           |             |           |
+| _Entity listeners_                |            |              |            |    yes    |             |           |
+| _Transaction listeners_           |            |              |            |           |     yes     |           |
 
-\* - Examples are here: [Product.java](validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)<br />
-\*\* - @NotNull<br />
+\* - `@Table` and `@Column` annotations, see example: [Product.java](validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)<br />
+\*\* - `@NotNull` that is accompanied with `@Column(nullable = false)`<br />
 \*\*\* - only for fields marked with `@Validated` annotations
 
 
 
 _**Table 2:** Validation implementation complexity_
 
-|                                              | Elementary | Simple | Average | Complex  |
-|----------------------------------------------|:----------:|:------:|:-------:|:--------:|
-| **DB level JPA constraints**                 |    yes     |        |         |          |
-| **Bean validation (JPA annotations)**        |    yes     |        |         |          |
-| **Bean validation (custom annotations)**     |            |        |   yes   |          |
-| **UI validation (standard Field.Validator)** |    yes     |        |         |          |
-| **Custom Field.Validator (Java class)**      |            |        |   yes   |          |
-| **Custom Field.Validator (Groovy script)**   |            |  yes   |         |          |
-| **Screen controllers validation**            |            |  yes   |         |          |
-| **Entity listeners**                         |            |        |         |   yes    |
-| **Transaction listeners**                    |            |        |         |   yes    |
+|                                            | Elementary | Simple | Average | Complex  |
+|--------------------------------------------|:----------:|:------:|:-------:|:--------:|
+| _DB level JPA constraints_                 |    yes     |        |         |          |
+| _Bean validation (JPA annotations)_        |    yes     |        |         |          |
+| _Bean validation (custom annotations_      |            |        |   yes   |          |
+| _UI validation (standard Field.Validator_  |    yes     |        |         |          |
+| _Custom Field.Validator (Java class)_      |            |        |   yes   |          |
+| _Custom Field.Validator (Groovy script)_   |            |  yes   |         |          |
+| _Screen controllers validation_            |            |  yes   |         |          |
+| _Entity listeners_                         |            |        |         |   yes    |
+| _Transaction listeners_                    |            |        |         |   yes    |
 
 
 
 _**Table 3:** Validation scope_
 
-|                                          | Single Field | Cross Field | DataStore | Transaction |
-|------------------------------------------|:------------:|:-----------:|:---------:|:-----------:|
-| DB level JPA constraints                 |     yes      |   yes\*     |           |             |
-| Bean validation (JPA annotations)        |     yes      |             |           |             |
-| Bean validation (custom annotations)     |     yes      |    yes      |           |             |
-| UI validation (standard Field.Validator) |     yes      |             |           |             |
-| Custom Field.Validator (Java class)      |     yes      |             |           |             |
-| Custom Field.Validator (Groovy script)   |     yes      |             |           |             |
-| Screen controllers validation            |     yes      |    yes      |           |             |
-| Entity listeners                         |     yes      |    yes      |    yes    |             |
-| Transaction listeners                    |     yes      |    yes      |    yes    |     yes     |
+|                                            | Single Field | Cross Field | DataStore | Transaction |
+|--------------------------------------------|:------------:|:-----------:|:---------:|:-----------:|
+| _DB level JPA constraints_                 |     yes      |   yes\*     |           |             |
+| _Bean validation (JPA annotations)_        |     yes      |             |           |             |
+| _Bean validation (custom annotations)_     |     yes      |    yes      |           |             |
+| _UI validation (standard Field.Validator)_ |     yes      |             |           |             |
+| _Custom Field.Validator (Java class)_      |     yes      |             |           |             |
+| _Custom Field.Validator (Groovy script)_   |     yes      |             |           |             |
+| _Screen controllers validation_            |     yes      |    yes      |           |             |
+| _Entity listeners_                         |     yes      |    yes      |    yes    |             |
+| _Transaction listeners_                    |     yes      |    yes      |    yes    |     yes     |
 
-\* - for complex indexes (`@UniqueConstraint`)
+\* - for complex indexes (`@UniqueConstraint`), see example: [Product.java](validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)
 
 
 
