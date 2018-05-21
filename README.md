@@ -605,6 +605,7 @@ _[TransactionListener.java](listeners-validation/modules/core/src/io/dyakonoff/l
 We have covered most of the mechanisms that [CUBA platform](https://www.cuba-platform.com/) offers for input data validation. Let's group them by
 
 _**Table 1:** Validation levels_
+
 Level                                  | Generic UI client | Generic REST client | Middleware | DataStore | Transaction | Database
 ---------------------------------------|-------------------|---------------------|------------|-----------|-------------|----------
 DB level constraints + Bean Validation |        √          |         √ (\*)      |     √      |           |             |     √    
