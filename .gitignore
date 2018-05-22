@@ -1,3 +1,5 @@
 **/.DS_store
 resources/*.kra~
+resources/*.kra
 resources/*autosave.kra
+resources/*.png~

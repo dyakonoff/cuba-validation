@@ -23,16 +23,15 @@ Here are the approaches we will discuss:
 
 ## Model problem description
 
-Before discussing different validation methods available in [CUBA platform](https://www.cuba-platform.com/) let's settle down the model problem that our code example will be solving.
-
-**Note:** If you want to check out code examples and technical details you can skip this section.
+Before discussing different validation methods available in [CUBA platform](https://www.cuba-platform.com/) let's discuss the example application first.
 
 As the matter of fact, I'm going to use an example application that includes all validation methods mentioned in this article to demonstrate how they work from different perspectives: code, user interface, CUBA studio IDE, REST endpoints etc.
 
-However, before starting coding exercises, let's discuss the problem, we are going to model with our software.
+It will be a small order-management application with the next data structure:
 
+![Entities structure](resources/database_scheme.png)
 
-![Ship scheme](resources/ship_scheme.jpg)
+Detailed list of entities and constraints is [here](order-management.md)
 
 
 [Top](#introduction)
