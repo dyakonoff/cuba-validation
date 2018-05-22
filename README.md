@@ -32,13 +32,13 @@ It will be a small order-management application with the next data structure:
 
 ![Entities structure](resources/database_scheme_sm.png)
 
-Detailed list of entities and constraints is [here](order-management.md)
+Detailed list of entities and constraints could be found [here](order-management.md).
 
 [Top](#introduction)
 
 ## Example application
 
-## [JPA DB level constraints](validation-with-custom-annotations/)
+## JPA DB level constraints
 [JPA constraints]() that
 Let's start this article with a look at one of the most common constraints that [CUBA platform](https://www.cuba-platform.com/) offers. For any field of the entity you can say that this field is unique or mandatory. This can be done either during the entity field creation or after that with entity editor.
 
@@ -107,7 +107,7 @@ create unique index IDX_VALIDATIONANNOTATIONS_PRODUCT_UNQ on VALIDATIONANNOTATIO
 
 [Top](#introduction)
 
-## [JPA validation for entities](simple-validation/)
+## JPA validation for entities
 
 The next validation type that comes with [CUBA studio IDE.](https://www.cuba-platform.com/download) is a [bean validation](https://doc.cuba-platform.com/manual-6.8/bean_validation.html), some of which annotations could be configured from studio UI. This gives users an easy way to mark entity fields through the editor screen with the common validators.
 

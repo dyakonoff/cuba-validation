@@ -8,64 +8,65 @@ This is a simple order management system that resembles a stock of a small US ba
 
 | **Customer**      |           |
 |-------------------|-----------|
-| Name              | required, should have length >= 1, and should start with Latin letter |
-| Email             | required, unique, should be a well-formed email address |
-| Phone             | should follow the US phone numbers format: `+1 NXX-NXX-XXXX` , where: `N`=digits 2–9, `X`=digits 0–9 |
-| Logo image        |           |
-| Address Line 1    | required, should has length greater than 5 |
-| Address Line 2    |           |
-| Address Line 3    |           |
-| Postal code       | required and should follow US ZIP codes format: `12345` or `12345-6789` or `12345 1234` |
+| name              | required, should have length >= 1, and should start with Latin letter |
+| email             | required, unique, should be a well-formed email address |
+| phone             | should follow the US phone numbers format: `+1 NXX-NXX-XXXX` , where: `N`=digits 2–9, `X`=digits 0–9 |
+| logoImage         |           |
+| addressLine1      | required, should has length greater than 5 |
+| addressLine2      |           |
+| addressLine3      |           |
+| postalCode        | required and should follow US ZIP codes format: `12345` or `12345-6789` or `12345 1234` |
 
 Other constraints:
-1. Either `name` or `email` should be defined for a customer
+* Either `name` or `email` should be defined for a customer
 
 ----
 
 | **Order**           |         |
 |---------------------|---------|
-| Customer            | required |
-| Date                | required, should be in the past |
+| customer            | required |
+| date                | required, should be in the past |
 | number              | required, unique, should be:  yyyy-MM-dd-incremental_number (unique for 1 day) |
-| Status              | required, Values: New, Paid, Cancelled |
-| Order items         | required |
-| Price               | required, positive |
-| Responsible manager | required, (User) |
+| status              | required, Values: New, Paid, Cancelled |
+| orderItems          | required |
+| price               | required, positive |
+| responsibleManager  | required, (User) |
 
 Other constraints:
-1. `price` should be equal to the sum of order item total prices
-1. Order can not be committed if there are not enough products in `Stock` for any of `orderItems`
+* `price` should be equal to the sum of order item total prices
+* Order can not be committed if there are not enough products in `Stock` for any of `orderItems`
 
 -----
 
 | **Order Item** |          |
 |----------------|----------|
-| Product        | required |
-| Quantity       | required, > 0 |
-| Total price    | required, > 0 |
+| product        | required |
+| quantity       | required, > 0 |
+| subTotal       | required, > 0 |
 
 Other constraints:
-1. `totalPrice == quantity * product.pricePerMeasure`
+* `totalPrice == quantity * product.pricePerMeasure`
+* `quantity` should be an whole number greater than 0 if `product.measure == COUNT || product.measure == PACK` otherwise `quantity` could have a fractional part
 
 -----
 
 | **Product**        |          |
 |--------------------|----------|
-| Name               | required, should not contain swear words |
-| Description        | should not contain swear words
-| Measure            | Values: pound, count, pack  |
-| Price per measure  | required, > 0 |
+| name               | required, should not contain swear words |
+| description        | should not contain swear words
+| measure            | required, Values: pound, count, pack  |
+| pricePerMeasure    | required, > 0 |
 
 Other constraints:
-1. `name` and `measure` combination should be unique
+* `name` and `measure` combination should be unique
 
 -----
 
-| **Stock**                           |          |
-|-------------------------------------|----------|
-| Product                             | required |
-| Stock (how many/much are available) | required, non-negative |
-| Optimal stock level                 | >=0 or null |
+| **Stock**         |          |
+|-------------------|----------|
+| product           | required |
+| inStock           | required, non-negative (how many/much are available) |
+| optimalStockLevel | >=0 or null |
 
 [Back to article](README.md)
 
