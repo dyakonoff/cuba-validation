@@ -7,16 +7,17 @@ Input validation is one of common tasks in everyday developer’s life. We need 
 In this article I want to touch the main approaches of data validation that [CUBA platform](https://www.cuba-platform.com/) offers.
 
 Here are the approaches we will discuss:
-1. [Model problem description](#model-problem-description)
-1. [JPA DB level constraints](#jpa-db-level-constraints) / [Example]()
+1. [Model problem description](#model-problem-description) / _[full description](order-management.md)_
+1. [Example application](#example-application)
+1. [JPA DB level constraints](#jpa-db-level-constraints)
     * [Single-field constraints](#single-field-constraints)
     * [Multi-column indexes](#multi-column-indexes)
-1. [JPA validation for entities](#jpa-validation-for-entities) / _[Example](simple-validation/)_
+1. [JPA validation for entities](#jpa-validation-for-entities)
     * [Generic REST Validation](#generic-rest-validation)
-1. [Bean validation with custom annotations](#bean-validation-with-custom-annotations) / _[Example 1](validation-with-custom-annotations/), [Example 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)_
-1. [Defining custom Validator class and groovy validation scripts for UI components](#custom-validator-classes-and-scripts) / _[Example](validator-component/)_
-1. [Validation in UI screen controllers](#validation-in-ui-screen-controllers)  / _[Example](validation-in-controllers/)_
-1. [Using Entity and Transaction listeners for validation](#using-middleware-listeners-for-data-validation) / _[Example](listeners-validation)_
+1. [Bean validation with custom annotations](#bean-validation-with-custom-annotations) 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)
+1. [Defining custom Validator class and groovy validation scripts for UI components](#custom-validator-classes-and-scripts)
+1. [Validation in UI screen controllers](#validation-in-ui-screen-controllers)
+1. [Using Entity and Transaction listeners for validation](#using-middleware-listeners-for-data-validation)
     * [Single Entity Context](#single-entity-context)
     * [Transaction Context](#transaction-context)
 1. [Conclusion](#conclusion)
@@ -29,12 +30,13 @@ As the matter of fact, I'm going to use an example application that includes all
 
 It will be a small order-management application with the next data structure:
 
-![Entities structure](resources/database_scheme.png)
+![Entities structure](resources/database_scheme_sm.png)
 
 Detailed list of entities and constraints is [here](order-management.md)
 
-
 [Top](#introduction)
+
+## Example application
 
 ## [JPA DB level constraints](validation-with-custom-annotations/)
 [JPA constraints]() that

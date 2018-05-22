@@ -2,6 +2,8 @@
 
 This is a simple order management system that resembles a stock of a small US based online shop that works for domestic market only.
 
+[Back to article](README.md)
+
 ## Data model and constraints
 
 | **Customer**      |           |
@@ -65,10 +67,13 @@ Other constraints:
 | Stock (how many/much are available) | required, non-negative |
 | Optimal stock level                 | >=0 or null |
 
+[Back to article](README.md)
 
 ## Database scheme diagram
 
 ![Database structure](resources/database_scheme.png)
+
+[Back to article](README.md)
 
 ## Screens
 
