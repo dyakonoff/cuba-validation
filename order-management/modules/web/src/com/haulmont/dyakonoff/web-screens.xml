@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <screen-config xmlns="http://schemas.haulmont.com/cuba/screens.xsd">
-
     <include file="com/haulmont/dyakonoff/screens.xml"/>
-
+    <screen id="ordermanagement$Customer.browse"
+            template="com/haulmont/dyakonoff/web/customer/customer-browse.xml"/>
 </screen-config>

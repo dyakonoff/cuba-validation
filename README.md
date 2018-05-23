@@ -8,13 +8,13 @@ In this article I want to touch the main approaches of data validation that [CUB
 
 Here are the approaches we will discuss:
 1. [Model problem description](#model-problem-description) / _[full description](order-management.md)_
-1. [Example application](#example-application)
+1. [Sample application](#sample-application)
 1. [JPA DB level constraints](#jpa-db-level-constraints)
     * [Single-field constraints](#single-field-constraints)
     * [Multi-column indexes](#multi-column-indexes)
 1. [JPA validation for entities](#jpa-validation-for-entities)
     * [Generic REST Validation](#generic-rest-validation)
-1. [Bean validation with custom annotations](#bean-validation-with-custom-annotations) 2](https://github.com/cuba-platform/sample-user-registration/tree/master/modules/global/src/com/company/sample)
+1. [Bean validation with custom annotations](#bean-validation-with-custom-annotations)
 1. [Defining custom Validator class and groovy validation scripts for UI components](#custom-validator-classes-and-scripts)
 1. [Validation in UI screen controllers](#validation-in-ui-screen-controllers)
 1. [Using Entity and Transaction listeners for validation](#using-middleware-listeners-for-data-validation)
@@ -33,10 +33,11 @@ It will be a small order-management application with the next data structure:
 ![Entities structure](resources/database_scheme_sm.png)
 
 Detailed list of entities and constraints could be found [here](order-management.md).
+List of implemented validation methods is [here](validations-index.md).
 
 [Top](#introduction)
 
-## Example application
+## Sample application
 
 ## JPA DB level constraints
 [JPA constraints]() that
@@ -662,8 +663,8 @@ _**Table 2:** Validation implementation complexity_
 |--------------------------------------------|:----------:|:------:|:-------:|:--------:|
 | _DB level JPA constraints_                 |    yes     |        |         |          |
 | _Bean validation (JPA annotations)_        |    yes     |        |         |          |
-| _Bean validation (custom annotations_      |            |        |   yes   |          |
-| _UI validation (standard Field.Validator_  |    yes     |        |         |          |
+| _Bean validation (custom annotations)_      |            |        |   yes   |          |
+| _UI validation (standard Field.Validator)_  |    yes     |        |         |          |
 | _Custom Field.Validator (Java class)_      |            |        |   yes   |          |
 | _Custom Field.Validator (Groovy script)_   |            |  yes   |         |          |
 | _Screen controllers validation_            |            |  yes   |         |          |
