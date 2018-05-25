@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.chile.core.annotations.NamePattern;
@@ -51,6 +52,7 @@ public class Order extends StandardEntity {
 
     @NotNull
     @Column(name = "PRICE", nullable = false)
+    @DecimalMin(inclusive = false, value = "0.00", message = "Order price should be greater than 0")
     protected BigDecimal price;
 
     @NotNull

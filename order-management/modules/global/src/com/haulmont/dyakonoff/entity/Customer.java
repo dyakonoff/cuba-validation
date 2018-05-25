@@ -9,6 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+
+import com.haulmont.dyakonoff.validator.UsPhoneNumber;
 import org.hibernate.validator.constraints.Email;
 import com.haulmont.cuba.core.entity.StandardEntity;
 import org.hibernate.validator.constraints.Length;
@@ -30,6 +32,7 @@ public class Customer extends StandardEntity {
     protected String email;
 
     // TODO: Add phone validation with @Pattern JPA
+    @UsPhoneNumber
     @Column(name = "PHONE", length = 30)
     protected String phone;
 

@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <menu-config xmlns="http://schemas.haulmont.com/cuba/menu.xsd">
+    <item insertBefore="administration"
+          screen="ordermanagement$Customer.browse"/>
+    <item insertBefore="administration"
+          screen="ordermanagement$Order.browse"/>
     <menu id="application-ordermanagement"
           insertBefore="administration">
-        <item screen="ordermanagement$Customer.browse"/>
+        <item screen="ordermanagement$Product.browse"/>
+        <item screen="ordermanagement$Stock.browse"/>
+        <item id="userBrowse"
+              screen="sec$User.browse"/>
     </menu>
 </menu-config>

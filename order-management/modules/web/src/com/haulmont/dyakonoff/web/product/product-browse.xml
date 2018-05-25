@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
         caption="msg://browseCaption"
-        class="com.haulmont.dyakonoff.web.customer.CustomerBrowse"
-        focusComponent="customersTable"
-        lookupComponent="customersTable"
-        messagesPack="com.haulmont.dyakonoff.web.customer">
+        class="com.haulmont.dyakonoff.web.product.ProductBrowse"
+        focusComponent="productsTable"
+        lookupComponent="productsTable"
+        messagesPack="com.haulmont.dyakonoff.web.product">
     <dsContext>
-        <groupDatasource id="customersDs"
-                         class="com.haulmont.dyakonoff.entity.Customer"
+        <groupDatasource id="productsDs"
+                         class="com.haulmont.dyakonoff.entity.Product"
                          view="_local">
             <query>
-                <![CDATA[select e from ordermanagement$Customer e]]>
+                <![CDATA[select e from ordermanagement$Product e]]>
             </query>
         </groupDatasource>
     </dsContext>
     <dialogMode height="600"
                 width="800"/>
-    <layout expand="customersTable"
+    <layout expand="productsTable"
             spacing="true">
         <filter id="filter"
-                applyTo="customersTable"
-                datasource="customersDs">
+                applyTo="productsTable"
+                datasource="productsDs">
             <properties include=".*"/>
         </filter>
-        <groupTable id="customersTable"
+        <groupTable id="productsTable"
                     width="100%">
             <actions>
                 <action id="create"/>
@@ -32,23 +32,20 @@
             </actions>
             <columns>
                 <column id="name"/>
-                <column id="email"/>
-                <column id="phone"/>
-                <column id="addressLine1"/>
-                <column id="addressLine2"/>
-                <column id="addressLine3"/>
-                <column id="postalCode"/>
+                <column id="description"/>
+                <column id="measure"/>
+                <column id="pricePerMeasure"/>
             </columns>
-            <rows datasource="customersDs"/>
+            <rows datasource="productsDs"/>
             <rowsCount/>
             <buttonsPanel id="buttonsPanel"
                           alwaysVisible="true">
                 <button id="createBtn"
-                        action="customersTable.create"/>
+                        action="productsTable.create"/>
                 <button id="editBtn"
-                        action="customersTable.edit"/>
+                        action="productsTable.edit"/>
                 <button id="removeBtn"
-                        action="customersTable.remove"/>
+                        action="productsTable.remove"/>
             </buttonsPanel>
         </groupTable>
     </layout>
