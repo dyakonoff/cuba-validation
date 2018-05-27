@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="com.haulmont.dyakonoff.orderman.web.orderitem.OrderItemEdit"
+        datasource="orderItemDs"
+        focusComponent="fieldGroup"
+        messagesPack="com.haulmont.dyakonoff.orderman.web.orderitem">
+    <dsContext>
+        <datasource id="orderItemDs"
+                    class="com.haulmont.dyakonoff.orderman.entity.OrderItem"
+                    view="orderItem-view"/>
+        <collectionDatasource id="productsDs"
+                              class="com.haulmont.dyakonoff.orderman.entity.Product"
+                              view="_minimal">
+            <query>
+                <![CDATA[select e from orderman$Product e]]>
+            </query>
+        </collectionDatasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <fieldGroup id="fieldGroup"
+                    datasource="orderItemDs">
+            <column width="250px">
+                <field optionsDatasource="productsDs"
+                       property="product"/>
+                <field property="quantity"/>
+                <field property="subTotal"/>
+            </column>
+        </fieldGroup>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="com.haulmont.dyakonoff.orderman.web.order.OrderEdit"
+        datasource="orderDs"
+        focusComponent="fieldGroup"
+        messagesPack="com.haulmont.dyakonoff.orderman.web.order">
+    <dsContext>
+        <datasource id="orderDs"
+                    class="com.haulmont.dyakonoff.orderman.entity.Order"
+                    view="order-edit">
+            <collectionDatasource id="itemsDs"
+                                  property="items"/>
+        </datasource>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <fieldGroup id="fieldGroup"
+                    datasource="orderDs">
+            <column width="250px">
+                <field optionsDatasource="itemsDs"
+                       property="customer"/>
+                <field property="date"/>
+                <field property="number"/>
+                <field property="status"/>
+                <field property="price"/>
+                <field optionsDatasource="itemsDs"
+                       property="manager"/>
+            </column>
+        </fieldGroup>
+        <groupBox id="itemsBox"
+                  caption="msg://com.haulmont.dyakonoff.orderman.entity/Order.items">
+            <table id="itemsTable"
+                   height="200px"
+                   width="100%">
+                <actions>
+                    <action id="create"/>
+                    <action id="edit"/>
+                    <action id="remove"/>
+                </actions>
+                <columns>
+                    <column id="product"/>
+                    <column id="quantity"/>
+                    <column id="subTotal"/>
+                </columns>
+                <rows datasource="itemsDs"/>
+                <buttonsPanel>
+                    <button action="itemsTable.create"/>
+                    <button action="itemsTable.edit"/>
+                    <button action="itemsTable.remove"/>
+                </buttonsPanel>
+            </table>
+        </groupBox>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>

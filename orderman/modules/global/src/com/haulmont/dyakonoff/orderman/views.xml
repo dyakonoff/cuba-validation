@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<views xmlns="http://schemas.haulmont.com/cuba/view.xsd">
+    <view class="com.haulmont.dyakonoff.orderman.entity.Customer"
+          extends="_local"
+          name="customer-view">
+        <property name="logoImage"
+                  view="_minimal"/>
+    </view>
+    <view class="com.haulmont.dyakonoff.orderman.entity.Stock"
+          extends="_local"
+          name="stock-view">
+        <property name="product"
+                  view="_minimal"/>
+    </view>
+    <view class="com.haulmont.cuba.security.entity.User"
+          extends="_minimal"
+          name="user-view"/>
+    <view class="com.haulmont.dyakonoff.orderman.entity.Order"
+          extends="_minimal"
+          name="order-view">
+        <property name="date"/>
+        <property name="status"/>
+        <property name="price"/>
+    </view>
+    <view class="com.haulmont.dyakonoff.orderman.entity.Order"
+          extends="_local"
+          name="order-edit">
+        <property name="customer"
+                  view="_minimal"/>
+        <property name="items"
+                  view="_minimal">
+            <property name="subTotal"/>
+        </property>
+        <property name="manager"
+                  view="_minimal"/>
+    </view>
+    <view class="com.haulmont.dyakonoff.orderman.entity.OrderItem"
+          extends="_local"
+          name="orderItem-view">
+        <property name="product"
+                  view="_minimal"/>
+    </view>
+</views>
