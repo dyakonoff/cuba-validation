@@ -8,7 +8,5 @@
           insertBefore="administration">
         <item screen="orderman$Product.browse"/>
         <item screen="orderman$Stock.browse"/>
-        <item id="userBrowserAndEditor"
-              screen="sec$User.browse"/>
     </menu>
 </menu-config>

@@ -11,8 +11,6 @@
             template="com/haulmont/dyakonoff/orderman/web/product/product-edit.xml"/>
     <screen id="orderman$Stock.browse"
             template="com/haulmont/dyakonoff/orderman/web/stock/stock-browse.xml"/>
-    <screen id="sec$User.browse"
-            template="com/haulmont/dyakonoff/orderman/web/user/user-browse.xml"/>
     <screen id="orderman$Order.browse"
             template="com/haulmont/dyakonoff/orderman/web/order/order-browse.xml"/>
     <screen id="orderman$Order.edit"

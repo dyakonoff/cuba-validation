@@ -10,7 +10,8 @@
           extends="_local"
           name="stock-view">
         <property name="product"
-                  view="_minimal"/>
+                  view="_minimal">
+        </property>
     </view>
     <view class="com.haulmont.cuba.security.entity.User"
           extends="_minimal"
@@ -31,13 +32,23 @@
                   view="_minimal">
             <property name="subTotal"/>
         </property>
-        <property name="manager"
-                  view="_minimal"/>
     </view>
     <view class="com.haulmont.dyakonoff.orderman.entity.OrderItem"
           extends="_local"
           name="orderItem-view">
         <property name="product"
+                  view="_minimal">
+            <property name="pricePerMeasure"/>
+        </property>
+    </view>
+    <view class="com.haulmont.dyakonoff.orderman.entity.Order"
+          extends="_local"
+          name="order-view_1">
+        <property name="customer"
                   view="_minimal"/>
+        <property name="items"
+                  view="_minimal">
+            <property name="subTotal"/>
+        </property>
     </view>
 </views>

@@ -19,7 +19,9 @@
                         datasource="customerDs">
                 <column width="250px">
                     <field property="name"/>
-                    <field property="email"/>
+                    <field property="email">
+                        <validator class="com.haulmont.cuba.gui.components.validators.EmailValidator"/>
+                    </field>
                     <field property="phone"/>
                     <field property="addressLine1"/>
                     <field property="addressLine2"/>

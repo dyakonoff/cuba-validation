@@ -22,7 +22,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.DecimalMin;
+import com.haulmont.cuba.core.entity.annotation.Listeners;
 
+@Listeners("orderman_OrderEntityListener")
 @NamePattern("%s order#: %s|customer,number")
 @Table(name = "ORDERMAN_ORDER")
 @Entity(name = "orderman$Order")
@@ -59,11 +61,6 @@ public class Order extends StandardEntity {
     @Column(name = "PRICE", nullable = false)
     protected BigDecimal price;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "MANAGER_ID")
-    protected User manager;
-
     public void setStatus(OrderStatus status) {
         this.status = status == null ? null : status.getId();
     }
@@ -86,14 +83,6 @@ public class Order extends StandardEntity {
 
     public BigDecimal getPrice() {
         return price;
-    }
-
-    public void setManager(User manager) {
-        this.manager = manager;
-    }
-
-    public User getManager() {
-        return manager;
     }
 
 

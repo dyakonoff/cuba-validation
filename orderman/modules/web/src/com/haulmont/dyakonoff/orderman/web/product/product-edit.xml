@@ -17,9 +17,15 @@
         <fieldGroup id="fieldGroup"
                     datasource="productDs">
             <column width="250px">
-                <field property="name"/>
+                <field property="name">
+                    <validator class="com.haulmont.dyakonoff.orderman.validation.ProductNameValidator"
+                               message="msg://badNameInProductName" />
+                </field>
                 <field property="description"
-                       rows="5"/>
+                       rows="5">
+                    <validator class="com.haulmont.dyakonoff.orderman.validation.ProductNameValidator"
+                               message="msg://badNameInProductDescription" />
+                </field>
                 <field property="measure"/>
                 <field property="pricePerMeasure"/>
             </column>

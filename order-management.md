@@ -4,6 +4,7 @@ This is a simple order management system that resembles a stock of a small US ba
 
 [Back to article](README.md)
 
+
 ## Data model and constraints
 
 |   | **Customer**      |           |
@@ -30,7 +31,6 @@ Other constraints:
 | + | status              | required, Values: New, Paid, Cancelled |
 |   | orderItems          | required |
 | + | price               | required, positive |
-| + | responsibleManager  | required, (User) |
 
 Other constraints:
 * `price` should be equal to the sum of order item total prices
@@ -45,7 +45,7 @@ Other constraints:
 | + | subTotal       | required, > 0 |
 
 Other constraints:
-* `totalPrice == quantity * product.pricePerMeasure`
+* + `totalPrice == quantity * product.pricePerMeasure`
 * `quantity` should be an whole number greater than 0 if `product.measure == COUNT || product.measure == PACK` otherwise `quantity` could have a fractional part
 
 -----
@@ -58,7 +58,7 @@ Other constraints:
 | + | pricePerMeasure    | required, > 0 |
 
 Other constraints:
-* `name` and `measure` combination should be unique
+* + `name` and `measure` combination should be unique
 
 -----
 
@@ -80,7 +80,6 @@ Other constraints:
 
 * Customer: browser + editor with list of orders.
 * Order: browser + editor with order items. Actions:
-  * Automatically assign responsible manager to the user who creates an order.
   * Automatically calculate total price based on order items
   * When an order is created, corresponding stock is reduced. When an order is cancelled, stock is released back.
 * Order item editor. Actions:
@@ -88,6 +87,5 @@ Other constraints:
   * Check that there is sufficient stock
 * Products: browser + editor. Browser should allow search by name, measure
 * Stock: master-details (browse and view details/edit/create on one screen)
-* Users management: browser and editor (master-detail)
 
 [Back to article](README.md)

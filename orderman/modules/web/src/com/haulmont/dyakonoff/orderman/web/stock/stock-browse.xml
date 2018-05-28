@@ -21,6 +21,13 @@
                 <![CDATA[select e from orderman$Stock e]]>
             </query>
         </groupDatasource>
+        <collectionDatasource id="productsListDs"
+                              class="com.haulmont.dyakonoff.orderman.entity.Product"
+                              view="_minimal">
+            <query>
+                <![CDATA[select e from orderman$Product e]]>
+            </query>
+        </collectionDatasource>
     </dsContext>
     <actions>
         <action id="save"
@@ -86,7 +93,7 @@
                     <fieldGroup id="fieldGroup"
                                 datasource="stockDs">
                         <column width="250px">
-                            <field optionsDatasource="stocksDs"
+                            <field optionsDatasource="productsListDs"
                                    property="product"/>
                             <field property="inStock"/>
                             <field property="optimalStockLevel"/>

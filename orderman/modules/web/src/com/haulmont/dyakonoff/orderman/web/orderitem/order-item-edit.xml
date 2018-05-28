@@ -11,7 +11,7 @@
                     view="orderItem-view"/>
         <collectionDatasource id="productsDs"
                               class="com.haulmont.dyakonoff.orderman.entity.Product"
-                              view="_minimal">
+                              view="_base">
             <query>
                 <![CDATA[select e from orderman$Product e]]>
             </query>
@@ -27,7 +27,8 @@
                 <field optionsDatasource="productsDs"
                        property="product"/>
                 <field property="quantity"/>
-                <field property="subTotal"/>
+                <field editable="false"
+                       property="subTotal"/>
             </column>
         </fieldGroup>
         <frame id="windowActions"

@@ -8,7 +8,7 @@
     <dsContext>
         <datasource id="orderDs"
                     class="com.haulmont.dyakonoff.orderman.entity.Order"
-                    view="order-edit">
+                    view="order-view_1">
             <collectionDatasource id="itemsDs"
                                   property="items"/>
         </datasource>
@@ -20,14 +20,14 @@
         <fieldGroup id="fieldGroup"
                     datasource="orderDs">
             <column width="250px">
-                <field optionsDatasource="itemsDs"
-                       property="customer"/>
+                <field property="customer"/>
                 <field property="date"/>
-                <field property="number"/>
+                <field editable="false"
+                       property="number"/>
                 <field property="status"/>
-                <field property="price"/>
-                <field optionsDatasource="itemsDs"
-                       property="manager"/>
+                <field id="orderPriceField"
+                       editable="false"
+                       property="price"/>
             </column>
         </fieldGroup>
         <groupBox id="itemsBox"
