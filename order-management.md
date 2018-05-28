@@ -26,14 +26,14 @@ Other constraints:
 |   | **Order**           |         |
 |---|---------------------|---------|
 | + | customer            | required |
-| ? | date                | required, should be in the past |
+| + | date                | required, should be in the past |
 | + | number              | required, unique, should be:  yyyy-MM-dd-incremental_number (unique for 1 day) |
 | + | status              | required, Values: New, Paid, Cancelled |
-|   | orderItems          | required |
+| + | orderItems          | required |
 | + | price               | required, positive |
 
 Other constraints:
-* `price` should be equal to the sum of order item total prices
+* + `price` should be equal to the sum of order item total prices
 * Order can not be committed if there are not enough products in `Stock` for any of `orderItems`
 
 -----
@@ -46,7 +46,7 @@ Other constraints:
 
 Other constraints:
 * + `totalPrice == quantity * product.pricePerMeasure`
-* `quantity` should be an whole number greater than 0 if `product.measure == COUNT || product.measure == PACK` otherwise `quantity` could have a fractional part
+* + `quantity` should be an whole number greater than 0 if `product.measure == COUNT || product.measure == PACK` otherwise `quantity` could have a fractional part
 
 -----
 

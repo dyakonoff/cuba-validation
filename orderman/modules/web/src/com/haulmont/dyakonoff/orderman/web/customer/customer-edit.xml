@@ -22,7 +22,8 @@
                     <field property="email">
                         <validator class="com.haulmont.cuba.gui.components.validators.EmailValidator"/>
                     </field>
-                    <field property="phone"/>
+                    <field mask="+1 ###-###-####"
+                           property="phone"/>
                     <field property="addressLine1"/>
                     <field property="addressLine2"/>
                     <field property="addressLine3"/>
