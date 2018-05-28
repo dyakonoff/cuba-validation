@@ -38,6 +38,8 @@
     1. [Stock entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Stock.java): `@DecimalMin`
 1. Bean validation (custom annotations)
     1. [Customer entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Customer.java): `@UsPhoneNumber, @CustomerContactsCheck`
+1. Validation by Constraint
+    1. [OrderEntityListener](orderman/modules/core/src/com/haulmont/dyakonoff/orderman/service/OrderEntityListener.java)
 1. Generic REST validation
 1. Field.Validator - standard implementations
     1. [Customer edit screen](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/customer/customer-edit.xml): `EmailValidator`

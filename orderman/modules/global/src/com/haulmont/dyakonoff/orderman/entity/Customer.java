@@ -5,6 +5,7 @@ import javax.persistence.Table;
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 
+import com.haulmont.cuba.core.global.validation.groups.UiCrossFieldChecks;
 import com.haulmont.dyakonoff.orderman.entity.validator.CustomerContactsCheck;
 import com.haulmont.dyakonoff.orderman.entity.validator.UsPhoneNumber;
 import org.hibernate.validator.constraints.Email;
@@ -16,8 +17,9 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Pattern;
+import javax.validation.groups.Default;
 
-@CustomerContactsCheck
+@CustomerContactsCheck(groups = {Default.class, UiCrossFieldChecks.class})
 @NamePattern("%s (%s)|name,email")
 @Table(name = "ORDERMAN_CUSTOMER")
 @Entity(name = "orderman$Customer")

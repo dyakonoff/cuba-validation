@@ -2,6 +2,7 @@ package com.haulmont.dyakonoff.orderman.service;
 
 import com.haulmont.cuba.core.app.UniqueNumbersAPI;
 import com.haulmont.cuba.core.global.TimeSource;
+import com.haulmont.cuba.core.global.validation.RequiredView;
 import com.haulmont.dyakonoff.orderman.entity.OrderItem;
 import org.springframework.stereotype.Component;
 import com.haulmont.cuba.core.listener.BeforeInsertEntityListener;
@@ -12,6 +13,7 @@ import javax.inject.Inject;
 import javax.validation.ValidationException;
 
 import com.haulmont.cuba.core.listener.BeforeUpdateEntityListener;
+import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -27,8 +29,9 @@ public class OrderEntityListener implements BeforeInsertEntityListener<Order>, B
     @Inject
     private UniqueNumbersAPI uniqueNumbersAPI;
 
+    @Validated
     @Override
-    public void onBeforeInsert(Order order, EntityManager entityManager) {
+    public void onBeforeInsert(@RequiredView("order-edit") Order order, EntityManager entityManager) {
         validateOrderPrice(order);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd");
@@ -42,7 +45,8 @@ public class OrderEntityListener implements BeforeInsertEntityListener<Order>, B
 
 
     @Override
-    public void onBeforeUpdate(Order order, EntityManager entityManager) {
+    @Validated
+    public void onBeforeUpdate(@RequiredView("order-edit") Order order, EntityManager entityManager) {
         validateOrderPrice(order);
     }
 

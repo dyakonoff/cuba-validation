@@ -18,6 +18,6 @@ public class CustomerContactsCheckValidator implements ConstraintValidator<Custo
 
 
         return !((customer.getEmail() == null || customer.getEmail().length() == 0) &&
-                  customer.getPhone() == null || customer.getPhone().length() == 0);
+                 (customer.getPhone() == null || customer.getPhone().length() == 0));
     }
 }

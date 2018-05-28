@@ -27,7 +27,7 @@
                 <field optionsDatasource="productsDs"
                        property="product"/>
                 <field property="quantity">
-                    <validator>return (value &gt; 0 &amp;&amp; value != 666 &amp;&amp; value != 777)</validator>
+                    <validator message="Quantity cant'be equal to 666 or 777">return (value &gt; 0 &amp;&amp; value != 666 &amp;&amp; value != 777)</validator>
                 </field>
                 <field editable="false"
                        property="subTotal"/>

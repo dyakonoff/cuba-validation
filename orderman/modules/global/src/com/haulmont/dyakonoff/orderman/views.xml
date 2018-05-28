@@ -42,14 +42,4 @@
             <property name="measure"/>
         </property>
     </view>
-    <view class="com.haulmont.dyakonoff.orderman.entity.Order"
-          extends="_local"
-          name="order-view_1">
-        <property name="customer"
-                  view="_minimal"/>
-        <property name="items"
-                  view="_minimal">
-            <property name="subTotal"/>
-        </property>
-    </view>
 </views>

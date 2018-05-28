@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nullable;
 import javax.validation.ValidationException;
 
+
 @Component("orderman_ValidationExceptionHandler")
 public class ValidationExceptionHandler extends AbstractGenericExceptionHandler {
 

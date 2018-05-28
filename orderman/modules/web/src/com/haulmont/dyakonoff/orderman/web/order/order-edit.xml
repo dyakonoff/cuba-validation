@@ -8,7 +8,7 @@
     <dsContext>
         <datasource id="orderDs"
                     class="com.haulmont.dyakonoff.orderman.entity.Order"
-                    view="order-view_1">
+                    view="order-edit">
             <collectionDatasource id="itemsDs"
                                   property="items"/>
         </datasource>
