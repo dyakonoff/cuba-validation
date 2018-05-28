@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<screen-config xmlns="http://schemas.haulmont.com/cuba/screens.xsd">
-    <include file="io/dyakonoff/listenersvalidation/screens.xml"/>
-    <screen id="listenersvalidation$Printer.browse"
-            template="io/dyakonoff/listenersvalidation/web/printer/printer-browse.xml"/>
-    <screen id="listenersvalidation$PrintJob.browse"
-            template="io/dyakonoff/listenersvalidation/web/printjob/print-job-browse.xml"/>
-</screen-config>
