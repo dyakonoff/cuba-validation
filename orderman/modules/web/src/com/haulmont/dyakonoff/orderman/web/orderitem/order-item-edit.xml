@@ -26,7 +26,9 @@
             <column width="250px">
                 <field optionsDatasource="productsDs"
                        property="product"/>
-                <field property="quantity"/>
+                <field property="quantity">
+                    <validator>return (value &gt; 0 &amp;&amp; value != 666 &amp;&amp; value != 777)</validator>
+                </field>
                 <field editable="false"
                        property="subTotal"/>
             </column>

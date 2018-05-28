@@ -5,6 +5,7 @@ import javax.persistence.Table;
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 
+import com.haulmont.dyakonoff.orderman.entity.validator.CustomerContactsCheck;
 import com.haulmont.dyakonoff.orderman.entity.validator.UsPhoneNumber;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
@@ -16,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Pattern;
 
+@CustomerContactsCheck
 @NamePattern("%s (%s)|name,email")
 @Table(name = "ORDERMAN_CUSTOMER")
 @Entity(name = "orderman$Customer")
@@ -27,8 +29,7 @@ public class Customer extends StandardEntity {
     @Column(name = "NAME", nullable = false)
     protected String name;
 
-    @NotNull
-    @Column(name = "EMAIL", nullable = false, unique = true)
+    @Column(name = "EMAIL")
     @Email(message = "Email should have valid email address format", regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
     protected String email;
 

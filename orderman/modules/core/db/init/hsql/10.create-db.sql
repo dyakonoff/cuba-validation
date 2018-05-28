@@ -10,7 +10,7 @@ create table ORDERMAN_CUSTOMER (
     DELETED_BY varchar(50),
     --
     NAME varchar(255) not null,
-    EMAIL varchar(255) not null,
+    EMAIL varchar(255),
     PHONE varchar(30),
     LOGO_IMAGE_ID varchar(36),
     ADDRESS_LINE1 varchar(255) not null,

@@ -5,14 +5,15 @@ import javax.persistence.Table;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+
 import com.haulmont.cuba.core.entity.StandardEntity;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
+
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.cuba.core.entity.annotation.OnDelete;
@@ -21,7 +22,7 @@ import com.haulmont.cuba.security.entity.User;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.DecimalMin;
+
 import com.haulmont.cuba.core.entity.annotation.Listeners;
 
 @Listeners("orderman_OrderEntityListener")
@@ -51,6 +52,8 @@ public class Order extends StandardEntity {
     @Column(name = "STATUS", nullable = false)
     protected Integer status;
 
+    @Size(min = 1)
+    @Valid
     @Composition
     @OnDelete(DeletePolicy.CASCADE)
     @OneToMany(mappedBy = "order")

@@ -10,7 +10,7 @@ This is a simple order management system that resembles a stock of a small US ba
 |   | **Customer**      |           |
 |---|-------------------|-----------|
 | + | name              | required, should have length >= 1, and should start with Latin letter |
-| + | email             | required, unique, should be a well-formed email address |
+| + | email             | should be a well-formed email address |
 | + | phone             | should follow the US phone numbers format: `+1 NXX-NXX-XXXX` , where: `N`=digits 2–9, `X`=digits 0–9 |
 |   | logoImage         |           |
 | + | addressLine1      | required, should has length greater than 5 |
@@ -19,7 +19,7 @@ This is a simple order management system that resembles a stock of a small US ba
 | + | postalCode        | required and should follow US ZIP codes format: `12345` or `12345-6789` or `12345 1234` |
 
 Other constraints:
-* Either `name` or `email` should be defined for a customer
+* + Either `phone` or `email` should be defined for a customer
 
 ----
 
@@ -34,14 +34,14 @@ Other constraints:
 
 Other constraints:
 * + `price` should be equal to the sum of order item total prices
-* Order can not be committed if there are not enough products in `Stock` for any of `orderItems`
+* + Order can not be committed if there are not enough products in `Stock` for any of `orderItems`
 
 -----
 
 |   | **Order Item** |          |
 |---|----------------|----------|
 | + | product        | required |
-| + | quantity       | required, > 0 |
+| + | quantity       | required, > 0, should not be equal to 666 or 777|
 | + | subTotal       | required, > 0 |
 
 Other constraints:

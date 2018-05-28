@@ -27,7 +27,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {})
 public @interface UsPhoneNumber {
-    String message() default "{msg://com.haulmont.dyakonoff.orderman.validator/PhoneNumberError.message}";
+    String message() default "{msg://com.haulmont.dyakonoff.orderman.entity.validator/PhoneNumberError.message}";
 
     Class<?>[] groups() default {};
 

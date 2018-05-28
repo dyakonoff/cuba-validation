@@ -32,19 +32,19 @@
     1. [Product entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Product.java)
 1. Bean validation (JPA & Hibernate - standard annotations)
     1. [Customer entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Customer.java): `@Email, @Length, @Pattern`
-    1. [Order entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Order.java): `@Temporal`
+    1. [Order entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Order.java): `@Temporal, @Size, @Valid`
     1. [OrderItem entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Order.java): `@DecimalMin(inclusive = false)`
     1. [Product entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Product.java): `@DecimalMin`
     1. [Stock entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Stock.java): `@DecimalMin`
 1. Bean validation (custom annotations)
-    1. [Customer entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Customer.java): `@UsPhoneNumber`
-    1. []
+    1. [Customer entity](orderman/modules/global/src/com/haulmont/dyakonoff/entity/Customer.java): `@UsPhoneNumber, @CustomerContactsCheck`
 1. Generic REST validation
 1. Field.Validator - standard implementations
     1. [Customer edit screen](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/customer/customer-edit.xml): `EmailValidator`
 1. Field.Validator - custom Java classes implementations
     1. [Product edit screen](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/product/product-edit.xml): `ProductNameValidator`
 1. Field.Validator - Groovy script implementation
+    1. [OrderItem edit screen](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/orderitem/order-item-edit.xml)
 1. UI screen controllers
     1. [OrderItemEdit](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/orderitem/OrderItemEdit.java): `postValidate(...)`
 1. Entity listeners
