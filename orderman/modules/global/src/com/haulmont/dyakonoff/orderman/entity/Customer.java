@@ -17,6 +17,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import javax.validation.groups.Default;
 
 @CustomerContactsCheck(groups = {Default.class, UiCrossFieldChecks.class})

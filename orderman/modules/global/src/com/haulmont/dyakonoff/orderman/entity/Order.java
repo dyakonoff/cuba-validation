@@ -18,7 +18,6 @@ import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.chile.core.annotations.Composition;
 import com.haulmont.cuba.core.entity.annotation.OnDelete;
 import com.haulmont.cuba.core.global.DeletePolicy;
-import com.haulmont.cuba.security.entity.User;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.OneToMany;
@@ -45,14 +44,14 @@ public class Order extends StandardEntity {
 
     @Pattern(message = "Number format should be yyyy-MM-dd-<sequentional number>", regexp = "\\d{4}-\\d{2}-\\d{2}-\\d+")
     @NotNull
-    @Column(name = "NUMBER_", nullable = false, length = 20)
+    @Column(name = "NUMBER_", nullable = false, unique = true, length = 20)
     protected String number;
 
     @NotNull
     @Column(name = "STATUS", nullable = false)
     protected Integer status;
 
-    @Size(min = 1)
+    @Size(min = 1, max = 10)
     @Valid
     @Composition
     @OnDelete(DeletePolicy.CASCADE)

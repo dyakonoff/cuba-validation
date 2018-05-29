@@ -65,8 +65,16 @@ public class TransactionListener implements BeforeCommitTransactionListener {
             BigDecimal orderMultiplicator = new BigDecimal( getOrderMultiplier(order, persistenceTools));
             for (OrderItem item : order.getItems()) {
                 UUID productId = item.getProduct().getId();
-                BigDecimal newQty = item.getQuantity();
-                BigDecimal oldQty = (BigDecimal)persistenceTools.getOldValue(item, "quantity");
+                BigDecimal newQty, oldQty;
+                // handling OrderItem that are going to be deleted
+                if (!item.isDeleted()) {
+                    newQty = item.getQuantity();
+                    oldQty = (BigDecimal) persistenceTools.getOldValue(item, "quantity");
+                }
+                else {
+                    newQty = BigDecimal.ZERO;
+                    oldQty = item.getQuantity();
+                }
 
                 if (newQty == null) newQty = BigDecimal.ZERO;
                 if (oldQty == null) oldQty = BigDecimal.ZERO;

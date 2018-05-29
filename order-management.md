@@ -29,7 +29,7 @@ Other constraints:
 | + | date                | required, should be in the past |
 | + | number              | required, unique, should be:  yyyy-MM-dd-incremental_number (unique for 1 day) |
 | + | status              | required, Values: New, Paid, Cancelled |
-| + | orderItems          | required, should have size >= 1, all orderItemsShould be valid |
+| + | orderItems          | required, should have  1 <= size <= 10 (we don't allow to make big orders), all orderItemsShould be valid |
 | + | price               | required, positive |
 
 Other constraints:
