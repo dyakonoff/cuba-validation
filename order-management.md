@@ -2,8 +2,7 @@
 
 This is a simple order management system that resembles a stock of a small US based online shop that works for domestic market only.
 
-[Back to article](README.md)
-
+[Back to the article](README.md)
 
 ## Data model and constraints
 
@@ -19,7 +18,8 @@ This is a simple order management system that resembles a stock of a small US ba
 | + | postalCode        | required and should follow US ZIP codes format: `12345` or `12345-6789` or `12345 1234` |
 
 Other constraints:
-* + Either `phone` or `email` should be defined for a customer
+
+* (+) Either `phone` or `email` should be defined for a customer
 
 ----
 
@@ -29,14 +29,15 @@ Other constraints:
 | + | date                | required, should be in the past |
 | + | number              | required, unique, should be:  yyyy-MM-dd-incremental_number (unique for 1 day) |
 | + | status              | required, Values: New, Paid, Cancelled |
-| + | orderItems          | required |
+| + | orderItems          | required, should have size >= 1, all orderItemsShould be valid |
 | + | price               | required, positive |
 
 Other constraints:
-* + `price` should be equal to the sum of order item total prices
-* + Order can not be committed if there are not enough products in `Stock` for any of `orderItems`
 
------
+* (+) `price` should be equal to the sum of order item total prices
+* (+) Order can not be committed if there are not enough products in `Stock` for any of `orderItems`
+
+----
 
 |   | **Order Item** |          |
 |---|----------------|----------|
@@ -45,10 +46,11 @@ Other constraints:
 | + | subTotal       | required, > 0 |
 
 Other constraints:
-* + `totalPrice == quantity * product.pricePerMeasure`
-* + `quantity` should be an whole number greater than 0 if `product.measure == COUNT || product.measure == PACK` otherwise `quantity` could have a fractional part
 
------
+* (+) `totalPrice == quantity * product.pricePerMeasure`
+* (+) `quantity` should be an whole number greater than 0 if `product.measure == COUNT || product.measure == PACK` otherwise `quantity` could have a fractional part
+
+----
 
 |   | **Product**        |          |
 |---|--------------------|----------|
@@ -58,9 +60,10 @@ Other constraints:
 | + | pricePerMeasure    | required, > 0 |
 
 Other constraints:
-* + `name` and `measure` combination should be unique
 
------
+* (+) `name` and `measure` combination should be unique
+
+----
 
 |   | **Stock**         |          |
 |---|-------------------|----------|
@@ -68,13 +71,13 @@ Other constraints:
 | + | inStock           | required, non-negative (how many/much are available) |
 | + | optimalStockLevel | >=0 or null |
 
-[Back to article](README.md)
+[Back to the article](README.md)
 
 ## Database scheme diagram
 
 ![Database structure](resources/database_scheme.png)
 
-[Back to article](README.md)
+[Back to the article](README.md)
 
 ## Screens
 
@@ -88,4 +91,4 @@ Other constraints:
 * Products: browser + editor. Browser should allow search by name, measure
 * Stock: master-details (browse and view details/edit/create on one screen)
 
-[Back to article](README.md)
+[Back to the article](README.md)

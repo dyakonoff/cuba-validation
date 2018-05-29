@@ -5,3 +5,4 @@ resources/*autosave.kra
 resources/*.png~
 !orderman/deploy/tomcat/work/app-core/filestorage/*
 !orderman/deploy/hsqldb
+.vscode/
