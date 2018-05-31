@@ -1,4 +1,4 @@
-# Input data validation in [CUBA platform](https://www.cuba-platform.com/)
+# Data validation in [CUBA platform](https://www.cuba-platform.com/) applications
 
 ## Content
 
@@ -8,7 +8,6 @@
 1. [Validation with annotations](#validation-with-annotations)
     * [JPA DB level constraints](#jpa-db-level-constraints)
     * [Single-field constraints](#single-field-constraints)
-    * [Multi-column indexes](#multi-column-indexes)
 1. [JPA validation for entities](#jpa-validation-for-entities)
 1. [Validation by contract]()
    * [Generic REST Validation](#generic-rest-validation)
@@ -65,7 +64,7 @@ The sample application's code is [here](https://github.com/dyakonoff/cuba-valida
 
 Let's start the review of validators with the simplest ones that we have in our toolbox: JPA constraints. Annotation-based validators provide uniform approach to data checking on the middleware, [GUI](https://doc.cuba-platform.com/manual-6.8/gui_framework.html) and [REST services](https://doc.cuba-platform.com/manual-6.8/rest_api_v2.html). They are based on the JSR 349 - Bean Validation 1.1 and its reference implementation: [Hibernate Validator](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/?v=5.3).
 
-[Documentation](https://doc.cuba-platform.com/manual-6.8/bean_validation.html) says that this mechanism allows users to set limitations on entity fields, getters and classes. Most of the annotations available from are `javax.validation.constraints` [namespace](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html), although couple come from `javax.persistence`, `javax.validation` and `org.hibernate.validator.constraints`.
+[Documentation](https://doc.cuba-platform.com/manual-6.8/bean_validation.html) says that this mechanism allows users to set limitations on entity fields, getters and classes. Most of the annotations available from are [`javax.validation.constraints` namespace](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html), although couple come from `javax.persistence`, `javax.validation` and `org.hibernate.validator.constraints`.
 
 Also, it's not hard to create your own annotations to validate fields and entities, which we'll se in the [later sections]().
 
@@ -73,7 +72,7 @@ Also, it's not hard to create your own annotations to validate fields and entiti
 
 ### JPA DB level constraints
 
-In [CUBA platform]() some of JPA annotation put constraints on DB level as table indexes or table column / multi-column costraints.
+In [CUBA platform]() some of JPA annotation put constraints on DB level as table indexes or table column / multi-column constraints.
 Although there are only few of such annotations, they are only only one which acts on DB server level.
 
 * `@Column(..., unique=true)` - sets SQL `unique` constraint on a table column for entity fields marked as **Unique**
@@ -124,7 +123,9 @@ On the other hand, **Unique** constraint (reflected with `@Column(..., unique=tr
 
 This type of data constraint / validation acts on DB level only and is represented by multi-column index with unique constraint. It could be created from Entity designer in CUBA studio:
 
-![Figure 3: Creating ](resources/unique_index_editor.png)
+![Figure 3: Creating multi-column unique constraint](resources/unique_index_editor.png)
+
+**Figure 3:** Creating multi-column unique constraint
 
 Or right in Java code:
 
@@ -139,17 +140,15 @@ public class Product extends StandardEntity {
 }
 ```
 
-Which is reflected as `create unique index IDX_ORDERMAN_PRODUCT_UNQ on ORDERMAN_PRODUCT (NAME, MEASURE)` in generated DDL.
-
 [Product.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/Product.java)
 
-
-and you can use custom validation annotations which I will describe in the next section.
- article with a look at one of the most common constraints that [CUBA platform](https://www.cuba-platform.com/) offers. For any field of the entity you can say that this field is unique or mandatory. This can be done either during the entity field creation or after that with entity designer.
-
-These two checkboxes alongside with `@NotNull` constraint that you can set for entities (see [figure 2](resources/figure_2.png) ) generate both annotations and DDL (SQL) constraints.
+Which is reflected as `create unique index IDX_ORDERMAN_PRODUCT_UNQ on ORDERMAN_PRODUCT (NAME, MEASURE)` in generated DDL.
 
 [Top](#content)
+
+### Single field constraints
+
+Let's go through other standard JPA annotations that were designed for data validation. As I mentioned before most of them are from 
 
 ## JPA validation for entities
 
@@ -219,6 +218,11 @@ protected String ipAddress;
 Although these annotations are simple to use and well documented, they can cover only simple cases. But sometimes we need to express more complex limitations while keeping the expressiveness and reusability of annotations-based approach. This is feaseble with custom validation annotations.
 
 [Top](#content)
+
+## Validation by contract
+[Validation in middleware services](https://doc.cuba-platform.com/manual-6.8/bean_validation_running.html#bean_validation_in_services)
+[@RestrictedView](https://doc.cuba-platform.com/manual-6.8/bean_validation_constraints.html#bean_validation_cuba_annotations)
+
 
 ### Generic REST Validation
 
@@ -746,5 +750,9 @@ _**Table 3:** Validation scope_
 ## Appendix A
 
 There is a old version of this article that used different samples approach: one simple example per validation method. And which contains couple of small examples. It can be found [here](https://github.com/dyakonoff/cuba-validation-examples/tree/version-1).
+
+CUBA Documentation articles, related to validation:
+
+1. [Bean Validation](https://doc.cuba-platform.com/manual-6.8/bean_validation.html)
 
 [Top](#content)
