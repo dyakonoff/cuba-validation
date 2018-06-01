@@ -12,8 +12,10 @@
     1. [Generic REST Validation](#generic-rest-validation)
     1. [Validation by contract](#validation-by-contrect)
     1. [Notes on JPA validation](#jpa-validation-for-entities)
-1. [Custom validators in UI]()
-1. [Defining custom Validator class and groovy validation scripts for UI components](#custom-validator-classes-and-scripts)
+1. [GUI Validator](#gui-validator)
+    1. Standard validators
+    1. Custom Java class validator
+    1. Validating with Groovy scripts
 1. [Validation in UI screen controllers](#validation-in-ui-screen-controllers)
 1. [Using Entity and Transaction listeners for validation](#using-middleware-listeners-for-data-validation)
     * [Single Entity Context](#single-entity-context)
@@ -28,6 +30,8 @@ Input validation is one of common tasks in everyday developer’s life. We need 
 This article's goal is to summarize all validation methods common to [CUBA platform](https://www.cuba-platform.com/) present explanations and examples for all of them and talk about pros and cons of each of these methods. I hope that the article will be a good tutorial and reference for all questions related to data validation in [CUBA platform](https://www.cuba-platform.com/) based applications.
 
 The sample application for this article could be downloaded from [here](https://github.com/dyakonoff/cuba-validation-examples). A list of additional examples and materials for further reading is in [Appendix A](#appendix_a).
+
+<img align="right" alt="Mad scientist validates stuff" src="resources/mad_scientist.png />
 
 [Top](#content)
 
@@ -329,6 +333,10 @@ public class Customer extends StandardEntity {
 
 ### Generic REST Validation
 
+CUBA by default makes all your entities available via REST protocol which follows Swagger specification and available at following URL: http://files.cuba-platform.com/swagger/ . This feature is called [generic REST endpoints](https://doc.cuba-platform.com/manual-6.5/rest_api_v2.html) and by default JPA annotations is applied to REST calls es well.
+
+
+
 **IN PROGRESS**
 
 [Top](#content)
@@ -338,13 +346,13 @@ public class Customer extends StandardEntity {
 
 
 
-## JPA validation for entities
+### JPA validation for entities
 
 **IN PROGRESS**
 
 [Top](#content)
 
-## Validation by contract
+### Validation by contract
 
 **IN PROGRESS**
 [Validation in middleware services](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)
@@ -354,6 +362,8 @@ public class Customer extends StandardEntity {
 
 
 ### Notes on JPA validation
+
+TODO: 
 
 By default, JPA annotations works:
 
@@ -375,8 +385,18 @@ By default, JPA annotations works:
 
 
 
+## GUI Validator
 
-## Custom validator classes and scripts
+[CUBA platform](https://www.cuba-platform.com/) offers an UI-level mechanism to validate input data. Let's take a look at [gui validator documentation](https://doc.cuba-platform.com/manual-6.9/gui_validator.html). In a screen XML-descriptor, a component validator can be defined in a nested validator elements. The validator element can have the following attributes:
+
+* **class** − name of a Java class implementing the Field.Validator interface. You can use one of the [classes that come out of the box](http://files.cuba-platform.com/javadoc/cuba/6.9/com/haulmont/cuba/gui/components/validators/package-summary.html) or implement your own custom implementation of `Field.Validator` interface. 
+* **script** − path to a Groovy script performing validation. Script could be embedded into a screen's XML-descriptor or be given as a separate groovy file.
+
+Groovy validator scripts and standard classes of Java validators, located in the [`com.haulmont.cuba.gui.components.validators`](http://files.cuba-platform.com/javadoc/cuba/6.9/com/haulmont/cuba/gui/components/validators/package-summary.html) package support message attribute − a message displayed to a user when validation fails. The attribute value should contain either a message or a message key from the [messages pack](https://doc.cuba-platform.com/manual-6.9/message_packs.html) of the current screen.
+
+This validation mechanism works only at UI-level (ran on server-side with error messages passed to user's browser) and is called when user submits the form or application calls validation programmatically by calling `AbstractWindow.validateAll()` method or `validate()` method of a component.
+
+
 
 Although [this approach](https://doc.cuba-platform.com/manual-6.9/gui_validator.html) works only at GUI level, there is a wide [range of components](http://files.cuba-platform.com/javadoc/cuba/6.8/com/haulmont/cuba/gui/components/validators/package-summary.html) implementing `Field.Validator` interface that come out of the box with CUBA platform.
 
@@ -800,7 +820,7 @@ _**Table 3:** Validation scope_
 1. Bean validation could use standard and custom annotations. It works on all tiers, so offers the best level of data security. Besides that it is reusable and gives good UI feedback to a user. The limitations of that approach:
     1. It can't be used for validating the whole data graph when you need to check state of more than one entity.
     1. Business logic at middleware level can change the entities directly and they will not be validated by this mechanism even before saving them to DB.
-1. Defining custom Validator class and groovy scripts for UI components. Since it works at UI level only, this mechanism offers nice UI integration suppot (highlighting and pretty error messages formatting) but drawbacks are the same as for annotations, plus:
+1. Defining custom Validator class and groovy scripts for UI components. Since it works at UI level only, this mechanism offers nice UI integration support (highlighting and pretty error messages formatting) but drawbacks are the same as for annotations, plus:
     1. It won't be able to check Generic REST calls.
     1. Groovy scripts are hard to debug.
 1. Validation in UI screen controllers - it is the simplest way to do validation if there are no standard annotations or `Validator` classes to do it. However, you get the checks done only at UI level and the code reusability is not at the best level.
@@ -815,5 +835,6 @@ There is a old version of this article that used different samples approach: one
 CUBA Documentation articles, related to validation:
 
 1. [Bean Validation](https://doc.cuba-platform.com/manual-6.9/bean_validation.html)
+1. [List of JPA constraints in CUBA applications](common_jpa_annotations.md)
 
 [Top](#content)
