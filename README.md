@@ -31,7 +31,7 @@ This article's goal is to summarize all validation methods common to [CUBA platf
 
 The sample application for this article could be downloaded from [here](https://github.com/dyakonoff/cuba-validation-examples). A list of additional examples and materials for further reading is in [Appendix A](#appendix_a).
 
-<img align="right" alt="Mad scientist validates stuff" src="resources/mad_scientist.png />
+![Mad scientist validates stuff](resources/mad_scientist.png)
 
 [Top](#content)
 
