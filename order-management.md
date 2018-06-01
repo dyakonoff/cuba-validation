@@ -42,7 +42,7 @@ Other constraints:
 |   | **Order Item** |          |
 |---|----------------|----------|
 | + | product        | required |
-| + | quantity       | required, > 0, should not be equal to 666 or 777|
+| + | quantity       | required, > 0, should not be equal to 666 or 777, should be no greater than 1000 |
 | + | subTotal       | required, > 0 |
 
 Other constraints:

@@ -19,9 +19,9 @@
                         datasource="customerDs">
                 <column width="250px">
                     <field property="name"/>
-                    <field property="email">
-                        <validator class="com.haulmont.cuba.gui.components.validators.EmailValidator"/>
-                    </field>
+                <field property="email">
+                    <validator class="com.haulmont.cuba.gui.components.validators.EmailValidator"/>
+                </field>
                     <field mask="+1 (###) ###-####"
                            property="phone"/>
                     <field property="addressLine1"/>

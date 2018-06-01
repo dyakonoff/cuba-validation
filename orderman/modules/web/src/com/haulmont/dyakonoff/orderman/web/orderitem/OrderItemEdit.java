@@ -1,8 +1,6 @@
 package com.haulmont.dyakonoff.orderman.web.orderitem;
 
-import com.haulmont.cuba.gui.components.AbstractEditor;
-import com.haulmont.cuba.gui.components.TextField;
-import com.haulmont.cuba.gui.components.ValidationErrors;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.dyakonoff.orderman.entity.MeasureUnit;
 import com.haulmont.dyakonoff.orderman.entity.OrderItem;
 import com.haulmont.dyakonoff.orderman.service.StockService;
@@ -10,6 +8,7 @@ import com.haulmont.dyakonoff.orderman.service.StockService;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.math.BigDecimal;
+import java.util.Map;
 
 public class OrderItemEdit extends AbstractEditor<OrderItem> {
     @Inject
@@ -17,6 +16,33 @@ public class OrderItemEdit extends AbstractEditor<OrderItem> {
 
     @Named("fieldGroup.quantity")
     private TextField quantityField;
+
+    @Override
+    public void init(Map<String, Object> params) {
+        quantityField.addValidator(
+                new Field.Validator() {
+                    @Override
+                    public void validate(Object value) throws ValidationException {
+                        if (value != null && value instanceof BigDecimal
+                                && ((BigDecimal)value).compareTo(new BigDecimal(1000)) > 0) {
+                            throw new ValidationException(getMessage("quantityIsTooBig"));
+                        }
+                    }
+                }
+        );
+        super.init(params);
+    }
+
+//    // Adding validator programmatically using lambda function
+//    @Override
+//    public void init(Map<String, Object> params) {
+//        quantityField.addValidator(
+//                (Object value) -> {
+//                    if (value != null && value instanceof BigDecimal && ((BigDecimal)value).compareTo(new BigDecimal(1000)) > 0)
+//                        throw new ValidationException(getMessage("quantityIsTooBig"));
+//                });
+//        super.postInit();
+//    }
 
     @Override
     protected void postValidate(ValidationErrors errors) {

@@ -13,13 +13,15 @@
     1. [Validation by contract](#validation-by-contrect)
     1. [Notes on JPA validation](#jpa-validation-for-entities)
 1. [GUI Validator](#gui-validator)
-    1. Standard validators
-    1. Custom Java class validator
-    1. Validating with Groovy scripts
+    1. [Standard validators](#standard-validators)
+    1. [Setting validator programmatically](#setting-validator-programmatically)
+    1. [Custom Java class validator](#custom-java-class-validator)
+    1. [Validating with Groovy scripts](#validating-with-groovy-scripts)
 1. [Validation in UI screen controllers](#validation-in-ui-screen-controllers)
 1. [Using Entity and Transaction listeners for validation](#using-middleware-listeners-for-data-validation)
     * [Single Entity Context](#single-entity-context)
     * [Transaction Context](#transaction-context)
+1. [Presenting error messages to a user](#presenting-error-messages-to-a-user)
 1. [Summary](#summary)
 1. [Appendix A](#appendix_a)
 
@@ -47,7 +49,7 @@ The application's entities structure is shown below:
 
 ![Figure 1: Entities structure](resources/database_scheme_sm.png)
 
-**Figure 1:** Entities structure
+_**Figure 1:** Entities structure._
 
 The full description of the application's requirements and data constraints could be found [here](order-management.md).
 
@@ -93,7 +95,7 @@ Single column constraints could be applied from CUBA studio entity editor's UI d
 
 ![Figure 2: Setting column level DB constraints from CUBA](resources/db_constraints_column_level.png)
 
-**Figure 2:** Setting column level DB constraints from CUBA
+_**Figure 2:** Setting column level DB constraints from CUBA._
 
 They are reflected in Java code in the next manner (which you can always edit manually, of course):
 
@@ -134,7 +136,7 @@ This type of data constraint / validation acts on DB level only and is represent
 
 ![Figure 3: Creating multi-column unique constraint](resources/unique_index_editor.png)
 
-**Figure 3:** Creating multi-column unique constraint
+_**Figure 3:** Creating multi-column unique constraint._
 
 Or right in Java code:
 
@@ -163,7 +165,7 @@ Some of these annotations can be configured from CUBA studio in VALIDATION secti
 
 ![Figure 4: JPA validation tab](resources/jpa_validation_tab.png)
 
-**Figure 4:** JPA validation tab
+_**Figure 4:** JPA validation tab._
 
 From the code perspective these annotations look like that:
 
@@ -335,10 +337,7 @@ public class Customer extends StandardEntity {
 
 CUBA by default makes all your entities available via REST protocol which follows Swagger specification and available at following URL: http://files.cuba-platform.com/swagger/ . This feature is called [generic REST endpoints](https://doc.cuba-platform.com/manual-6.5/rest_api_v2.html) and by default JPA annotations is applied to REST calls es well.
 
-
-
 **IN PROGRESS**
-
 [Top](#content)
 
 
@@ -349,14 +348,23 @@ CUBA by default makes all your entities available via REST protocol which follow
 ### JPA validation for entities
 
 **IN PROGRESS**
-
 [Top](#content)
+
+
+
+
+
 
 ### Validation by contract
 
 **IN PROGRESS**
 [Validation in middleware services](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)
 [@RestrictedView](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_cuba_annotations)
+
+
+
+
+
 
 [Top](#content)
 
@@ -396,39 +404,100 @@ Groovy validator scripts and standard classes of Java validators, located in the
 
 This validation mechanism works only at UI-level (ran on server-side with error messages passed to user's browser) and is called when user submits the form or application calls validation programmatically by calling `AbstractWindow.validateAll()` method or `validate()` method of a component.
 
+Let's look at the examples.
 
+[Top](#content)
 
-Although [this approach](https://doc.cuba-platform.com/manual-6.9/gui_validator.html) works only at GUI level, there is a wide [range of components](http://files.cuba-platform.com/javadoc/cuba/6.8/com/haulmont/cuba/gui/components/validators/package-summary.html) implementing `Field.Validator` interface that come out of the box with CUBA platform.
+### Standard validators
 
-Let's look at these cases:
-1. Using of existing `Field.Validator`
-1. Creating custom `Field.Validator` by yourself
-1. Running a groovy script for a field validation
-1. Setting screen validator programmatically
+There are set of `Validator` interface implementations that comes out of the box, although many of them repeat JPA annotation-based validators' functionality:
 
-**Using of pre-defined Field.Validator class**
+* DateValidator
+* DoubleValidator
+* EmailValidator
+* IntegerValidator
+* LongValidator
+* PatternValidator
+* ScriptValidator
+* StringValidator
 
-[CUBA studio](https://www.cuba-platform.com/download) gives a simple UI that allows developers to specify what class need to be used as a `Field.Validator` for the component. This editor is available from **Screen Designer** at the component properties tab.
+These validators could be added by hands to the screens' XML-descriptors, just like that:
 
-![Figure 5: Accessing Validator property for FieldGroup](resources/figure_5.png)<br />
-_**Figure 5:** Accessing Validator property for FieldGroup_
-
-![Figure 6: Field.Validator editor](resources/figure_6.png)<br />
-_**Figure 6:** Field.Validator editor_
-
-From the XML layout perspective these validators looks quite simple and straightforward. You may wish to edit screen layout XML directly by hands, as for me this is a bit faster and simpler way of linking Validators to UI components.
-```XML
-<field property="vendorEmail">
+```xml
+<field property="email">
     <validator class="com.haulmont.cuba.gui.components.validators.EmailValidator"/>
 </field>
 ```
-[product-edit.xml](validator-component/modules/web/src/io/dyakonoff/validatorcomponent/web/product/product-edit.xml)
 
-**Creating custom Field.Validator**
+[customer-edit.xml](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/customer/customer-edit.xml)
 
-Creation of a custom `Field.Validator` is not rocket science as well. Let's create for our simple [product management sample](validator-component/) a validator that does check the name of a product for swear words and doesn't let users to enter such bad-named-products into the system. To do that, we need to perform the next steps:
+or, using CUBA studio UI, which will give exactly the same result:
 
-**1.** Create our custom `ProductNameValidator` class implementing `Field.Validator` interface.
+![Figure XX: Standard UI validator](resources/standard_ui_validator.png)
+
+A validator class can be assigned to a component not only using a screen XML-descriptor, but also programmatically – by submitting a validator instance into the component’s `addValidator()` method.
+
+[Top](#content)
+
+### Setting validator programmatically
+
+It's also possible to set `Validator` programmatically for a component (in your screen controller, for example), which could be a good option if you need to modify your validation rules on the fly according to some conditions that can be determined only in run-time. Here is an example of adding `EmailValidator` programmatically in a screen controller which checks that OrderItem quantity is <= 1000 and if it is not reads the error message string from the current screen `messages.properties` file and throws `ValidationException`:
+
+```java
+public class OrderItemEdit extends AbstractEditor<OrderItem> {
+    ...
+    @Named("fieldGroup.quantity")
+    private TextField quantityField;
+
+    @Override
+    public void init(Map<String, Object> params) {
+        quantityField.addValidator(
+                new Field.Validator() {
+                    @Override
+                    public void validate(Object value) throws ValidationException {
+                        if (value != null && value instanceof BigDecimal
+                                && ((BigDecimal)value).compareTo(new BigDecimal(1000)) > 0) {
+                            throw new ValidationException(getMessage("quantityIsTooBig"));
+                        }
+                    }
+                }
+        );
+        super.init(params);
+    }
+    ...
+}
+```
+
+Or we can do the same thing using lambda-function syntax:
+
+```java
+    @Override
+    public void init(Map<String, Object> params) {
+        super.postInit();
+        quantityField.addValidator(
+                (Object value) -> {
+                    if (value != null && value instanceof BigDecimal && ((BigDecimal)value).compareTo(new BigDecimal(1000)) > 0)
+                        throw new ValidationException(getMessage("quantityIsTooBig"));
+                });
+    }
+```
+
+[OrderItem.java](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/orderitem/OrderItemEdit.java)
+
+Another example of adding `Field.Validator` in runtime can be found [here](https://www.cuba-platform.com/discuss/t/how-to-implement-error-display-when-using-custom-validator/2870/6).
+
+[Top](#content)
+
+### Custom Java class validator
+
+Creation of a custom `Field.Validator` is not rocket science as well. If a Java class is being used as a validator, it should have a default constructor without parameters or a constructor with the following set of parameters:
+
+* `org.dom4j.Element`, `String` – this constructor will receive the validator XML-element and the message pack name of the screen.
+* `org.dom4j.Element` – this constructor will receive the validator XML-element.
+
+If the validator is implemented as an internal class, it should be declared with a static modifier and its name should be separated by "$", for example: ```<validator class="com.sample.sales.gui.AddressEdit$ZipValidator"/>s```
+
+As an exercise let's write a small java class to validate that product and description do not contain swear words. This can be done by creating a class in `gui` module that implements `Field.Validator` interface:
 
 ```java
 public class ProductNameValidator implements Field.Validator {
@@ -439,7 +508,9 @@ public class ProductNameValidator implements Field.Validator {
     protected String messagesPack;
     protected Messages messages = AppBeans.get(Messages.NAME);
 
-    public static String[] swearWords = { ... };
+    public static String[] swearWords = {
+        ...
+    };
 
     public ProductNameValidator(Element element, String messagesPack) {
         message = element.attributeValue("message");
@@ -465,99 +536,56 @@ public class ProductNameValidator implements Field.Validator {
     }
 }
 ```
-[ProductNameValidator.java](validator-component/modules/gui/src/io/dyakonoff/validatorcomponent/validation/ProductNameValidator.java)
 
-_optionally_ provide a message in a screen message pack. (If you don't care about localisation and string resources that much, you can just override `validate` method and skip everything else in your`Field.Validator` class).
+[ProductNameValidator.java](orderman/modules/gui/src/com/haulmont/dyakonoff/orderman/validation/ProductNameValidator.java)
 
-```
-badNameInProductName = '%s' is not an appropriate word to be in a product name
-```
-[messages.properties](validator-component/modules/web/src/io/dyakonoff/validatorcomponent/web/product/messages.properties)
+And setting it as a `validator` component in XML-descriptor of the screen for "name" and "description" fields:
 
-**2.** Use the just created `ProductNameValidator` in your screen.
-
-Right through editing your screen XML layout:
-```XML
+```xml
 <field property="name">
-    <validator class="io.dyakonoff.validatorcomponent.validation.ProductNameValidator"
-               message="msg://badNameInProductName"/>
+    <validator class="com.haulmont.dyakonoff.orderman.validation.ProductNameValidator"
+                message="msg://badNameInProductName" />
+</field>
+<field property="description" rows="5">
+    <validator class="com.haulmont.dyakonoff.orderman.validation.ProductNameValidator"
+                message="msg://badNameInProductDescription" />
 </field>
 ```
-[product-edit.xml](validator-component/modules/web/src/io/dyakonoff/validatorcomponent/web/product/product-edit.xml)
 
-Or by specifying the Validator for the component using CUBA studio IDE:
+[product-edit.xml](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/product/product-edit.xml)
 
-![Figure 7: Setting up a custom Field.Validator using studio UI](resources/figure_7.png)<br />
-_**Figure 7:** Setting up a custom Field.Validator using studio UI_
+_optionally_, you can provide a message in a screen message pack, as it was done in the example of validating `quantityField`.
 
-However, the second way would not let you to give additional parameters for validator like the `message` one above.
+[Top](#content)
 
-**Running a groovy script for a field validation**
+### Validating with Groovy scripts
 
-Running [groovy](http://groovy-lang.org/) script dynamically with [Scripting interface](https://doc.cuba-platform.com/manual-6.9/scripting.html) looks quite appealing from the first glance. What you shall do is to write a small groovy script that has access to a named variable `value` (which represents the UI component value script needs to check) and return boolean check result back to the application.
+Running [groovy](http://groovy-lang.org/) dynamically with [Scripting interface](https://doc.cuba-platform.com/manual-6.9/scripting.html) looks quite appealing from the first glance. What you shall do is to write a small script that has access to a named variable `value` (which represents the UI component value script needs to check) and return boolean check result back to the application.
 
 This script can be specified either from CUBA studio UI:
 
-![Figure 8: Setting up a groovy script for field validation](resources/figure_8.png)<br />
-_**Figure 8:** Setting up a groovy script for field validation_
+![Figure XX: Setting up a groovy script for field validation](resources/standard_ui_validator.png)
+
+_**Figure XX:** Setting up a groovy script for field validation._
 
 or by editing XML screen layout directly:
 
 ```XML
-<field property="vendorSiteUrl">
-    <validator>
-        try
-        {
-            def instr = new java.net.URL(value).openStream()
-            instr.close()
-            return true
-        }
-        catch (Exception e)
-        {
-            return false
-        }
-    </validator>
+<field property="quantity">
+    <validator message="Quantity cant'be equal to 666 or 777">return (value &gt; 0 &amp;&amp; value != 666 &amp;&amp; value != 777)</validator>
 </field>
 ```
 
-However, this is not the approach I can recommend for complex cases, mainly because of difficulties with groovy script debugging and lack of support from an IDE. If you still chose to try that way I would say that keeping groovy script in a separate file and giving component reference to it would be a better option.
+[order-item-edit.xml](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/orderitem/order-item-edit.xml)
 
-**Setting screen validator programmatically**
-
-It's also possible to set Validator programmatically for a component (in your screen controller, for example), which could be a good option if you need to modify your validation rules on the fly according to some condition that can be determined only in run-time.
-
-Here is a small example:
-
-```java
-public class ProductEdit extends AbstractEditor<Product> {
-    @Inject
-    private FieldGroup fieldGroup;
-
-    @Inject
-    private BadWordsDetectionService badWordsDetectionService;
-
-    @Override
-    public void init(Map<String, Object> params) {
-        super.init(params);
-        // Adding validator manually
-        fieldGroup.getField("nameField").addValidator( value -> {
-            String productName = (String) value;
-            String badWord = badWordsDetectionService.detectBadWords(productName);
-            if (badWord != null) {
-                throw new ValidationException("Product name should not contain a word '" + badWord + "'");
-            }
-        });
-    }
-
-...
-
-}
-```
-[ProductEdit.java](validation-in-controllers/modules/web/src/io/dyakonoff/controllersvalidation/web/product/ProductEdit.java)
-
-Another example of adding `Field.Validator` in runtime can be found [here](https://www.cuba-platform.com/discuss/t/how-to-implement-error-display-when-using-custom-validator/2870/6).
+However, this is not the approach I would recommend for complex cases, mainly because of difficulties with groovy script debugging and lack of support from an IDE. If you still chose to try that way I would say that keeping groovy script in a separate file and giving component reference to it would be a better option.
 
 [Top](#content)
+
+
+
+
+
 
 ## Validation in UI screen controllers
 
@@ -762,6 +790,11 @@ public class TransactionListener implements BeforeCommitTransactionListener {
 ```
 _[TransactionListener.java](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/TransactionListener.java)_
 
+[Top](#content)
+
+## Presenting error messages to a user
+
+**IN PROGRESS**
 [Top](#content)
 
 ## Summary
