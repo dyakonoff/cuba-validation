@@ -24,6 +24,8 @@ public class StockServiceBean implements StockService {
     @Inject
     private DataManager dataManager;
 
+    // TODO: Remove unused code
+
     /**
      * Change Stock values
      * @param newItems
