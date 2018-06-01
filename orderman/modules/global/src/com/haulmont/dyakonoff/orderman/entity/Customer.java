@@ -13,11 +13,11 @@ import org.hibernate.validator.constraints.Length;
 import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.chile.core.annotations.NamePattern;
 import com.haulmont.cuba.core.entity.FileDescriptor;
+
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import javax.validation.groups.Default;
 
 @CustomerContactsCheck(groups = {Default.class, UiCrossFieldChecks.class})
@@ -59,6 +59,7 @@ public class Customer extends StandardEntity {
     @NotNull
     @Column(name = "POSTAL_CODE", nullable = false, length = 16)
     protected String postalCode;
+
 
     public void setLogoImage(FileDescriptor logoImage) {
         this.logoImage = logoImage;
