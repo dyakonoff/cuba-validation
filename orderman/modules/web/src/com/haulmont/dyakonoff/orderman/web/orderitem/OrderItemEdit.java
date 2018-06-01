@@ -69,8 +69,6 @@ public class OrderItemEdit extends AbstractEditor<OrderItem> {
 
             errors.add(quantityField, msg);
         }
-
-        super.postValidate(errors);
     }
 
     @Override

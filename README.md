@@ -582,45 +582,68 @@ However, this is not the approach I would recommend for complex cases, mainly be
 
 [Top](#content)
 
-
-
-
-
-
 ## Validation in UI screen controllers
 
 This is a simple and intuitive approach that wold allow you to perform quite complex checks of your screen data. Here are pros and cons of this way:
 
 **Pros:**
+
 * Easy to implement: you just need to override `postValidate` method in your screen controller.
 * Has access to Entity object, screen UI controls, middleware services etc...
 * Can do checks of arbitrary complexity.
 * Easy to debug.
 
 **Cons:**
+
 * Acts only on one UI layer, so you'd need to repeat yourself if you have two or more UI modules (web and desktop, for example).
-* Can't help with REST calls validation, even for [Generic REST](https://doc.cuba-platform.com/manual-6.5/rest_api_v2.html).
+* Can't help with REST calls validation, even with [Generic REST](https://doc.cuba-platform.com/manual-6.5/rest_api_v2.html).
 * Has difficulties with highlighting fields/components that contains incorrect data. (You'd have to do some CSS/JS magic to achieve that result.)
 
-Let's look at the code:
-```java
-public class ProductEdit extends AbstractEditor<Product> {
+However, combining this approach with static and dynamically added `Field.Validator` checks would negate the last flaw.
 
-...
+Let's look at the code:
+
+```java
+public class OrderItemEdit extends AbstractEditor<OrderItem> {
+    @Inject
+    private StockService stockService;
+
+    @Named("fieldGroup.quantity")
+    private TextField quantityField;
+
+    ...
 
     @Override
     protected void postValidate(ValidationErrors errors) {
         super.postValidate(errors);
-        Product product = getItem();
-        if (product.getRetail() && product.getPrice().compareTo(new BigDecimal(10000)) > 0) {
-            errors.add("Retail product can not have price greater than 10,000");
+
+        OrderItem item = getItem();
+
+        // check that only POUNDs could have a fractional number quantity
+        MeasureUnit unit = item.getProduct().getMeasure();
+        if (unit != MeasureUnit.POUND &&
+                item.getQuantity().remainder( BigDecimal.ONE ).compareTo(BigDecimal.ZERO) != 0) {
+            String msg = "You can't get a fractional number of items measured in " + unit.toString();
+            errors.add(msg);
+        }
+
+        // Check that Stock has enough Product
+        // This is a preliminary check that helps User to get the feedback earlier
+        // The final check happens in Order's EntityListener, to be 100% safe from run conditions
+        BigDecimal countInStock = stockService.getProductAvailability(item.getProduct());
+
+        if (item.getQuantity().compareTo(countInStock) > 0) {
+            String msg = String.format("Insufficient product '%s' in stock (%s left)",
+                    item.getProduct().getName(), countInStock.toString());
+
+            errors.add(quantityField, msg);
         }
     }
+    ...
 }
 ```
-[ProductEdit.java](validation-in-controllers/modules/web/src/io/dyakonoff/controllersvalidation/web/product/ProductEdit.java)
 
-However, combining this approach with static and dynamically added `Field.Validator` checks would negate the last flaw.
+[OrderItemEdit.java](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/orderitem/OrderItemEdit.java)
 
 [Top](#content)
 
