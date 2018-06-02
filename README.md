@@ -62,7 +62,7 @@ List of implemented validation methods with links is [here](validations-index.md
 The sample application's code is [here](https://github.com/dyakonoff/cuba-validation-examples/orderman). I encourage you to download the sample project archive from [here](https://github.com/dyakonoff/cuba-validation-examples/archive/master.zip) or clone the project with the next commend:
 
 ```bash
-> git clone git@github.com:dyakonoff/cuba-validation-examples.git
+$ git clone git@github.com:dyakonoff/cuba-validation-examples.git
 ```
 
 [Top](#content)
@@ -649,6 +649,7 @@ public class OrderItemEdit extends AbstractEditor<OrderItem> {
 
 ## Using middleware listeners for data validation
 
+**IN PROGRESS**
 Let's discuss the last two ways of validating the data that [CUBA platform](https://www.cuba-platform.com/) offers: [entity listeners](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) and [transaction listeners](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html).
 These listeners act on the middle tier and allow you to intercept data before the changes be passed to a database. Power of this approach is based on the fact that incorrect data would not be able to pass your checks, doesn't matter from where they came.
 
