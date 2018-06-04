@@ -670,9 +670,9 @@ Both entity and transaction listeners could be easily created from the CUBA stud
 
 _**Figure XX:** Creating listeners in CUBA studio_
 
-Which allows you to create both interfaces and managed beans for listeners with empty methods inmplementations.
+Which allows you to create both interfaces and managed beans for listeners with empty methods implementations.
 
-For entity listeners you can specify what kind of [8 events](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) you'd like to process. However, for data validation `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` are the two most important.
+For entity listeners you can specify what kind of [eight events](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) you'd like to process. However, for data validation `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` are the two most important.
 
 ![Figure XX: Entity listener designer](resources/entity_listener_editor.png)
 
@@ -748,7 +748,7 @@ public class OrderEntityListener implements BeforeInsertEntityListener<Order>, B
 
 [OrderEntityListener.java](orderman/modules/core/src/com/haulmont/dyakonoff/orderman/service/OrderEntityListener.java)
 
-Here [`UniqueNumbersAPI` API](https://doc.cuba-platform.com/manual-6.9/uniqueNumbers.html) is used to generate sequential integer numbers for every day.
+Here [`UniqueNumbersAPI`](https://doc.cuba-platform.com/manual-6.9/uniqueNumbers.html) is used to generate sequential integer numbers for every day.
 
 [Top](#content)
 
@@ -797,7 +797,48 @@ So, as we can see from this example, the [transaction listeners](https://doc.cub
 
 ## Presenting error messages to a user
 
-**IN PROGRESS**
+As we have seen above, three of the methods we have discussed use exception mechanism to notify client that some field has inappropriate value:
+
+* Field.Validator method
+* Transaction listeners
+* Entity listeners
+
+In most cases `ValidationException' is thrown to send a message to UI layer.
+
+However, by default, CUBA platform doesn't handle this exception in a special way and shows a standard 'Unexpected error' dialog as for any other exception. This dialog is more suited for presenting some kind of system and unexpected errors rather than showing user validation errors that you as a developer kind of expecting to happen from time to time as a part of your application's business logic.
+
+So, it's recommended to implement a [client level exception handler](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html) 
+doesn't look like a good method 
+
+![Figure XX: Error message WITHOUT client-level exception handler](resources/no_client_exception_handler.png)
+
+_**Figure XX:** Error message WITHOUT client-level exception handler_
+
+![Figure XX: Error message WITH client-level exception handler](resources/client_exception_handler.png)
+
+_**Figure XX:** Error message WITH client-level exception handler_
+
+The basic client-level exception handler is quite simple. You just need to make [managed bean](https://doc.cuba-platform.com/manual-6.9/managed_beans.html) that implements `AbstractGenericExceptionHandler interface` in your web (or desktop)module and implement `doHandle` method:
+
+```java
+@Component("orderman_ValidationExceptionHandler")
+public class ValidationExceptionHandler extends AbstractGenericExceptionHandler {
+
+    public ValidationExceptionHandler() {
+        super(ValidationException.class.getName());
+    }
+
+    @Override
+    protected void doHandle(String className, String message, @Nullable Throwable throwable, WindowManager windowManager) {
+        windowManager.showNotification(message, Frame.NotificationType.WARNING);
+    }
+}
+```
+
+[ValidationExceptionHandler.java](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/handler/ValidationExceptionHandler.java)
+
+Additional examples for cases that do not cover common `ValidationException` handling needs could be found in [documentation](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html).
+
 [Top](#content)
 
 ## Summary
@@ -834,7 +875,7 @@ _**Table 2:** Validation implementation complexity_
 | _Custom Field.Validator (Java class)_       |            |        |   yes   |          |
 | _Custom Field.Validator (Groovy script)_    |            |  yes   |         |          |
 | _Screen controllers validation_             |            |  yes   |         |          |
-| _Entity listeners_                          |            |        |         |   yes    |
+| _Entity listeners_                          |            |        |  yes    |          |
 | _Transaction listeners_                     |            |        |         |   yes    |
 
 _**Table 3:** Validation scope_
@@ -851,7 +892,7 @@ _**Table 3:** Validation scope_
 | _Entity listeners_                         |     yes      |    yes      |    yes    |                    |
 | _Transaction listeners_                    |     yes      |    yes      |    yes    |         yes        |
 
-\* - for complex indexes (`@UniqueConstraint`), see example: [Product.java](validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)
+\* - for multi-column unique constraints (`@UniqueConstraint`), see example: [Product.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/Product.java)
 
 1. Bean validation could use standard and custom annotations. It works on all tiers, so offers the best level of data security. Besides that it is reusable and gives good UI feedback to a user. The limitations of that approach:
     1. It can't be used for validating the whole data graph when you need to check state of more than one entity.
