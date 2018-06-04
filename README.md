@@ -10,8 +10,8 @@
     1. [Single-field constraints](#single-field-constraints)
     1. [Bean validation with custom annotations](#bean-validation-with-custom-annotations)
     1. [Universal REST Validation](#universal-rest-validation)
-    1. [Validation by contract](#validation-by-contrect)
-    1. [Notes on JPA validation](#jpa-validation-for-entities)
+    1. [Validation by contract](#validation-by-contract)
+    1. [Notes on JPA validation](#notes-on-jpa-validation)
 1. [GUI Validator](#gui-validator)
     1. [Standard validators](#standard-validators)
     1. [Setting validator programmatically](#setting-validator-programmatically)
@@ -23,7 +23,7 @@
     1. [Transactional Context example](#transactional-context-example)
 1. [Presenting error messages to a user](#presenting-error-messages-to-a-user)
 1. [Summary](#summary)
-1. [Appendix A](#appendix_a)
+1. [Appendix A](#appendix-a)
 
 ## Introduction
 
@@ -413,6 +413,9 @@ To do that, let's create a new middleware service using CUBA studio and call it 
 
 
 
+![Figure 5: Configuring REST service from CUBA studio](resources/null.png)
+
+_**Figure 5:** Configuring REST service from CUBA studio_
 
 **IN PROGRESS**
 
@@ -525,9 +528,9 @@ These validators could be added by hands to the screens' XML-descriptors, just l
 
 or, using CUBA studio UI, which will give exactly the same result:
 
-![Figure XX: Standard UI validator](resources/standard_ui_validator.png)
+![Figure 6: Standard UI validator](resources/standard_ui_validator.png)
 
-_**Figure XX:** Standard UI validator_
+_**Figure 6:** Standard UI validator_
 
 A validator class can be assigned to a component not only using a screen XML-descriptor, but also programmatically – by submitting a validator instance into the component’s `addValidator()` method.
 
@@ -658,9 +661,9 @@ Running [groovy](http://groovy-lang.org/) dynamically with [Scripting interface]
 
 This script can be specified either from CUBA studio UI:
 
-![Figure XX: Setting up a groovy script for field validation](resources/standard_ui_validator.png)
+![Figure 7: Setting up a groovy script for field validation](resources/groovy_validator.png)
 
-_**Figure XX:** Setting up a groovy script for field validation._
+_**Figure 7:** Setting up a groovy script for field validation._
 
 or by editing XML screen layout directly:
 
@@ -758,17 +761,17 @@ For sending error messages to a user you can use standard `ValidationException`,
 
 Both entity and transaction listeners could be easily created from the CUBA studio:
 
-![Figure XX: Creating listeners in CUBA studio](resources/listeners_creation.png)
+![Figure 8: Creating listeners in CUBA studio](resources/listeners_creation.png)
 
-_**Figure XX:** Creating listeners in CUBA studio_
+_**Figure 8:** Creating listeners in CUBA studio_
 
 Which allows you to create both interfaces and managed beans for listeners with empty methods implementations.
 
 For entity listeners you can specify what kind of [eight events](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) you'd like to process. However, for data validation `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` are the two most important.
 
-![Figure XX: Entity listener designer](resources/entity_listener_editor.png)
+![Figure 9: Entity listener designer](resources/entity_listener_editor.png)
 
-_**Figure XX:** Entity listener designer_
+_**Figure 9:** Entity listener designer_
 
 The **Use for entities** list typically contains only one entity. The same entity should be specified in the Entity type field. However, you may want to specify a `@MappedSuperclass` entity in the Entity type field and add its subclasses to the Use for entities list.
 
@@ -901,13 +904,13 @@ However, by default, CUBA platform doesn't handle this exception in a special wa
 So, it's recommended to implement a [client level exception handler](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html) 
 doesn't look like a good method 
 
-![Figure XX: Error message WITHOUT client-level exception handler](resources/no_client_exception_handler.png)
+![Figure 10: Error message WITHOUT client-level exception handler](resources/no_client_exception_handler.png)
 
-_**Figure XX:** Error message WITHOUT client-level exception handler_
+_**Figure 10:** Error message WITHOUT client-level exception handler_
 
-![Figure XX: Error message WITH client-level exception handler](resources/client_exception_handler.png)
+![Figure 11: Error message WITH client-level exception handler](resources/client_exception_handler.png)
 
-_**Figure XX:** Error message WITH client-level exception handler_
+_**Figure 11:** Error message WITH client-level exception handler_
 
 The basic client-level exception handler is quite simple. You just need to make [managed bean](https://doc.cuba-platform.com/manual-6.9/managed_beans.html) that implements `AbstractGenericExceptionHandler interface` in your web (or desktop)module and implement `doHandle` method:
 
