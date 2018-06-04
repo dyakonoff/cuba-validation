@@ -226,7 +226,7 @@ There is no need to limit ourselves with the standard JPA annotations, if it's n
 
 Let’s check out how to do that. In our sample application there were implemented [two custom constraints](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator):
 
-* `@UsPhoneNumber` - a constraint which is [implemented](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator/UsPhoneNumber.java) as a descendant of `@Pattern` annotation and does the simple regexp check for the phone format. 
+* `@UsPhoneNumber` - a constraint which is [implemented](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator/UsPhoneNumber.java) as a descendant of `@Pattern` annotation and does the simple regexp check for the phone format.
 * `@CustomerContactsCheck` ensures that a customer entity has either phone number **or** email specified.
 
 `@UsPhoneNumber` validator is quite primitive and implemented as a custom interface:
@@ -255,7 +255,7 @@ Going through the code we should note the next:
 
 * `@Constraint(validatedBy = {})` says that there is no custom class implementing the validator.
 * `@Retention(RetentionPolicy.RUNTIME)` marks annotation as a runtime one, which all validators should be.
-* `@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })` specifies targets that this annotation can be applied to. Althouth in our case, it would be possible to limit the scope only with `ElementType.FIELD`.
+* `@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })` specifies targets that this annotation can be applied to. Although, in our case, it would be possible to limit the scope only with `ElementType.FIELD`.
 * And finally, `@Pattern(...)` part specifies the actual validator's behavior.
 
 Usage of such annotation is simple:
@@ -335,11 +335,66 @@ public class Customer extends StandardEntity {
 
 ### Generic REST Validation
 
-CUBA by default makes all your entities available via REST protocol which follows Swagger specification and available at following URL: http://files.cuba-platform.com/swagger/ . This feature is called [generic REST endpoints](https://doc.cuba-platform.com/manual-6.5/rest_api_v2.html) and by default JPA annotations is applied to REST calls es well.
+CUBA by default makes all your entities available via REST protocol which follows Swagger specification and available at following URL: http://files.cuba-platform.com/swagger/ . This feature is called [generic REST endpoints](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) and by default JPA annotations is applied to REST calls es well.
 
-**IN PROGRESS**
+Following the instruction from [here](rest-commands.md), let's get OAuth2 access token and try to add a new customer using generic REST:
+Our new test customer has couple fields that shouldn't allow it to be added:
+
+```json
+{
+    "addressLine1": "Earth",
+    "addressLine2": "1240 W Main str, Louisville, KY",
+    "addressLine3": "USA",
+    "email": "john.smith_invalid_email",
+    "name": "John Smith",
+    "phone": "+1 (000) 000-1000",
+    "postalCode": "40203"
+}
+```
+
+We can see that email is bad-formed and a phone number doesn't follow the requirements. So, let's run the command _(don't forget to set your own access token as it shown [here](rest-commands.md))._
+
+```bash
+$ http --json POST localhost:8080/app/rest/v2/entities/orderman\$Customer 'Authorization:Bearer 819fe70b-7881-43ca-98ef-b5749f417f49'  @rest/customer_john_smith.json
+HTTP/1.1 400
+Content-Type: application/json;charset=UTF-8
+
+[
+    {
+        "invalidValue": "john.smith_invalid_email",
+        "message": "Invalid email format: john.smith_invalid_email",
+        "messageTemplate": "Invalid email format: ${validatedValue}",
+        "path": "email"
+    },
+    {
+        "invalidValue": "+1 (000) 000-1000",
+        "message": "must match \"\\+1\\s\\([2-9](\\d){2}\\)\\s[2-9](\\d){2}-(\\d){4}\"",
+        "messageTemplate": "{javax.validation.constraints.Pattern.message}",
+        "path": "phone"
+    }
+]
+```
+
+As we see, our JPA validation works just fine.
+
+Let's try to check if our custom validation java class works as well. After making this try we see that it works just fine as well.
+
+```bash
+$ http --json POST localhost:8080/app/rest/v2/entities/orderman\$Customer 'Authorization:Bearer 819fe70b-7881-43ca-98ef-b5749f417f49'  @rest/customer_mary_smith.json
+HTTP/1.1 400
+Content-Type: application/json;charset=UTF-8
+
+[
+    {
+        "invalidValue": null,
+        "message": "Either 'name' or 'email' should be defined for a customer",
+        "messageTemplate": "{msg://com.haulmont.dyakonoff.orderman.entity.validator/CustomerContactsCheck.message}",
+        "path": ""
+    }
+]
+```
+
 [Top](#content)
-
 
 
 
@@ -373,7 +428,7 @@ https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_v
 
 ### Notes on JPA validation
 
-#### When JPA annotation works
+#### At what level JPA annotation works
 
 By default, JPA annotations works:
 
@@ -441,7 +496,7 @@ In the example above, when an instance of `Order` is validated, the list of item
 
 [CUBA platform](https://www.cuba-platform.com/) offers an UI-level mechanism to validate input data. Let's take a look at [gui validator documentation](https://doc.cuba-platform.com/manual-6.9/gui_validator.html). In a screen XML-descriptor, a component validator can be defined in a nested validator elements. The validator element can have the following attributes:
 
-* **class** − name of a Java class implementing the Field.Validator interface. You can use one of the [classes that come out of the box](http://files.cuba-platform.com/javadoc/cuba/6.9/com/haulmont/cuba/gui/components/validators/package-summary.html) or implement your own custom implementation of `Field.Validator` interface. 
+* **class** − name of a Java class implementing the Field.Validator interface. You can use one of the [classes that come out of the box](http://files.cuba-platform.com/javadoc/cuba/6.9/com/haulmont/cuba/gui/components/validators/package-summary.html) or implement your own custom implementation of `Field.Validator` interface.
 * **script** − path to a Groovy script performing validation. Script could be embedded into a screen's XML-descriptor or be given as a separate groovy file.
 
 Groovy validator scripts and standard classes of Java validators, located in the [`com.haulmont.cuba.gui.components.validators`](http://files.cuba-platform.com/javadoc/cuba/6.9/com/haulmont/cuba/gui/components/validators/package-summary.html) package support message attribute − a message displayed to a user when validation fails. The attribute value should contain either a message or a message key from the [messages pack](https://doc.cuba-platform.com/manual-6.9/message_packs.html) of the current screen.
@@ -738,7 +793,6 @@ public class Order extends StandardEntity {
 ```
 
 [Order.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/Order.java)
-
 
 Let's look at the examples.
 
