@@ -9,7 +9,7 @@
     1. [JPA DB level constraints](#jpa-db-level-constraints)
     1. [Single-field constraints](#single-field-constraints)
     1. [Bean validation with custom annotations](#bean-validation-with-custom-annotations)
-    1. [Generic REST Validation](#generic-rest-validation)
+    1. [Universal REST Validation](#universal-rest-validation)
     1. [Validation by contract](#validation-by-contrect)
     1. [Notes on JPA validation](#jpa-validation-for-entities)
 1. [GUI Validator](#gui-validator)
@@ -317,7 +317,7 @@ public class CustomerContactsCheckValidator implements ConstraintValidator<Custo
 
 [CustomerContactsCheckValidator.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator/CustomerContactsCheckValidator.java)
 
-So far, nothing special, but if we want to get this annotation called and be able to do the cross-field check, we need to specify appropriate [constraint group.](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups)
+So far, nothing special, but if we want to get this annotation called and be able to do the cross-field check, we need to specify appropriate [constraint group.](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups) Editor screens perform validation against class-level constraints on commit if the constraint includes the `UiCrossFieldChecks` group and if all attribute-level checks are passed. You can turn off the validation of this kind using the `crossFieldValidate` property of the screen in the screen XML descriptor or in the controller.
 
 ```java
 @CustomerContactsCheck(groups = {Default.class, UiCrossFieldChecks.class})
@@ -333,12 +333,11 @@ public class Customer extends StandardEntity {
 
 [Top](#content)
 
-### Generic REST Validation
+### Universal REST Validation
 
-CUBA by default makes all your entities available via REST protocol which follows Swagger specification and available at following URL: http://files.cuba-platform.com/swagger/ . This feature is called [generic REST endpoints](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) and by default JPA annotations is applied to REST calls es well.
+CUBA by default makes all your entities available via REST protocol which follows Swagger specification and available at following URL: http://files.cuba-platform.com/swagger/ . This feature is called Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) and all JPA validations are applied to universal REST create and update actions automatically (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_rest) for details).
 
-Following the instruction from [here](rest-commands.md), let's get OAuth2 access token and try to add a new customer using generic REST:
-Our new test customer has couple fields that shouldn't allow it to be added:
+Following [this instruction](rest-commands.md), let's get OAuth2 access token and try to add a new customer using universal REST. However, let's make this test customer to have couple fields that shouldn't allow it to be added:
 
 ```json
 {
@@ -375,9 +374,9 @@ Content-Type: application/json;charset=UTF-8
 ]
 ```
 
-As we see, our JPA validation works just fine.
+As we see, our JPA validation works just fine and returns the error messages we have expected to see.
 
-Let's try to check if our custom validation java class works as well. After making this try we see that it works just fine as well.
+Let's make another check if our custom validation java class works as well. After making this try we see that it works just fine.
 
 ```bash
 $ http --json POST localhost:8080/app/rest/v2/entities/orderman\$Customer 'Authorization:Bearer 819fe70b-7881-43ca-98ef-b5749f417f49'  @rest/customer_mary_smith.json
@@ -396,32 +395,26 @@ Content-Type: application/json;charset=UTF-8
 
 [Top](#content)
 
-
-
-
-
-### JPA validation for entities
-
-**IN PROGRESS**
-https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_related_objects 
-
-[Top](#content)
-
-
-
-
-
-
 ### Validation by contract
 
+Let's make the custom REST service and specify the limitation for method parameters returned values etc, in the way that is somewhat similar to contract programming approach.
+
+We want our service to:
+
+1. List all products in stock.
+1. Get Stock object by particular product by it's name (throw exception if there are more than one product with such name in stock).
+1. Add a new product to stock.
+1. Increase amount of existing product in stock.
+
+To do that, let's create a new middleware service using CUBA studio and call it StockApiService
+
+* [Validation in middleware services](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)
+* [Validation Annotations Defined by CUBA](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_cuba_annotations)
+
+
+
+
 **IN PROGRESS**
-[Validation in middleware services](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)
-[@RestrictedView](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_cuba_annotations)
-
-
-
-
-
 
 [Top](#content)
 
@@ -433,7 +426,7 @@ https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_v
 By default, JPA annotations works:
 
 * AT UI level when method `validateAll` of the editor's controller is called automatically on the screen commit. _(But you need to override `postValidate` method to do the custom validation in the screen controller, see later sections)_.
-* At REST level when Generic REST endpoints are called.
+* At REST level when Universal REST endpoints are called.
 * At middleware layer when validation is called manually.
 
 #### Custom messages in JPA constraints
@@ -697,7 +690,7 @@ This is a simple and intuitive approach that wold allow you to perform quite com
 **Cons:**
 
 * Acts only on one UI layer, so you'd need to repeat yourself if you have two or more UI modules (web and desktop, for example).
-* Can't help with REST calls validation, even with [Generic REST](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html).
+* Can't help with REST calls validation, even with [universal REST](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html).
 * Has difficulties with highlighting fields/components that contains incorrect data. (You'd have to do some CSS/JS magic to achieve that result.)
 
 However, combining this approach with static and dynamically added `Field.Validator` checks would negate the last flaw.
@@ -945,16 +938,16 @@ We have covered most of the mechanisms that [CUBA platform](https://www.cuba-pla
 
 _**Table 1:** Validation levels_
 
-|                                   | Generic UI | Generic REST | Middleware | DataStore | Transaction | DB server |
-|-----------------------------------|:----------:|:------------:|:----------:|:---------:|:-----------:|:---------:|
-| _DB level JPA constraints \*_     |            |              |            |           |             |    yes    |
-| _@NotNull constraint \*\*_        |     yes    |   yes\*\*\*  |    yes     |           |             |    yes    |
-| _Bean validation (annotations)_   |     yes    |   yes\*\*\*  |    yes     |           |             |           |
-| _UI validation (Field.Validator)_ |     yes    |              |            |           |             |           |
-| _Custom Field.Validator_          |     yes    |              |            |           |             |           |
-| _Screen controllers validation_   |     yes    |              |            |           |             |           |
-| _Entity listeners_                |            |              |            |    yes    |             |           |
-| _Transaction listeners_           |            |              |            |           |     yes     |           |
+|                                   | Generic UI | Universal REST | Middleware | DataStore | Transaction | DB server |
+|-----------------------------------|:----------:|:--------------:|:----------:|:---------:|:-----------:|:---------:|
+| _DB level JPA constraints \*_     |            |                |            |           |             |    yes    |
+| _@NotNull constraint \*\*_        |     yes    |    yes\*\*\*   |    yes     |           |             |    yes    |
+| _Bean validation (annotations)_   |     yes    |    yes\*\*\*   |    yes     |           |             |           |
+| _UI validation (Field.Validator)_ |     yes    |                |            |           |             |           |
+| _Custom Field.Validator_          |     yes    |                |            |           |             |           |
+| _Screen controllers validation_   |     yes    |                |            |           |             |           |
+| _Entity listeners_                |            |                |            |    yes    |             |           |
+| _Transaction listeners_           |            |                |            |           |     yes     |           |
 
 \* - `@Table` and `@Column` annotations, see example: [Product.java]<br />(validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)<br />
 \*\* - `@NotNull` that is accompanied with `@Column(nullable = false)`<br />
@@ -996,7 +989,7 @@ _**Table 3:** Validation scope_
     1. It can't be used for validating the whole data graph when you need to check state of more than one entity.
     1. Business logic at middleware level can change the entities directly and they will not be validated by this mechanism even before saving them to DB.
 1. Defining custom Validator class and groovy scripts for UI components. Since it works at UI level only, this mechanism offers nice UI integration support (highlighting and pretty error messages formatting) but drawbacks are the same as for annotations, plus:
-    1. It won't be able to check Generic REST calls.
+    1. It won't be able to check Universal REST calls.
     1. Groovy scripts are hard to debug.
 1. Validation in UI screen controllers - it is the simplest way to do validation if there are no standard annotations or `Validator` classes to do it. However, you get the checks done only at UI level and the code reusability is not at the best level.
 1. Entity and Transaction listeners give the best security level. Transaction listeners are capable to check the whole object graph. But this approach requires more coding, has not that good UI integration and doing data validation right before commit might lead to inability to fix the data because it could be too late to do something with data error. Also, complex listeners can degrade the system performance as they happen for **every** data commit.

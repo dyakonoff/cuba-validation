@@ -12,6 +12,8 @@
             <map>
                 <entry key="orderman_StockService"
                        value="com.haulmont.dyakonoff.orderman.service.StockService"/>
+                <entry key="orderman_StockApiService"
+                       value="com.haulmont.dyakonoff.orderman.service.StockApiService"/>
             </map>
         </property>
     </bean>

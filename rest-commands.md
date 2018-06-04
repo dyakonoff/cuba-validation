@@ -1,6 +1,6 @@
-# Helper commands for REST client tests
+# Using REST for CUBA application calls
 
-This examples use [httpie client](https://httpie.org/).
+This examples use [HTTPie client](https://httpie.org/).
 
 CUBA REST v2 API documentation: http://files.cuba-platform.com/swagger/6.8/
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<services xmlns="http://schemas.haulmont.com/cuba/rest-services-v2.xsd">
+    <service name="orderman_StockApiService">
+        <method name="getProductsInStock"/>
+        <method name="getStockForProductByName">
+            <param name="productName"/>
+        </method>
+        <method name="addNewProduct">
+            <param name="product"/>
+            <param name="inStock"/>
+            <param name="optimalLevel"/>
+        </method>
+        <method name="increaseQuantityByProductName">
+            <param name="productName"/>
+            <param name="increaseAmount"/>
+        </method>
+    </service>
+</services>
