@@ -23,12 +23,12 @@ public class OrderItem extends StandardEntity {
     @JoinColumn(name = "PRODUCT_ID")
     protected Product product;
 
-    @DecimalMin(message = "Quantity should be greater than 0", value = "0", inclusive = false)
+    @DecimalMin(message = "Quantity should be greater than {value}", value = "0", inclusive = false)
     @NotNull
     @Column(name = "QUANTITY", nullable = false)
     protected BigDecimal quantity;
 
-    @DecimalMin(message = "Sub total should be greater than 0", value = "0", inclusive = false)
+    @DecimalMin(message = "Sub total should be greater than {value}", value = "0", inclusive = false)
     @NotNull
     @Column(name = "SUB_TOTAL", nullable = false)
     protected BigDecimal subTotal;

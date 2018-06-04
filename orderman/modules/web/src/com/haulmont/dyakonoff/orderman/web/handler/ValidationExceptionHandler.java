@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import javax.validation.ValidationException;
 
 
-//@Component("orderman_ValidationExceptionHandler")
+@Component("orderman_ValidationExceptionHandler")
 public class ValidationExceptionHandler extends AbstractGenericExceptionHandler {
 
     public ValidationExceptionHandler() {

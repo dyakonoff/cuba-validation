@@ -29,7 +29,7 @@ public class Stock extends StandardEntity {
     @Column(name = "IN_STOCK")
     protected BigDecimal inStock;
 
-    @DecimalMin(message = "Optimal stock level should be 0 or gresater", value = "0")
+    @DecimalMin(message = "Optimal stock level should be {0}or greater", value = "0")
     @Column(name = "OPTIMAL_STOCK_LEVEL")
     protected BigDecimal optimalStockLevel;
 

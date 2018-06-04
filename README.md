@@ -348,6 +348,8 @@ CUBA by default makes all your entities available via REST protocol which follow
 ### JPA validation for entities
 
 **IN PROGRESS**
+https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_related_objects 
+
 [Top](#content)
 
 
@@ -371,7 +373,7 @@ CUBA by default makes all your entities available via REST protocol which follow
 
 ### Notes on JPA validation
 
-TODO: 
+#### When JPA annotation works
 
 By default, JPA annotations works:
 
@@ -379,19 +381,61 @@ By default, JPA annotations works:
 * At REST level when Generic REST endpoints are called.
 * At middleware layer when validation is called manually.
 
-**IN PROGRESS**
+#### Custom messages in JPA constraints
+
+All JPA constraints can have custom messages (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages)), for example:
+
+```java
+@Pattern(message = "Postal code should follow US ZIP codes format: 12345 or 12345-6789 or 12345 1234", regexp = "^\\d{5}(?:[-\\s]\\d{4})?$")
+@NotNull
+@Column(name = "POSTAL_CODE", nullable = false, length = 16)
+protected String postalCode;
+```
+
+Messages can contain parameters and expressions. Parameters are enclosed in `{}` and represent either localized messages or annotation parameters, e.g. `{min}, {max}, {value}`. Expressions are enclosed in `${}` and can include the validated value variable `validatedValue`, annotation parameters like `value` or `min`, and JSR-341 (EL 3.0) expressions. For example:
+
+```java
+@Column(name = "EMAIL")
+@Email(message = "Invalid email format: ${validatedValue}", regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
+protected String email;
+
+@Length(message = "Address line 1 should have length not less than {min}", min = 5)
+@NotNull
+@Column(name = "ADDRESS_LINE1", nullable = false)
+protected String addressLine1;
+```
+
+You can also place the message in a [localized messages pack](https://doc.cuba-platform.com/manual-6.9/message_packs.html) and use the following format to specify the message in an annotation: `{msg://message_pack/message_key}` or simply `{msg://message_key}` (for entities only). For example:
+
+```java
+@Pattern(regexp = "\\S+@\\S+", message = "{msg://com.company.demo.entity/Customer.email.validationMsg}")
+@Column(name = "EMAIL")
+protected String email;
+```
+
+#### Validation of related objects
+
+For cascade validation of related objects, mark the reference fields with `@Valid:`
+
+```java
+public class Order extends StandardEntity {
+    ...
+
+    @Size(min = 1, max = 10)
+    @Valid
+    @Composition
+    @OnDelete(DeletePolicy.CASCADE)
+    @OneToMany(mappedBy = "order")
+    protected List<OrderItem> items;
+
+    ...
+}
+```
+
+In the example above, when an instance of `Order` is validated, the list of items will be checked for the fact that it contains at least one instance, and all instances of Product in the list will also be validated.
 
 
 [Top](#content)
-
-
-
-
-
-
-
-
-
 
 ## GUI Validator
 
@@ -858,7 +902,7 @@ _**Table 1:** Validation levels_
 | _Entity listeners_                |            |              |            |    yes    |             |           |
 | _Transaction listeners_           |            |              |            |           |     yes     |           |
 
-\* - `@Table` and `@Column` annotations, see example: [Product.java](validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)<br />
+\* - `@Table` and `@Column` annotations, see example: [Product.java]<br />(validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)<br />
 \*\* - `@NotNull` that is accompanied with `@Column(nullable = false)`<br />
 \*\*\* - only for fields marked with `@Validated` annotations
 

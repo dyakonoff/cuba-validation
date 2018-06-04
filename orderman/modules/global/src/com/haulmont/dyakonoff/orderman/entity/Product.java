@@ -33,7 +33,7 @@ public class Product extends StandardEntity {
     @Column(name = "MEASURE", nullable = false)
     protected Integer measure;
 
-    @DecimalMin(message = "Price per measure should be 0.01 at least", value = "0.01")
+    @DecimalMin(message = "Price per measure should be {value} at least", value = "0.01")
     @NotNull
     @Column(name = "PRICE_PER_MEASURE", nullable = false)
     protected BigDecimal pricePerMeasure;

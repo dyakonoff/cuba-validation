@@ -58,7 +58,7 @@ public class Order extends StandardEntity {
     @OneToMany(mappedBy = "order")
     protected List<OrderItem> items;
 
-    @DecimalMin(message = "Price should be greater than 0", value = "0")
+    @DecimalMin(message = "Price should be greater than {value}", value = "0")
     @NotNull
     @Column(name = "PRICE", nullable = false)
     protected BigDecimal price;

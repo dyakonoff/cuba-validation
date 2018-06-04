@@ -33,7 +33,7 @@ public class Customer extends StandardEntity {
     protected String name;
 
     @Column(name = "EMAIL")
-    @Email(message = "Email should have valid email address format", regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
+    @Email(message = "Invalid email format: ${validatedValue}", regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
     protected String email;
 
     @UsPhoneNumber
@@ -44,7 +44,7 @@ public class Customer extends StandardEntity {
     @JoinColumn(name = "LOGO_IMAGE_ID")
     protected FileDescriptor logoImage;
 
-    @Length(message = "Address line 1 should have length not less than 5", min = 5)
+    @Length(message = "Address line 1 should have length not less than {min}", min = 5)
     @NotNull
     @Column(name = "ADDRESS_LINE1", nullable = false)
     protected String addressLine1;
