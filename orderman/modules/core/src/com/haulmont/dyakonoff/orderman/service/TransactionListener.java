@@ -54,6 +54,32 @@ public class TransactionListener implements BeforeCommitTransactionListener {
 
 
     /**
+     * Building a list of orders to be committed in this transaction
+     * @param managedEntities
+     * @return Set<Order>
+     */
+    private Set<Order> buildListOfOrdersToCheck(EntityManager entityManager, Collection<Entity> managedEntities) {
+        PersistenceTools persistenceTools = persistence.getTools();
+
+        Set<Order> ordersToCheck = new HashSet<>();
+        for (Entity entity : managedEntities) {
+
+            if (!persistenceTools.isDirty(entity))
+                continue;
+            if (entity instanceof Order) {
+                ordersToCheck.add( (Order)entity );
+            }
+            else if (entity instanceof OrderItem) {
+                Order order = ((OrderItem)entity).getOrder();
+                // a reference can be detached, so merge it into current persistence context
+                ordersToCheck.add(entityManager.merge(order));
+                ordersToCheck.add(order);
+            }
+        }
+        return ordersToCheck;
+    }
+
+    /**
      * Building a list of product quantity changes in Stock
      * @param ordersToCheck
      * @return map of products changed with the quantities
@@ -95,32 +121,6 @@ public class TransactionListener implements BeforeCommitTransactionListener {
     }
 
     /**
-     * Building a list of orders to be committed in this transaction
-     * @param managedEntities
-     * @return Set<Order>
-     */
-    private Set<Order> buildListOfOrdersToCheck(EntityManager entityManager, Collection<Entity> managedEntities) {
-        PersistenceTools persistenceTools = persistence.getTools();
-
-        Set<Order> ordersToCheck = new HashSet<>();
-        for (Entity entity : managedEntities) {
-
-            if (!persistenceTools.isDirty(entity))
-                continue;
-            if (entity instanceof Order) {
-                ordersToCheck.add( (Order)entity );
-            }
-            else if (entity instanceof OrderItem) {
-                Order order = ((OrderItem)entity).getOrder();
-                // a reference can be detached, so merge it into current persistence context
-                ordersToCheck.add(entityManager.merge(order));
-                ordersToCheck.add(order);
-            }
-        }
-        return ordersToCheck;
-    }
-
-    /**
      * Check that stock has enough products to fulfill the transaction.
      * Reduces and increases quantity of products in stock accordingly
      * Throws ValidationException if not.
@@ -148,6 +148,8 @@ public class TransactionListener implements BeforeCommitTransactionListener {
                             + s.getInStock().toString() + " left, required: " + valChange.multiply(new BigDecimal(-1)).toString();
                     throw new ValidationException(msg);
                 }
+
+                // update Stock level
                 s.setInStock(newStockVal);
             }
             tx.commit();

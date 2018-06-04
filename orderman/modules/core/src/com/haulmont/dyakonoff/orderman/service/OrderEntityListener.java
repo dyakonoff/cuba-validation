@@ -11,6 +11,7 @@ import com.haulmont.dyakonoff.orderman.entity.Order;
 
 import javax.inject.Inject;
 import javax.validation.ValidationException;
+import javax.validation.constraints.NotNull;
 
 import com.haulmont.cuba.core.listener.BeforeUpdateEntityListener;
 import org.springframework.validation.annotation.Validated;
@@ -43,14 +44,13 @@ public class OrderEntityListener implements BeforeInsertEntityListener<Order>, B
         order.setNumber(date2 + '-' + Long.toString(serialNumb));
     }
 
-
     @Override
     @Validated
     public void onBeforeUpdate(@RequiredView("order-edit") Order order, EntityManager entityManager) {
         validateOrderPrice(order);
     }
 
-    private void validateOrderPrice(Order order) {
+    private void validateOrderPrice(@NotNull Order order) {
         BigDecimal price = order.getPrice();
         for (OrderItem item : order.getItems()) {
             price = price.subtract(item.getSubTotal());

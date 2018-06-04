@@ -19,8 +19,8 @@
     1. [Validating with Groovy scripts](#validating-with-groovy-scripts)
 1. [Validation in UI screen controllers](#validation-in-ui-screen-controllers)
 1. [Using Entity and Transaction listeners for validation](#using-middleware-listeners-for-data-validation)
-    * [Single Entity Context](#single-entity-context)
-    * [Transaction Context](#transaction-context)
+    1. [Single Entity Context example](#single-entity-context-example)
+    1. [Transactional Context example](#transactional-context-example)
 1. [Presenting error messages to a user](#presenting-error-messages-to-a-user)
 1. [Summary](#summary)
 1. [Appendix A](#appendix_a)
@@ -435,6 +435,8 @@ or, using CUBA studio UI, which will give exactly the same result:
 
 ![Figure XX: Standard UI validator](resources/standard_ui_validator.png)
 
+_**Figure XX:** Standard UI validator_
+
 A validator class can be assigned to a component not only using a screen XML-descriptor, but also programmatically – by submitting a validator instance into the component’s `addValidator()` method.
 
 [Top](#content)
@@ -596,7 +598,7 @@ This is a simple and intuitive approach that wold allow you to perform quite com
 **Cons:**
 
 * Acts only on one UI layer, so you'd need to repeat yourself if you have two or more UI modules (web and desktop, for example).
-* Can't help with REST calls validation, even with [Generic REST](https://doc.cuba-platform.com/manual-6.5/rest_api_v2.html).
+* Can't help with REST calls validation, even with [Generic REST](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html).
 * Has difficulties with highlighting fields/components that contains incorrect data. (You'd have to do some CSS/JS magic to achieve that result.)
 
 However, combining this approach with static and dynamically added `Field.Validator` checks would negate the last flaw.
@@ -649,170 +651,147 @@ public class OrderItemEdit extends AbstractEditor<OrderItem> {
 
 ## Using middleware listeners for data validation
 
-**IN PROGRESS**
-Let's discuss the last two ways of validating the data that [CUBA platform](https://www.cuba-platform.com/) offers: [entity listeners](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) and [transaction listeners](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html).
-These listeners act on the middle tier and allow you to intercept data before the changes be passed to a database. Power of this approach is based on the fact that incorrect data would not be able to pass your checks, doesn't matter from where they came.
+The last two validation methods I'm going to discuss in this article are based on [entity listeners](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) and [transaction listeners](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html). Which acts on the middle tier.
 
-Also, [transaction listeners](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html) seems to be the best way to perform complex data checks that should involve analysis of more than just one entity object. So, you'd like to use them when you had to validate the state of your objects graph before committing it to the database.
+These listeners are called when [DataManager](https://doc.cuba-platform.com/manual-6.9/dataManager.html) commits the data. However, transaction listener's `beforeCommit()` method is called before transaction commit after all entity listeners if the transaction is not read-only. The method accepts a current EntityManager and a collection of entities in the current persistence context. So,
 
-In both cases, you'd need to define your custom `RuntimeException` class in global module and mark it with [@SupportedByClient](https://doc.cuba-platform.com/manual-6.9/remoteException.html) annotation to have your error messages transporting from middleware to client tier.
+* [**Entity listener**](https://doc.cuba-platform.com/manual-6.9/using_entity_listeners_recipe.html) allows you to execute your business logic each time an entity is added, updated or removed from the database. All it's methods get `Entity` object and `EntityManager`. Hence, entity listener is a good place to make the entity's field values single and cross-field checks.
+* [**Transaction listener**](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html) can be used to enforce complex business rules involving multiple entities, when all entities in the transaction are were processed by their entity listeners.
 
-Also, it seems to be a good idea to implement custom [client-level exception handlers](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html) to have your error messages displayed properly. However, if you don't care much about how your errors are displayed to a user, you can skip this step.
+Power of this approach is based on the fact that incorrect data would not be able to pass your checks, doesn't matter from where they came.
 
-![without implementing client-level exception handlers](resources/figure_9.png)<br />
-_**Figure 9:** Error message without implementing custom client-level exception handlers_
+**Performance note:** please note that transaction listener is called for *ECERY* transaction commit (if it's not read-only), including the fact that transaction listener might have quite complex business logic and even make some extra-calls you'd have to program to make the validation logic possible. The transaction listener's approach might be quite expensive in terms of the application productivity.
 
-![after implementing custom client-level exception handlers](resources/figure_10.png)<br />
-_**Figure 10:** Error message after implementing custom client-level exception handlers_
+For sending error messages to a user you can use standard `ValidationException`, or if you want to process these error messages with different [client-level exception handler](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html) (see the next [section](#presenting-error-messages-to-a-user) for details), you can define your custom `RuntimeException` class in global module and mark it with [@SupportedByClient](https://doc.cuba-platform.com/manual-6.9/remoteException.html) annotation to have your error messages transporting from middleware to client tier.
+
+Both entity and transaction listeners could be easily created from the CUBA studio:
+
+![Figure XX: Creating listeners in CUBA studio](resources/listeners_creation.png)
+
+_**Figure XX:** Creating listeners in CUBA studio_
+
+Which allows you to create both interfaces and managed beans for listeners with empty methods inmplementations.
+
+For entity listeners you can specify what kind of [8 events](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) you'd like to process. However, for data validation `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` are the two most important.
+
+![Figure XX: Entity listener designer](resources/entity_listener_editor.png)
+
+_**Figure XX:** Entity listener designer_
+
+The **Use for entities** list typically contains only one entity. The same entity should be specified in the Entity type field. However, you may want to specify a `@MappedSuperclass` entity in the Entity type field and add its subclasses to the Use for entities list.
+
+The `@Listeners` annotation is added to each class specified in the Use for entities list. If the Bean name is defined for the listener, it is used to refer to the listener in the annotation value. Otherwise, the fully qualified listener class name is used.
+
+```java
+@Listeners("orderman_OrderEntityListener")
+@NamePattern("%s order#: %s|customer,number")
+@Table(name = "ORDERMAN_ORDER")
+@Entity(name = "orderman$Order")
+public class Order extends StandardEntity {
+    private static final long serialVersionUID = -5542761764517463640L;
+    ...
+}
+```
+
+[Order.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/Order.java)
+
 
 Let's look at the examples.
 
-Assume that we have a small print jobs management system with two entities: `Printers` and `PrintJobs`. We want to check that each printer has accessible IP address before saving it's parameters to the database. Also we want to ensure that two-sided documents can be assigned only to printers that support duplex (two-sided) printing.
-
-We will implement the first constraint using Entity Listener and the second one using Transaction Listener.
-
 [Top](#content)
 
-### Single Entity Context
+### Single Entity Context example
 
-For the start we need to create an Entity Listener for our `Printer` entity. The simplest way is to do that using CUBA studio and in **Middleware** section pick menu item **New / Entity Listener**.
-
-![Figure 11: Creating Entity Listener with CUBA studio](resources/figure_11.png)<br />
-_**Figure 11:** Creating Entity Listener with CUBA studio_
-
-1. Give proper name to the Listener class,
-1. Check `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` interfaces to be implemented
-1. Specify that entity `Printer` need  to be handled by the listener
-
-![Figure 12: Setting parameters for Entity Listener](resources/figure_12.png)<br />
-_**Figure 12:** Setting parameters for Entity Listener_
-
-As an alternative it is possible to create [Entity Listener class](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/PrinterEntityListener.java) manually and mark `Printer class` with `@Listeners("listenersvalidation_PrinterEntityListener")` annotation:
+The demo application uses [`OrderEntityListener`](orderman/modules/core/src/com/haulmont/dyakonoff/orderman/service/OrderEntityListener.java) to set the unique order serial number and validate that the order price is correct and equals to the sum of it's order items.
 
 ```java
-@Listeners("listenersvalidation_PrinterEntityListener")
-@NamePattern("%s|name")
-@Table(name = "LISTENERSVALIDATION_PRINTER")
-@Entity(name = "listenersvalidation$Printer")
-public class Printer extends StandardEntity {
-  ...
-}
-```
-
-Before start working on our Entity Listener class, let's define custom `RuntimeException` and mark it with `@SupportedByClient` annotation to allow this exception to be passed to the client tier.
-
-```java
-@SupportedByClient
-public class PrinterValidationException extends RuntimeException {
-    public PrinterValidationException() {
-    }
-    public PrinterValidationException(String message) {
-        super(message);
-    }
-    public PrinterValidationException(String message, Throwable cause) {
-        super(message, cause);
-    }
-    protected PrinterValidationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-}
-```
-[PrinterValidationException.java](listeners-validation/modules/global/src/io/dyakonoff/listenersvalidation/exception/PrinterValidationException.java)
-
-Then wee need to open our Entity Listener class in IDE and implement both handlers. In our case they are identical and use a [middleware service](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/IpAddressCheckerServiceBean.java) to check if IP address is reachable.
-
-```java
-@Component("listenersvalidation_PrinterEntityListener")
-public class PrinterEntityListener implements BeforeInsertEntityListener<Printer>, BeforeUpdateEntityListener<Printer> {
+/**
+ * Sets the serial number for the order and validates that price is correct
+ */
+@Component("orderman_OrderEntityListener")
+public class OrderEntityListener implements BeforeInsertEntityListener<Order>, BeforeUpdateEntityListener<Order> {
+    @Inject
+    private TimeSource timeSource;
 
     @Inject
-    private IpAddressCheckerService ipAddressCheckerService;
+    private UniqueNumbersAPI uniqueNumbersAPI;
 
     @Override
-    public void onBeforeInsert(Printer entity, EntityManager entityManager) {
-        checkPrinterIsReachable(entity);
+    public void onBeforeInsert(Order order, EntityManager entityManager) {
+        validateOrderPrice(order);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd");
+        String date = sdf.format(timeSource.currentTimestamp());
+        long serialNumb = uniqueNumbersAPI.getNextNumber("order_" + date);
+
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+        String date2 = sdf2.format(timeSource.currentTimestamp());
+        order.setNumber(date2 + '-' + Long.toString(serialNumb));
     }
 
     @Override
-    public void onBeforeUpdate(Printer entity, EntityManager entityManager) {
-        checkPrinterIsReachable(entity);
+    public void onBeforeUpdate(Order order, EntityManager entityManager) {
+        validateOrderPrice(order);
     }
 
-    private void checkPrinterIsReachable(Printer printer) {
-        String ipAddr = printer.getIpAddress();
-        if (!ipAddressCheckerService.checkIpAddrIsReacheble(ipAddr, 2000)) {
-            throw new PrinterValidationException("Printer at " + ipAddr + " is not reachable");
+    private void validateOrderPrice(Order order) {
+        BigDecimal price = order.getPrice();
+        for (OrderItem item : order.getItems()) {
+            price = price.subtract(item.getSubTotal());
+        }
+        if (price.compareTo(BigDecimal.ZERO) != 0) {
+            throw new ValidationException("Order price does not match to the total cost of Order Items");
         }
     }
 }
 ```
-[PrinterEntityListener.java](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/PrinterEntityListener.java)
 
-The last step will be implementing client-level exception handler that will be used for both Entity and Transaction listeners errors processing.
+[OrderEntityListener.java](orderman/modules/core/src/com/haulmont/dyakonoff/orderman/service/OrderEntityListener.java)
 
-```java
-@Component("listenersvalidation_PrintingValidationExceptionHandler")
-public class PrintingValidationExceptionHandler extends AbstractGenericExceptionHandler {
-
-    public PrintingValidationExceptionHandler() {
-        super(PrintJobValidationException.class.getName(), PrinterValidationException.class.getName());
-    }
-
-    @Override
-    protected void doHandle(String className, String message, @Nullable Throwable throwable, WindowManager windowManager) {
-        windowManager.showNotification(message, Frame.NotificationType.ERROR);
-    }
-}
-```
-[PrintingValidationExceptionHandler.java](listeners-validation/modules/web/src/io/dyakonoff/listenersvalidation/exception/PrintingValidationExceptionHandler.java)
+Here [`UniqueNumbersAPI` API](https://doc.cuba-platform.com/manual-6.9/uniqueNumbers.html) is used to generate sequential integer numbers for every day.
 
 [Top](#content)
 
-### Transaction Context
+### Transactional Context example
 
-Handling `PrintJob` entity validation with Transaction Listener is quite similar, we need to:
+Transaction listener validation's idea is quite simple: check all changes in orders and order items that are going to be committed, calculate the products' quantities difference and compare these values with what does database has in `ORDERMAN_STOCK` table.
 
-* Create new `TransactionListener` with CUBA studio.
-* Give it a proper class name if needed.
-* Specify that `BeforeCommitTransactionListener` need to be implemented in [this bean](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/TransactionListener.java).
-* Define custom runtime exception: [PrintJobValidationException](listeners-validation/modules/global/src/io/dyakonoff/listenersvalidation/exception/PrintJobValidationException.java).
-* Implement validation logic in your transaction listener.
+However, this leads to the pretty complex and computationally heavy business logic, which includes a SELECT query to the database and may even attach new Stock objects to the transaction. (see [TransactionListener.java](orderman/modules/core/src/com/haulmont/dyakonoff/orderman/service/TransactionListener.java) for full details)
 
 ```java
-@Component("listenersvalidation_TransactionListener")
+@Component("orderman_TransactionListener")
 public class TransactionListener implements BeforeCommitTransactionListener {
+
+    @Inject
+    private Persistence persistence;
 
     private Logger log = LoggerFactory.getLogger(TransactionListener.class);
 
-    @Inject
-    private PersistenceTools persistenceTools;
-
-    @Inject
-    private IpAddressCheckerService ipAddressCheckerService;
-
+    /**
+     * Validates that Stock has enough items for all orders to be committed
+     * @see https://doc.cuba-platform.com/manual-6.8/transaction_listeners.html for more examples
+     * @param entityManager
+     * @param managedEntities
+     */
     @Override
     public void beforeCommit(EntityManager entityManager, Collection<Entity> managedEntities) {
-        for (Entity entity : managedEntities) {
-            if (!persistenceTools.isDirty(entity))
-                continue;
+        // see https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html for more examples
+        Set<Order> ordersToCheck = buildListOfOrdersToCheck(entityManager, managedEntities);
+        if (ordersToCheck.size() == 0) return;
 
-            if (entity instanceof  PrintJob) {
-                PrintJob pj = (PrintJob)entity;
-                Printer printer = pj.getPrinter();
-                if ((pj.getPrintOnBothSides() != null && pj.getPrintOnBothSides())
-                        && (printer.getDuplexSupport() == null || !printer.getDuplexSupport())
-                        ) {
-                    String msg = "File " + pj.getFile().getName() + " can't be printed on printer " + printer.getName() +
-                            ", this printer does not support duplex printing";
-                    throw new PrintJobValidationException(msg);
+        HashMap<UUID, BigDecimal> stockChanges = buildStockChangesSet(ordersToCheck);
+        if (stockChanges.size() == 0) return;
 
-                }
-            }
-        }
+        validateStockHasEnoughGoods(stockChanges);
     }
+
+    ...
 }
 ```
-_[TransactionListener.java](listeners-validation/modules/core/src/io/dyakonoff/listenersvalidation/listener/TransactionListener.java)_
+
+[TransactionListener.java](orderman/modules/core/src/com/haulmont/dyakonoff/orderman/service/TransactionListener.java)
+
+So, as we can see from this example, the [transaction listeners](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html) approach is very powerful, but may quite complex to implement and could be computationally heavy.
 
 [Top](#content)
 
@@ -893,5 +872,6 @@ CUBA Documentation articles, related to validation:
 
 1. [Bean Validation](https://doc.cuba-platform.com/manual-6.9/bean_validation.html)
 1. [List of JPA constraints in CUBA applications](common_jpa_annotations.md)
+1. ["Using entity listeners" recipe](https://doc.cuba-platform.com/manual-6.9/using_entity_listeners_recipe.html)
 
 [Top](#content)
