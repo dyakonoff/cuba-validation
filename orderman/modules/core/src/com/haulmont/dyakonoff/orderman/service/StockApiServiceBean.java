@@ -10,6 +10,7 @@ import java.util.List;
 
 @Service(StockApiService.NAME)
 public class StockApiServiceBean implements StockApiService {
+
     @Override
     public List<Stock> getProductsInStock() {
         return null;

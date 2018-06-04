@@ -4,9 +4,9 @@
 *.iml
 *.iws
 build/*
-deploy
 !deploy/tomcat/work/app-core/filestorage/*
 !deploy/hsqldb
+deploy
 modules/*/build/*
 out
 test-run

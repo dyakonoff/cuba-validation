@@ -42,4 +42,12 @@
             <property name="measure"/>
         </property>
     </view>
+    <view class="com.haulmont.dyakonoff.orderman.entity.Stock"
+          extends="stock-view"
+          name="stock-api-view">
+        <property name="product"
+                  view="_minimal">
+            <property name="measure"/>
+        </property>
+    </view>
 </views>

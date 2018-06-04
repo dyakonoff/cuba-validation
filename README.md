@@ -1000,7 +1000,7 @@ _**Table 3:** Validation scope_
 
 There is a old version of this article that used different samples approach: one simple example per validation method. And which contains couple of small examples. It can be found [here](https://github.com/dyakonoff/cuba-validation-examples/tree/version-1).
 
-CUBA Documentation articles, related to validation:
+### CUBA Documentation articles, related to validation
 
 1. [Bean Validation](https://doc.cuba-platform.com/manual-6.9/bean_validation.html)
 1. [List of JPA constraints in CUBA applications](common_jpa_annotations.md)
