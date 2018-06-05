@@ -15,6 +15,7 @@
     - [Notes on JPA validation](#notes-on-jpa-validation)
         - [At what level JPA annotation works](#at-what-level-jpa-annotation-works)
         - [Custom messages in JPA constraints](#custom-messages-in-jpa-constraints)
+        - [Message packs in JPA constraints](#message-packs-in-jpa-constraints)
         - [Validation of related objects](#validation-of-related-objects)
 - [Validation in REST](#validation-in-rest)
     - [Universal REST](#universal-rest)
@@ -376,6 +377,8 @@ protected String email;
 protected String addressLine1;
 ```
 
+#### Message packs in JPA constraints
+
 You can also place the message in a [localized messages pack](https://doc.cuba-platform.com/manual-6.9/message_packs.html) and use the following format to specify the message in an annotation: `{msg://message_pack/message_key}` or simply `{msg://message_key}` (for entities only). For example:
 
 ```java
@@ -386,7 +389,7 @@ protected String email;
 
 #### Validation of related objects
 
-For cascade validation of related objects, mark the reference fields with `@Valid:`
+For cascade validation of related objects, mark the reference fields with `@Valid`:
 
 ```java
 public class Order extends StandardEntity {
@@ -501,13 +504,20 @@ public interface StockApiService {
     @Validated
     @NotNull
     @RequiredView("stock-api-view")
-    Stock getStockForProductByName(@NotNull @Length(min = 1) String productName);
+    Stock getStockForProductByName(@NotNull @Length(min = 1, max = 255) String productName);
 
     @Validated
-    void addNewProduct(@RequiredView("_local") Product product, @NotNull @DecimalMin("0") @DecimalMax("1000") BigDecimal inStock, @Min(0) BigDecimal optimalLevel);
+    @NotNull
+    @RequiredView("_local")
+    Stock addNewProduct(@RequiredView("_local") Product product, 
+                        @NotNull @DecimalMin("0") @DecimalMax("1000") BigDecimal inStock,
+                        @Min(0) BigDecimal optimalLevel);
 
     @Validated
-    void increaseQuantityByProductName(@NotNull @Length(min = 1) String productName, @NotNull @DecimalMin(value = "0", inclusive = false) BigDecimal increaseAmount);
+    @NotNull
+    @RequiredView("stock-api-view")
+    Stock increaseQuantityByProductName(@NotNull @Length(min = 1, max = 255) String productName,
+                                        @NotNull @DecimalMin(value = "0", inclusive = false) @DecimalMax(value = "1000000000") BigDecimal increaseAmount);
 }
 ```
 

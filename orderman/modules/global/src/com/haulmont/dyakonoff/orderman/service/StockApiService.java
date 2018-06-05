@@ -21,18 +21,30 @@ public interface StockApiService {
     @Validated
     @NotNull
     @RequiredView("stock-api-view")
-    Stock getStockForProductByName(@NotNull @Length(min = 1, max = 255) String productName);
+    Stock getStockForProductByName(@NotNull(message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productNameMissing)")
+                                   @Length(min = 1, max = 255, message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productName}")
+                                           String productName);
 
     @Validated
     @NotNull
     @RequiredView("_local")
-    Stock addNewProduct(@RequiredView("_local") Product product, 
-                        @NotNull @DecimalMin("0") @DecimalMax("1000") BigDecimal inStock,
-                        @Min(0) BigDecimal optimalLevel);
+    Stock addNewProduct(@RequiredView("_local")
+                                Product product,
+                        @NotNull
+                        @DecimalMin("0")
+                        @DecimalMax(value = "1000", message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.inStockLimit}")
+                                BigDecimal inStock,
+                        @Min(0)
+                                BigDecimal optimalLevel);
 
     @Validated
     @NotNull
     @RequiredView("stock-api-view")
-    Stock increaseQuantityByProductName(@NotNull @Length(min = 1, max = 255) String productName,
-                                        @NotNull @DecimalMin(value = "0", inclusive = false) @DecimalMax(value = "1000000000") BigDecimal increaseAmount);
+    Stock increaseQuantityByProductName(@NotNull(message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productNameMissing)")
+                                        @Length(min = 1, max = 255, message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productName}")
+                                                String productName,
+                                        @NotNull
+                                        @DecimalMin(value = "0", inclusive = false)
+                                        @DecimalMax(value = "1000")
+                                                BigDecimal increaseAmount);
 }

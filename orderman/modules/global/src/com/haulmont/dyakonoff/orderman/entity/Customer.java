@@ -27,7 +27,7 @@ import javax.validation.groups.Default;
 public class Customer extends StandardEntity {
     private static final long serialVersionUID = -8612760748017102060L;
 
-    @Length(min = 1)
+    @Length(min = 1, max = 255)
     @NotNull
     @Column(name = "NAME", nullable = false)
     protected String name;
@@ -36,6 +36,7 @@ public class Customer extends StandardEntity {
     @Email(message = "Invalid email format: ${validatedValue}", regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
     protected String email;
 
+    @Length(max = 30)
     @UsPhoneNumber
     @Column(name = "PHONE", length = 30)
     protected String phone;
@@ -44,17 +45,20 @@ public class Customer extends StandardEntity {
     @JoinColumn(name = "LOGO_IMAGE_ID")
     protected FileDescriptor logoImage;
 
-    @Length(message = "Address line 1 should have length not less than {min}", min = 5)
+    @Length(message = "Address line 1 should have length not less than {min}", min = 5, max = 255)
     @NotNull
     @Column(name = "ADDRESS_LINE1", nullable = false)
     protected String addressLine1;
 
+    @Length(max = 255)
     @Column(name = "ADDRESS_LINE2")
     protected String addressLine2;
 
+    @Length(max = 255)
     @Column(name = "ADDRESS_LINE3")
     protected String addressLine3;
 
+    @Length(max = 16)
     @Pattern(message = "Postal code should follow US ZIP codes format: 12345 or 12345-6789 or 12345 1234", regexp = "^\\d{5}(?:[-\\s]\\d{4})?$")
     @NotNull
     @Column(name = "POSTAL_CODE", nullable = false, length = 16)

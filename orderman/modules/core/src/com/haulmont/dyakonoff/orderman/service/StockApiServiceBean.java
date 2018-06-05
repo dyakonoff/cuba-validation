@@ -58,19 +58,17 @@ public class StockApiServiceBean implements StockApiService {
     public Stock addNewProduct(Product product, BigDecimal inStock, BigDecimal optimalLevel) {
         // validate the product provided
         Validator validator = beanValidation.getValidator();
-        Set<ConstraintViolation<Product>> violations = validator.validate(product);
-        if (violations.size() > 0) {
+        Set<ConstraintViolation<Product>> product_violations = validator.validate(product);
+        if (product_violations.size() > 0) {
             StringBuilder strBuilder = new StringBuilder();
-            for (ConstraintViolation<Product> violation : violations) {
-                strBuilder.append(violation.getMessage());
-                strBuilder.append("; ");
-            }
+            product_violations.stream().forEach(violation -> strBuilder.append(violation.getMessage()).append("; "));
             throw new CustomValidationException(strBuilder.toString());
         }
 
         // check if product already exist in the db
         // we don't check for soft-deleted Product and Stock entities here for simplicity
         // if we'd like to do that might need to load entities and check them with isDeleted() method.
+        // see https://doc.cuba-platform.com/manual-6.9/soft_deletion_usage.html for details
         Integer cnt = (Integer) dataManager
                 .loadValue("SELECT COUNT(p) FROM orderman$Product p WHERE p.name = :productName", Integer.class)
                 .parameter("productName", product.getName())
@@ -84,8 +82,18 @@ public class StockApiServiceBean implements StockApiService {
         stock.setInStock(inStock);
         stock.setOptimalStockLevel(optimalLevel);
         stock.setProduct(savedProduct);
+
+        // validate the stock object
+        Set<ConstraintViolation<Stock>> stock_violations = validator.validate(stock);
+        if (stock_violations.size() > 0) {
+            StringBuilder strBuilder = new StringBuilder();
+            stock_violations.stream().forEach(violation -> strBuilder.append(violation.getMessage()).append("; "));
+            throw new CustomValidationException(strBuilder.toString());
+        }
+
         return dataManager.commit(stock);
     }
+
 
     @Override
     public Stock increaseQuantityByProductName(String productName, BigDecimal increaseAmount) {

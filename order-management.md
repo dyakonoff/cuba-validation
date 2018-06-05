@@ -6,16 +6,16 @@ This is a simple order management system that resembles a stock of a small US ba
 
 ## Data model and constraints
 
-|   | **Customer**      |           |
-|---|-------------------|-----------|
-| + | name              | required, should have length >= 1, and should start with Latin letter |
-| + | email             | should be a well-formed email address |
-| + | phone             | should follow the US phone numbers format: `+1 NXX-NXX-XXXX` , where: `N`=digits 2–9, `X`=digits 0–9 |
-|   | logoImage         |           |
-| + | addressLine1      | required, should has length greater than 5 |
-|   | addressLine2      |           |
-|   | addressLine3      |           |
-| + | postalCode        | required and should follow US ZIP codes format: `12345` or `12345-6789` or `12345 1234` |
+|     | **Customer** |                                                                                                      |
+| --- | ------------ | ---------------------------------------------------------------------------------------------------- |
+| +   | name         | required, should have length >= 1, and should start with Latin letter                                |
+| +   | email        | should be a well-formed email address                                                                |
+| +   | phone        | should follow the US phone numbers format: `+1 NXX-NXX-XXXX` , where: `N`=digits 2–9, `X`=digits 0–9 |
+|     | logoImage    |                                                                                                      |
+| +   | addressLine1 | required, should has length greater than 5                                                           |
+|     | addressLine2 |                                                                                                      |
+|     | addressLine3 |                                                                                                      |
+| +   | postalCode   | required and should follow US ZIP codes format: `12345` or `12345-6789` or `12345 1234`              |
 
 Other constraints:
 
@@ -23,14 +23,14 @@ Other constraints:
 
 ----
 
-|   | **Order**           |         |
-|---|---------------------|---------|
-| + | customer            | required |
-| + | date                | required, should be in the past |
-| + | number              | required, unique, should be:  yyyy-MM-dd-incremental_number (unique for 1 day) |
-| + | status              | required, Values: New, Paid, Cancelled |
-| + | orderItems          | required, should have  1 <= size <= 10 (we don't allow to make big orders), all orderItemsShould be valid |
-| + | price               | required, positive |
+|     | **Order**  |                                                                                                           |
+| --- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| +   | customer   | required                                                                                                  |
+| +   | date       | required, should be in the past                                                                           |
+| +   | number     | required, unique, should be:  yyyy-MM-dd-incremental_number (unique for 1 day)                            |
+| +   | status     | required, Values: New, Paid, Cancelled                                                                    |
+| +   | orderItems | required, should have  1 <= size <= 10 (we don't allow to make big orders), all orderItemsShould be valid |
+| +   | price      | required, positive                                                                                        |
 
 Other constraints:
 
@@ -39,11 +39,11 @@ Other constraints:
 
 ----
 
-|   | **Order Item** |          |
-|---|----------------|----------|
-| + | product        | required |
-| + | quantity       | required, > 0, should not be equal to 666 or 777, should be no greater than 1000 |
-| + | subTotal       | required, > 0 |
+|     | **Order Item** |                                                                                  |
+| --- | -------------- | -------------------------------------------------------------------------------- |
+| +   | product        | required                                                                         |
+| +   | quantity       | required, > 0, should not be equal to 666 or 777, should be no greater than 1000 |
+| +   | subTotal       | required, > 0                                                                    |
 
 Other constraints:
 
@@ -52,12 +52,12 @@ Other constraints:
 
 ----
 
-|   | **Product**        |          |
-|---|--------------------|----------|
-| + | name               | required, should not contain swear words |
-| + | description        | should not contain swear words
-| + | measure            | required, Values: pound, count, pack  |
-| + | pricePerMeasure    | required, > 0 |
+|     | **Product**     |                                          |
+| --- | --------------- | ---------------------------------------- |
+| +   | name            | required, should not contain swear words |
+| +   | description     | should not contain swear words           |
+| +   | measure         | required, Values: pound, count, pack     |
+| +   | pricePerMeasure | required, > 0                            |
 
 Other constraints:
 
@@ -65,11 +65,11 @@ Other constraints:
 
 ----
 
-|   | **Stock**         |          |
-|---|-------------------|----------|
-| + | product           | required, unique |
-| + | inStock           | required, non-negative (how many/much are available) |
-| + | optimalStockLevel | >=0 or null |
+|     | **Stock**         |                                                                |
+| --- | ----------------- | -------------------------------------------------------------- |
+| +   | product           | required, unique                                               |
+| +   | inStock           | required, non-negative, <= 10000 (how many/much are available) |
+| +   | optimalStockLevel | >=0 or null                                                    |
 
 [Back to the article](README.md)
 

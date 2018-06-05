@@ -14,6 +14,7 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 import com.haulmont.cuba.core.entity.annotation.OnDelete;
 import com.haulmont.cuba.core.global.DeletePolicy;
+import org.hibernate.validator.constraints.Length;
 
 @NamePattern("%s|name")
 @Table(name = "ORDERMAN_PRODUCT", uniqueConstraints = {
@@ -23,6 +24,7 @@ import com.haulmont.cuba.core.global.DeletePolicy;
 public class Product extends StandardEntity {
     private static final long serialVersionUID = -8918522012175747344L;
 
+    @Length(max = 255)
     @NotNull
     @Column(name = "NAME", nullable = false)
     protected String name;

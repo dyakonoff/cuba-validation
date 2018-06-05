@@ -23,6 +23,7 @@ import java.util.List;
 import javax.persistence.OneToMany;
 
 import com.haulmont.cuba.core.entity.annotation.Listeners;
+import org.hibernate.validator.constraints.Length;
 
 @Listeners("orderman_OrderEntityListener")
 @NamePattern("%s order#: %s|customer,number")
@@ -42,6 +43,7 @@ public class Order extends StandardEntity {
     @Column(name = "DATE_", nullable = false)
     protected Date date;
 
+    @Length(max = 20)
     @Pattern(message = "Number format should be yyyy-MM-dd-<sequentional number>", regexp = "\\d{4}-\\d{2}-\\d{2}-\\d+")
     @NotNull
     @Column(name = "NUMBER_", nullable = false, unique = true, length = 20)

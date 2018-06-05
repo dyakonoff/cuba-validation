@@ -11,6 +11,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.chile.core.annotations.NamePattern;
+import javax.validation.constraints.DecimalMax;
 
 @NamePattern("%s|product")
 @Table(name = "ORDERMAN_STOCK")
@@ -23,6 +24,7 @@ public class Stock extends StandardEntity {
     @JoinColumn(name = "PRODUCT_ID", unique = true)
     protected Product product;
 
+    @DecimalMax(message = "We don't keep more than 10,000 items in stock", value = "10000")
     @DecimalMin(message = "Stock can't go below 0", value = "0")
     @Column(name = "IN_STOCK")
     protected BigDecimal inStock;
