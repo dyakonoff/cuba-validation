@@ -32,7 +32,7 @@ public interface StockApiService {
 
     @Validated
     @NotNull
-    @RequiredView("_local")
+    @RequiredView("stock-api-view")
     Stock increaseQuantityByProductName(@NotNull @Length(min = 1, max = 255) String productName,
                                         @NotNull @DecimalMin(value = "0", inclusive = false) @DecimalMax(value = "1000000000") BigDecimal increaseAmount);
 }

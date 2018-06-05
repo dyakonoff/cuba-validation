@@ -3,6 +3,7 @@ package com.haulmont.dyakonoff.orderman.service;
 import com.haulmont.cuba.core.global.BeanValidation;
 import com.haulmont.cuba.core.global.DataManager;
 import com.haulmont.cuba.core.global.LoadContext;
+import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.core.global.validation.CustomValidationException;
 import com.haulmont.dyakonoff.orderman.entity.Product;
 import com.haulmont.dyakonoff.orderman.entity.Stock;
@@ -25,13 +26,16 @@ public class StockApiServiceBean implements StockApiService {
     @Inject
     private BeanValidation beanValidation;
 
+    @Inject
+    private Messages messages;
+
     @Override
     public List<Stock> getProductsInStock() {
         LoadContext<Stock> loadContext = LoadContext.create(Stock.class).setQuery(
                 LoadContext.createQuery("SELECT s FROM orderman$Stock s")).setView("stock-api-view");
         List<Stock> rez =  dataManager.loadList(loadContext);
         if (rez.size() == 0)
-            throw new CustomValidationException("Stock is empty");
+            throw new CustomValidationException(messages.getMainMessage("StockApiService.stockIsEmpty"));
 
         return rez;
     }
@@ -45,7 +49,7 @@ public class StockApiServiceBean implements StockApiService {
                 .setView("stock-api-view");
         Stock rez =  dataManager.load(loadContext);
         if (rez == null)
-            throw new CustomValidationException("Can't find product '" + productName + "' in Stock");
+            throw new CustomValidationException(messages.formatMainMessage("StockApiService.cantFindProductInStock", productName));
 
         return rez;
     }
@@ -65,12 +69,14 @@ public class StockApiServiceBean implements StockApiService {
         }
 
         // check if product already exist in the db
+        // we don't check for soft-deleted Product and Stock entities here for simplicity
+        // if we'd like to do that might need to load entities and check them with isDeleted() method.
         Integer cnt = (Integer) dataManager
                 .loadValue("SELECT COUNT(p) FROM orderman$Product p WHERE p.name = :productName", Integer.class)
                 .parameter("productName", product.getName())
                 .one();
         if (cnt > 0)
-            throw new CustomValidationException("Product '" + product.getName() + "' already exists in the DB");
+            throw new CustomValidationException(messages.formatMainMessage("StockApiService.productExists", product.getName()));
 
         Product savedProduct = dataManager.commit(product);
 
@@ -87,13 +93,15 @@ public class StockApiServiceBean implements StockApiService {
                 .setQuery(
                         LoadContext.createQuery("SELECT s FROM orderman$Stock s WHERE s.product.name = :productName")
                                 .setParameter("productName", productName))
-                .setView("_local");
+                .setView("stock-api-view");
         Stock stock =  dataManager.load(loadContext);
 
         if (stock == null)
-            throw new CustomValidationException("Cant find product with name '" + productName + "'");
+            throw new CustomValidationException(messages.formatMainMessage("StockApiService.cantFindProductInStock", productName));
 
         stock.setInStock(stock.getInStock().add(increaseAmount));
+
+        dataManager.commit(stock);
 
         return stock;
     }
