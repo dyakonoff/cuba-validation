@@ -1,35 +1,44 @@
-# Data validation in [CUBA platform](https://www.cuba-platform.com/) applications
+<H1>Data validation in CUBA platform applications</H1>
 
 ## Content
 
-1. [Introduction](#introduction)
-1. [Model problem description](#model-problem-description) / _[full description](order-management.md)_
-1. [Sample application](#sample-application)
-1. [Validation with JPA annotations](#validation-with-jpa-annotations)
-    1. [JPA DB level constraints](#jpa-db-level-constraints)
-    1. [Single-field constraints](#single-field-constraints)
-    1. [Bean validation with custom annotations](#bean-validation-with-custom-annotations)
-    1. [Universal REST Validation](#universal-rest-validation)
-    1. [Validation by contract](#validation-by-contract)
-    1. [Notes on JPA validation](#notes-on-jpa-validation)
-1. [GUI Validator](#gui-validator)
-    1. [Standard validators](#standard-validators)
-    1. [Setting validator programmatically](#setting-validator-programmatically)
-    1. [Custom Java class validator](#custom-java-class-validator)
-    1. [Validating with Groovy scripts](#validating-with-groovy-scripts)
-1. [Validation in UI screen controllers](#validation-in-ui-screen-controllers)
-1. [Using Entity and Transaction listeners for validation](#using-middleware-listeners-for-data-validation)
-    1. [Single Entity Context example](#single-entity-context-example)
-    1. [Transactional Context example](#transactional-context-example)
-1. [Presenting error messages to a user](#presenting-error-messages-to-a-user)
-1. [Summary](#summary)
-1. [Appendix A](#appendix-a)
+- [Content](#content)
+- [Introduction](#introduction)
+- [Model problem description](#model-problem-description)
+- [Sample application](#sample-application)
+- [Validation with JPA annotations](#validation-with-jpa-annotations)
+    - [JPA DB level constraints](#jpa-db-level-constraints)
+        - [Single column constraints](#single-column-constraints)
+        - [Multi-column constraints](#multi-column-constraints)
+    - [Single field constraints](#single-field-constraints)
+    - [Bean validation with custom annotations](#bean-validation-with-custom-annotations)
+    - [Notes on JPA validation](#notes-on-jpa-validation)
+        - [At what level JPA annotation works](#at-what-level-jpa-annotation-works)
+        - [Custom messages in JPA constraints](#custom-messages-in-jpa-constraints)
+        - [Validation of related objects](#validation-of-related-objects)
+- [Validation in REST](#validation-in-rest)
+    - [Universal REST](#universal-rest)
+    - [Validation by contract](#validation-by-contract)
+    - [Programmatic Validation](#programmatic-validation)
+- [GUI Validator](#gui-validator)
+    - [Standard validators](#standard-validators)
+    - [Setting validator programmatically](#setting-validator-programmatically)
+    - [Custom Java class validator](#custom-java-class-validator)
+    - [Validating with Groovy scripts](#validating-with-groovy-scripts)
+- [Validation in UI screen controllers](#validation-in-ui-screen-controllers)
+- [Using middleware listeners for data validation](#using-middleware-listeners-for-data-validation)
+    - [Single Entity Context example](#single-entity-context-example)
+    - [Transactional Context example](#transactional-context-example)
+- [Presenting error messages to a user](#presenting-error-messages-to-a-user)
+- [Summary](#summary)
+- [Appendix A](#appendix-a)
+    - [CUBA Documentation articles, related to validation](#cuba-documentation-articles--related-to-validation)
 
 ## Introduction
 
 Input validation is one of common tasks in everyday developer’s life. We need to check our data in many different situations: after getting data from UI, from API calls, before saving our model to the DB etc, etc.
 
-This article's goal is to summarize all validation methods common to [CUBA platform](https://www.cuba-platform.com/) present explanations and examples for all of them and talk about pros and cons of each of these methods. I hope that the article will be a good tutorial and reference for all questions related to data validation in [CUBA platform](https://www.cuba-platform.com/) based applications.
+This article's goal is to summarize all validation methods common to [CUBA platform](https://www.cuba-platform.com/), give explanations and examples for all of them and talk about pros and cons of each of these methods. I hope that the article will be a good tutorial and reference for all questions related to data validation in [CUBA platform](https://www.cuba-platform.com/) based applications.
 
 The sample application for this article could be downloaded from [here](https://github.com/dyakonoff/cuba-validation-examples). A list of additional examples and materials for further reading is in [Appendix A](#appendix_a).
 
@@ -62,7 +71,7 @@ List of implemented validation methods with links is [here](validations-index.md
 The sample application's code is [here](https://github.com/dyakonoff/cuba-validation-examples/orderman). I encourage you to download the sample project archive from [here](https://github.com/dyakonoff/cuba-validation-examples/archive/master.zip) or clone the project with the next commend:
 
 ```bash
-$ git clone git@github.com:dyakonoff/cuba-validation-examples.git
+git clone git@github.com:dyakonoff/cuba-validation-examples.git
 ```
 
 [Top](#content)
@@ -333,7 +342,74 @@ public class Customer extends StandardEntity {
 
 [Top](#content)
 
-### Universal REST Validation
+### Notes on JPA validation
+
+#### At what level JPA annotation works
+
+By default, JPA annotations works:
+
+* AT UI level when method `validateAll` of the editor's controller is called automatically on the screen commit. _(But you need to override `postValidate` method to do the custom validation in the screen controller, see later sections)_.
+* At REST level when Universal REST endpoints are called.
+* At middleware layer when validation is called manually.
+
+#### Custom messages in JPA constraints
+
+All JPA constraints can have custom messages (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages)), for example:
+
+```java
+@Pattern(message = "Postal code should follow US ZIP codes format: 12345 or 12345-6789 or 12345 1234", regexp = "^\\d{5}(?:[-\\s]\\d{4})?$")
+@NotNull
+@Column(name = "POSTAL_CODE", nullable = false, length = 16)
+protected String postalCode;
+```
+
+Messages can contain parameters and expressions. Parameters are enclosed in `{}` and represent either localized messages or annotation parameters, e.g. `{min}, {max}, {value}`. Expressions are enclosed in `${}` and can include the validated value variable `validatedValue`, annotation parameters like `value` or `min`, and JSR-341 (EL 3.0) expressions. For example:
+
+```java
+@Column(name = "EMAIL")
+@Email(message = "Invalid email format: ${validatedValue}", regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
+protected String email;
+
+@Length(message = "Address line 1 should have length not less than {min}", min = 5)
+@NotNull
+@Column(name = "ADDRESS_LINE1", nullable = false)
+protected String addressLine1;
+```
+
+You can also place the message in a [localized messages pack](https://doc.cuba-platform.com/manual-6.9/message_packs.html) and use the following format to specify the message in an annotation: `{msg://message_pack/message_key}` or simply `{msg://message_key}` (for entities only). For example:
+
+```java
+@Pattern(regexp = "\\S+@\\S+", message = "{msg://com.company.demo.entity/Customer.email.validationMsg}")
+@Column(name = "EMAIL")
+protected String email;
+```
+
+#### Validation of related objects
+
+For cascade validation of related objects, mark the reference fields with `@Valid:`
+
+```java
+public class Order extends StandardEntity {
+    ...
+
+    @Size(min = 1, max = 10)
+    @Valid
+    @Composition
+    @OnDelete(DeletePolicy.CASCADE)
+    @OneToMany(mappedBy = "order")
+    protected List<OrderItem> items;
+
+    ...
+}
+```
+
+In the example above, when an instance of `Order` is validated, the list of items will be checked for the fact that it contains at least one instance, and all instances of Product in the list will also be validated.
+
+[Top](#content)
+
+## Validation in REST
+
+### Universal REST
 
 CUBA by default makes all your entities available via REST protocol which follows Swagger specification and available at following URL: http://files.cuba-platform.com/swagger/ . This feature is called Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) and all JPA validations are applied to universal REST create and update actions automatically (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_rest) for details).
 
@@ -408,10 +484,37 @@ We want our service to:
 
 To do that, let's create a new middleware service using CUBA studio and call it StockApiService
 
+
+
+
+`@RequiredView` annotation can be used to validate what kind of views are required for REST method parameters and return data. This annotation works with entity objects and their collections.
+
+```java
+public interface StockApiService {
+    String NAME = "orderman_StockApiService";
+
+    @Validated
+    @NotNull
+    @RequiredView("stock-api-view")
+    List<Stock> getProductsInStock();
+
+    @Validated
+    @NotNull
+    @RequiredView("stock-api-view")
+    Stock getStockForProductByName(@NotNull @Length(min = 1) String productName);
+
+    @Validated
+    void addNewProduct(@RequiredView("_local") Product product, @NotNull @DecimalMin("0") @DecimalMax("1000") BigDecimal inStock, @Min(0) BigDecimal optimalLevel);
+
+    @Validated
+    void increaseQuantityByProductName(@NotNull @Length(min = 1) String productName, @NotNull @DecimalMin(value = "0", inclusive = false) BigDecimal increaseAmount);
+}
+```
+
 * [Validation in middleware services](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)
 * [Validation Annotations Defined by CUBA](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_cuba_annotations)
 
-
+If you perform some custom programmatic validation in a service, use CustomValidationException to inform clients about validation errors in the same format as the standard bean validation does. It can be particularly relevant for REST API clients.
 
 ![Figure 5: Configuring REST service from CUBA studio](resources/null.png)
 
@@ -422,69 +525,13 @@ _**Figure 5:** Configuring REST service from CUBA studio_
 [Top](#content)
 
 
-### Notes on JPA validation
+### Programmatic Validation
 
-#### At what level JPA annotation works
+[Programmatic validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_programmatic) can be used to run JPA validation mechanism manually if you don't wont to rely on validation by contract for some reason.
 
-By default, JPA annotations works:
+You can perform bean validation programmatically using the `BeanValidation` infrastructure interface, available on both middleware and client tier. It is used to obtain a `javax.validation.Validator` implementation which runs validation. The result of validation is a set of `ConstraintViolation` objects.
 
-* AT UI level when method `validateAll` of the editor's controller is called automatically on the screen commit. _(But you need to override `postValidate` method to do the custom validation in the screen controller, see later sections)_.
-* At REST level when Universal REST endpoints are called.
-* At middleware layer when validation is called manually.
-
-#### Custom messages in JPA constraints
-
-All JPA constraints can have custom messages (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages)), for example:
-
-```java
-@Pattern(message = "Postal code should follow US ZIP codes format: 12345 or 12345-6789 or 12345 1234", regexp = "^\\d{5}(?:[-\\s]\\d{4})?$")
-@NotNull
-@Column(name = "POSTAL_CODE", nullable = false, length = 16)
-protected String postalCode;
-```
-
-Messages can contain parameters and expressions. Parameters are enclosed in `{}` and represent either localized messages or annotation parameters, e.g. `{min}, {max}, {value}`. Expressions are enclosed in `${}` and can include the validated value variable `validatedValue`, annotation parameters like `value` or `min`, and JSR-341 (EL 3.0) expressions. For example:
-
-```java
-@Column(name = "EMAIL")
-@Email(message = "Invalid email format: ${validatedValue}", regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
-protected String email;
-
-@Length(message = "Address line 1 should have length not less than {min}", min = 5)
-@NotNull
-@Column(name = "ADDRESS_LINE1", nullable = false)
-protected String addressLine1;
-```
-
-You can also place the message in a [localized messages pack](https://doc.cuba-platform.com/manual-6.9/message_packs.html) and use the following format to specify the message in an annotation: `{msg://message_pack/message_key}` or simply `{msg://message_key}` (for entities only). For example:
-
-```java
-@Pattern(regexp = "\\S+@\\S+", message = "{msg://com.company.demo.entity/Customer.email.validationMsg}")
-@Column(name = "EMAIL")
-protected String email;
-```
-
-#### Validation of related objects
-
-For cascade validation of related objects, mark the reference fields with `@Valid:`
-
-```java
-public class Order extends StandardEntity {
-    ...
-
-    @Size(min = 1, max = 10)
-    @Valid
-    @Composition
-    @OnDelete(DeletePolicy.CASCADE)
-    @OneToMany(mappedBy = "order")
-    protected List<OrderItem> items;
-
-    ...
-}
-```
-
-In the example above, when an instance of `Order` is validated, the list of items will be checked for the fact that it contains at least one instance, and all instances of Product in the list will also be validated.
-
+**IN PROGRESS**
 
 [Top](#content)
 

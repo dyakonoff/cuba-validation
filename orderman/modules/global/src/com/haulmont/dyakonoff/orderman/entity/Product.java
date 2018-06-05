@@ -12,6 +12,8 @@ import javax.persistence.UniqueConstraint;
 import com.haulmont.chile.core.annotations.NamePattern;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
+import com.haulmont.cuba.core.entity.annotation.OnDelete;
+import com.haulmont.cuba.core.global.DeletePolicy;
 
 @NamePattern("%s|name")
 @Table(name = "ORDERMAN_PRODUCT", uniqueConstraints = {
@@ -38,6 +40,7 @@ public class Product extends StandardEntity {
     @Column(name = "PRICE_PER_MEASURE", nullable = false)
     protected BigDecimal pricePerMeasure;
 
+    @OnDelete(DeletePolicy.CASCADE)
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "product")
     protected Stock stock;
 

@@ -15,16 +15,24 @@ public interface StockApiService {
 
     @Validated
     @NotNull
+    @RequiredView("stock-api-view")
     List<Stock> getProductsInStock();
 
     @Validated
     @NotNull
     @RequiredView("stock-api-view")
-    Stock getStockForProductByName(@NotNull @Length(min = 1) String productName);
+    Stock getStockForProductByName(@NotNull @Length(min = 1, max = 255) String productName);
 
     @Validated
-    void addNewProduct(@RequiredView("_local") Product product, @NotNull @DecimalMin("0") @DecimalMax("1000") BigDecimal inStock, @Min(0) BigDecimal optimalLevel);
+    @NotNull
+    @RequiredView("_local")
+    Stock addNewProduct(@RequiredView("_local") Product product, 
+                        @NotNull @DecimalMin("0") @DecimalMax("1000") BigDecimal inStock,
+                        @Min(0) BigDecimal optimalLevel);
 
     @Validated
-    void increaseQuantityByProductName(@NotNull @Length(min = 1) String productName, @NotNull @DecimalMin(value = "0", inclusive = false) BigDecimal increaseAmount);
+    @NotNull
+    @RequiredView("_local")
+    Stock increaseQuantityByProductName(@NotNull @Length(min = 1, max = 255) String productName,
+                                        @NotNull @DecimalMin(value = "0", inclusive = false) @DecimalMax(value = "1000000000") BigDecimal increaseAmount);
 }
