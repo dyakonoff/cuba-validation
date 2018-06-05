@@ -2,7 +2,6 @@ package com.haulmont.dyakonoff.orderman.entity.validator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 import java.lang.annotation.*;
 

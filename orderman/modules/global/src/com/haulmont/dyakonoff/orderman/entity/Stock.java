@@ -11,9 +11,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import com.haulmont.cuba.core.entity.StandardEntity;
 import com.haulmont.chile.core.annotations.NamePattern;
-import com.haulmont.cuba.core.entity.annotation.Listeners;
 
-@Listeners("orderman_DemoEntityListener")
 @NamePattern("%s|product")
 @Table(name = "ORDERMAN_STOCK")
 @Entity(name = "orderman$Stock")

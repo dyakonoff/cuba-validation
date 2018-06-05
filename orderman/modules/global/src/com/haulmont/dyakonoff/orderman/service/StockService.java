@@ -10,7 +10,4 @@ public interface StockService {
     String NAME = "orderman_StockService";
 
     BigDecimal getProductAvailability(Product product);
-//    void onOrderDelete(Order order);
-//    void onOrderInsert(Order order);
-//    void onOrderUpdate(Order order);
 }

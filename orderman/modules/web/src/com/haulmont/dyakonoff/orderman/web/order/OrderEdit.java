@@ -3,14 +3,12 @@ package com.haulmont.dyakonoff.orderman.web.order;
 import com.haulmont.cuba.core.global.TimeSource;
 import com.haulmont.cuba.gui.components.AbstractEditor;
 import com.haulmont.cuba.gui.components.Table;
-import com.haulmont.cuba.security.global.UserSession;
 import com.haulmont.dyakonoff.orderman.entity.Order;
 import com.haulmont.dyakonoff.orderman.entity.OrderItem;
 import com.haulmont.dyakonoff.orderman.entity.OrderStatus;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
-import com.haulmont.cuba.gui.components.Component;
 
 public class OrderEdit extends AbstractEditor<Order> {
     @Inject
