@@ -14,13 +14,15 @@
     - [Bean validation with custom annotations](#bean-validation-with-custom-annotations)
     - [Notes on JPA validation](#notes-on-jpa-validation)
         - [At what level JPA annotation works](#at-what-level-jpa-annotation-works)
+        - [Validation of related objects](#validation-of-related-objects)
         - [Custom messages in JPA constraints](#custom-messages-in-jpa-constraints)
         - [Message packs in JPA constraints](#message-packs-in-jpa-constraints)
-        - [Validation of related objects](#validation-of-related-objects)
 - [Validation in REST](#validation-in-rest)
     - [Universal REST](#universal-rest)
+    - [REST queries validation](#rest-queries-validation)
     - [Validation by contract](#validation-by-contract)
     - [Programmatic Validation](#programmatic-validation)
+    - [Validation errors in REST](#validation-errors-in-rest)
 - [GUI Validator](#gui-validator)
     - [Standard validators](#standard-validators)
     - [Setting validator programmatically](#setting-validator-programmatically)
@@ -353,6 +355,27 @@ By default, JPA annotations works:
 * At REST level when Universal REST endpoints are called.
 * At middleware layer when validation is called manually.
 
+#### Validation of related objects
+
+For cascade validation of related objects, mark the reference fields with `@Valid`:
+
+```java
+public class Order extends StandardEntity {
+    ...
+
+    @Size(min = 1, max = 10)
+    @Valid
+    @Composition
+    @OnDelete(DeletePolicy.CASCADE)
+    @OneToMany(mappedBy = "order")
+    protected List<OrderItem> items;
+
+    ...
+}
+```
+
+In the example above, when an instance of `Order` is validated, the list of items will be checked for the fact that it contains at least one instance, and all instances of Product in the list will also be validated.
+
 #### Custom messages in JPA constraints
 
 All JPA constraints can have custom messages (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages)), for example:
@@ -386,27 +409,6 @@ You can also place the message in a [localized messages pack](https://doc.cuba-p
 @Column(name = "EMAIL")
 protected String email;
 ```
-
-#### Validation of related objects
-
-For cascade validation of related objects, mark the reference fields with `@Valid`:
-
-```java
-public class Order extends StandardEntity {
-    ...
-
-    @Size(min = 1, max = 10)
-    @Valid
-    @Composition
-    @OnDelete(DeletePolicy.CASCADE)
-    @OneToMany(mappedBy = "order")
-    protected List<OrderItem> items;
-
-    ...
-}
-```
-
-In the example above, when an instance of `Order` is validated, the list of items will be checked for the fact that it contains at least one instance, and all instances of Product in the list will also be validated.
 
 [Top](#content)
 
@@ -474,6 +476,15 @@ Content-Type: application/json;charset=UTF-8
 
 [Top](#content)
 
+### REST queries validation
+
+https://doc.cuba-platform.com/manual-6.9/rest_api_v2_ex_query_get.html
+https://doc.cuba-platform.com/manual-6.9/rest_api_v2_ex_query_post.html
+
+**IN PROGRESS**
+
+[Top](#content)
+
 ### Validation by contract
 
 Let's make the custom REST service and specify the limitation for method parameters returned values etc, in the way that is somewhat similar to contract programming approach.
@@ -485,12 +496,41 @@ We want our service to:
 1. Add a new product to stock.
 1. Increase amount of existing product in stock.
 
-To do that, let's create a new middleware service using CUBA studio and call it StockApiService
+To do that, let's create a new middleware service using CUBA studio and call it `StockApiService`.
 
+![Figure 5: Adding a middleware service](resources/adding_a_service.png)
 
+_**Figure 5:** Adding a middleware service_
 
+The next step of creation REST service would be opening [StockApiService.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/service/StockApiService.java) and creation of appropriate methods:
 
-`@RequiredView` annotation can be used to validate what kind of views are required for REST method parameters and return data. This annotation works with entity objects and their collections.
+- `List<Stock> getProductsInStock();`
+- `Stock getStockForProductByName(String productName);`
+- `Stock addNewProduct(Product product, BigDecimal inStock, BigDecimal optimalLevel);`
+- `Stock increaseQuantityByProductName(String productName, BigDecimal increaseAmount);`
+
+Next, we need to mark these methods in CUBA studio as REST methods:
+
+![Figure 6: Marking methods as REST available](resources/service_designer.png)
+
+_**Figure 6:** Marking methods as REST available_
+
+Next, let's open `StockApiService` in our Java IDE again and annotate the methods for validation.
+
+1. First, we need to know, that JPA validation will be applied **only** to the methods that are marked with `@Validated` annotation. (See [documentation here](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)). By default, `@Validated` uses the next [constraint groups](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups):
+    - `Default` and `ServiceParametersChecks` - for method parameters
+    - `Default` and `ServiceResultChecks` - for method return value
+    - As for [constraint group](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups) `RestApiChecks`, it could be used for those JPA validations that must be checked only when instance is passed to REST-API.
+2. [Annotation `@RequiredView` could be used](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_cuba_annotations) to ensure that input parameters of the method have fields that are corresponded to the specified [view](https://doc.cuba-platform.com/manual-6.9/views.html).
+    - `@RequiredView` validates that the validated Entity has **at least** those fields loaded that are required by the view. It doesn't fire an error if the Entity has extra fields loaded.
+    - This annotation works with entity objects and their collections.
+3. All standard and custom JPA validations can be applied either to:
+    - **methods** - then the return value is checked)
+    - or to method **parameters** - which makes these parameters to be validated
+    - once again, this JPA validations will be used only to methods that are marked by `@Validated` annotation.
+4. Error messages can be provided with annotations either directly or using messages packs. (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages) for more details)
+
+Here is a result of applying all our validations to the REST service interface:
 
 ```java
 public interface StockApiService {
@@ -504,31 +544,40 @@ public interface StockApiService {
     @Validated
     @NotNull
     @RequiredView("stock-api-view")
-    Stock getStockForProductByName(@NotNull @Length(min = 1, max = 255) String productName);
+    Stock getStockForProductByName(@NotNull(message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productNameMissing)")
+                                   @Length(min = 1, max = 255, message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productName}")
+                                           String productName);
 
     @Validated
     @NotNull
     @RequiredView("_local")
-    Stock addNewProduct(@RequiredView("_local") Product product, 
-                        @NotNull @DecimalMin("0") @DecimalMax("1000") BigDecimal inStock,
-                        @Min(0) BigDecimal optimalLevel);
+    Stock addNewProduct(@RequiredView("_local")
+                                Product product,
+                        @NotNull
+                        @DecimalMin("0")
+                        @DecimalMax(value = "1000", message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.inStockLimit}")
+                                BigDecimal inStock,
+                        @Min(0)
+                                BigDecimal optimalLevel);
 
     @Validated
     @NotNull
     @RequiredView("stock-api-view")
-    Stock increaseQuantityByProductName(@NotNull @Length(min = 1, max = 255) String productName,
-                                        @NotNull @DecimalMin(value = "0", inclusive = false) @DecimalMax(value = "1000000000") BigDecimal increaseAmount);
+    Stock increaseQuantityByProductName(@NotNull(message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productNameMissing)")
+                                        @Length(min = 1, max = 255, message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productName}")
+                                                String productName,
+                                        @NotNull
+                                        @DecimalMin(value = "0", inclusive = false)
+                                        @DecimalMax(value = "1000")
+                                                BigDecimal increaseAmount);
 }
 ```
 
-* [Validation in middleware services](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)
-* [Validation Annotations Defined by CUBA](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_cuba_annotations)
+[StockApiService.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/service/StockApiService.java)
 
-If you perform some custom programmatic validation in a service, use CustomValidationException to inform clients about validation errors in the same format as the standard bean validation does. It can be particularly relevant for REST API clients.
+This REST interface methods are available at endpoint `http://localhost:8080/app/rest/v2/services/{serviceName}/{methodName}` as [swagger specification](http://files.cuba-platform.com/swagger/#/Services) says.
 
-![Figure 5: Configuring REST service from CUBA studio](resources/null.png)
-
-_**Figure 5:** Configuring REST service from CUBA studio_
+Let's run [Postman REST client](https://www.getpostman.com/) and check how our validation annotations works.
 
 **IN PROGRESS**
 
@@ -540,6 +589,19 @@ _**Figure 5:** Configuring REST service from CUBA studio_
 [Programmatic validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_programmatic) can be used to run JPA validation mechanism manually if you don't wont to rely on validation by contract for some reason.
 
 You can perform bean validation programmatically using the `BeanValidation` infrastructure interface, available on both middleware and client tier. It is used to obtain a `javax.validation.Validator` implementation which runs validation. The result of validation is a set of `ConstraintViolation` objects.
+
+If you perform some custom programmatic validation in a service, use CustomValidationException to inform clients about validation errors in the same format as the standard bean validation does. It can be particularly relevant for REST API clients.
+
+**IN PROGRESS**
+
+[Top](#content)
+
+### Validation errors in REST
+
+Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) automatically performs bean validation for create and update actions. Validation errors are returned to the client in the following way:
+5. The `MethodParametersValidationException` and `MethodResultValidationException` exceptions are thrown on validation errors.
+    - `MethodResultValidationException` and `ValidationException` cause `500 Server error` HTTP status
+    - `MethodParametersValidationException`, `ConstraintViolationException` and `CustomValidationException` cause `400 Bad request` HTTP status
 
 **IN PROGRESS**
 
@@ -585,9 +647,9 @@ These validators could be added by hands to the screens' XML-descriptors, just l
 
 or, using CUBA studio UI, which will give exactly the same result:
 
-![Figure 6: Standard UI validator](resources/standard_ui_validator.png)
+![Figure 7: Standard UI validator](resources/standard_ui_validator.png)
 
-_**Figure 6:** Standard UI validator_
+_**Figure 7:** Standard UI validator_
 
 A validator class can be assigned to a component not only using a screen XML-descriptor, but also programmatically – by submitting a validator instance into the component’s `addValidator()` method.
 
@@ -718,9 +780,9 @@ Running [groovy](http://groovy-lang.org/) dynamically with [Scripting interface]
 
 This script can be specified either from CUBA studio UI:
 
-![Figure 7: Setting up a groovy script for field validation](resources/groovy_validator.png)
+![Figure 8: Setting up a groovy script for field validation](resources/groovy_validator.png)
 
-_**Figure 7:** Setting up a groovy script for field validation._
+_**Figure 8:** Setting up a groovy script for field validation._
 
 or by editing XML screen layout directly:
 
@@ -818,17 +880,17 @@ For sending error messages to a user you can use standard `ValidationException`,
 
 Both entity and transaction listeners could be easily created from the CUBA studio:
 
-![Figure 8: Creating listeners in CUBA studio](resources/listeners_creation.png)
+![Figure 9: Creating listeners in CUBA studio](resources/listeners_creation.png)
 
-_**Figure 8:** Creating listeners in CUBA studio_
+_**Figure 9:** Creating listeners in CUBA studio_
 
 Which allows you to create both interfaces and managed beans for listeners with empty methods implementations.
 
 For entity listeners you can specify what kind of [eight events](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) you'd like to process. However, for data validation `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` are the two most important.
 
-![Figure 9: Entity listener designer](resources/entity_listener_editor.png)
+![Figure 10: Entity listener designer](resources/entity_listener_editor.png)
 
-_**Figure 9:** Entity listener designer_
+_**Figure 10:** Entity listener designer_
 
 The **Use for entities** list typically contains only one entity. The same entity should be specified in the Entity type field. However, you may want to specify a `@MappedSuperclass` entity in the Entity type field and add its subclasses to the Use for entities list.
 
@@ -961,13 +1023,13 @@ However, by default, CUBA platform doesn't handle this exception in a special wa
 So, it's recommended to implement a [client level exception handler](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html) 
 doesn't look like a good method 
 
-![Figure 10: Error message WITHOUT client-level exception handler](resources/no_client_exception_handler.png)
+![Figure 111: Error message WITHOUT client-level exception handler](resources/no_client_exception_handler.png)
 
-_**Figure 10:** Error message WITHOUT client-level exception handler_
+_**Figure 11:** Error message WITHOUT client-level exception handler_
 
-![Figure 11: Error message WITH client-level exception handler](resources/client_exception_handler.png)
+![Figure 12: Error message WITH client-level exception handler](resources/client_exception_handler.png)
 
-_**Figure 11:** Error message WITH client-level exception handler_
+_**Figure 12:** Error message WITH client-level exception handler_
 
 The basic client-level exception handler is quite simple. You just need to make [managed bean](https://doc.cuba-platform.com/manual-6.9/managed_beans.html) that implements `AbstractGenericExceptionHandler interface` in your web (or desktop)module and implement `doHandle` method:
 

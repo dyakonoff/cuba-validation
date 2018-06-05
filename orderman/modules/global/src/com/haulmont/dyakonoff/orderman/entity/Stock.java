@@ -56,6 +56,4 @@ public class Stock extends StandardEntity {
     public BigDecimal getOptimalStockLevel() {
         return optimalStockLevel;
     }
-
-
 }
