@@ -1,5 +1,9 @@
 .gradle
 .studio
+.project
+.settings
+.classpath
+modules/*/bin
 *.ipr
 *.iml
 *.iws

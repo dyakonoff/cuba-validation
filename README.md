@@ -42,9 +42,13 @@
 
 Input validation is one of the common tasks in everyday developer’s life. We need to check our data in many different situations: after getting data from UI, in API call handlers, before saving our model to the DB etc, etc.
 
-Main goal of this article is to summarize all validation methods that are common to [CUBA platform](https://www.cuba-platform.com/), give detailed explanations and examples for all of them and talk a bit about pros and cons of each of these approaches. I hope that the article will be a good tutorial and reference for all the questions related to data validation in [CUBA platform](https://www.cuba-platform.com/) based applications.
+Main goal of this article is to summarize all validation methods that are common to [CUBA platform](https://www.cuba-platform.com/), give detailed explanations with examples for all of them and talk a bit about pros and cons of each of these approaches. I hope that the article will be a good tutorial and reference for all the questions related to data validation in [CUBA platform](https://www.cuba-platform.com/) based applications.
 
-The sample application for this article could be downloaded from [here](https://github.com/dyakonoff/cuba-validation-examples). A list of additional examples and materials for further reading is in [Appendix A](#appendix_a).
+The sample application for this article could be downloaded from [here](https://github.com/dyakonoff/cuba-validation-examples).
+
+A list of additional examples and materials for further reading is in [Appendix A](#appendix_a).
+
+Happy reading!
 
 ![Mad scientist validates stuff](resources/mad_scientist.png)
 
@@ -52,9 +56,9 @@ The sample application for this article could be downloaded from [here](https://
 
 ## Model problem description
 
-Before discussing different validation methods available for us in [CUBA platform](https://www.cuba-platform.com/) application, let's discuss what it does first.
+Before discussing different validation methods available for us in [CUBA platform](https://www.cuba-platform.com/) application, let's discuss what the application does first.
 
-For this article I'm going to use one application that includes all validation methods mentioned here to demonstrate how they work from different perspectives: code, user interface, CUBA studio IDE, REST endpoints etc.
+For this article I'm going to use an application that demonstrates all validation methods mentioned here and how they work from different perspectives: code, user interface, CUBA studio IDE, REST endpoints etc.
 
 This application mimics a small order-management system for an US-based store that ships it's goods over the US. That's why this system uses imperial measurement units and enforces US phone numbers and ZIP codes formats.
 
@@ -64,7 +68,7 @@ The application's entities structure is shown below:
 
 _**Figure 1:** Entities structure._
 
-The full description of the application's requirements and data constraints could be found [here](order-management.md).
+For more detailed description of the application's requirements and data constraints you can consult [this page](order-management.md).
 
 List of implemented validation methods with links is [here](validations-index.md).
 
@@ -72,39 +76,41 @@ List of implemented validation methods with links is [here](validations-index.md
 
 ## Sample application
 
-The sample application's code is [here](https://github.com/dyakonoff/cuba-validation-examples/orderman). I encourage you to download the sample project archive from [here](https://github.com/dyakonoff/cuba-validation-examples/archive/master.zip) or clone the project with the next commend:
+The sample application's repository is [here](https://github.com/dyakonoff/cuba-validation-examples/tree/master/orderman). I encourage you to clone it using the next command:
 
 ```bash
 git clone git@github.com:dyakonoff/cuba-validation-examples.git
 ```
 
+Or download sample app .zip archive from [here](https://github.com/dyakonoff/cuba-validation-examples/archive/master.zip).
+
+
 [Top](#content)
 
 ## Validation with JPA annotations
 
-Let's start the review of validators with the simplest ones that we have in our toolbox: JPA constraints. Annotation-based validators provide uniform approach to data checking on the middleware, [GUI](https://doc.cuba-platform.com/manual-6.9/gui_framework.html) and [REST services](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html). They are based on the JSR 349 - Bean Validation 1.1 and its reference implementation: [Hibernate Validator](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/?v=5.3).
+Let's start the review of validation methods with the simplest one that we have in our toolbox: JPA constraints. Annotation-based validators provide uniform approach to data checking on the middleware, [GUI](https://doc.cuba-platform.com/manual-6.9/gui_framework.html) and [universal REST services](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html). They are based on the JSR 349 - Bean Validation 1.1 and its reference implementation: [Hibernate Validator](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/?v=5.3).
 
-[Documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation.html) says that this mechanism allows users to set limitations on entity fields, getters and classes. Most of the annotations are available from [`javax.validation.constraints` namespace](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html), although couple come from `javax.persistence`, `javax.validation` and `org.hibernate.validator.constraints`.
+[Documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation.html) says that this mechanism allows users to set limitations on entity fields, getters and classes. Most of the annotations are available from [`javax.validation.constraints` namespace](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html), although couple of them come from `javax.persistence`, `javax.validation` and `org.hibernate.validator.constraints`.
 
-Also, it's not hard to create your own annotations to validate fields and entities, which we'll se in the [later sections]().
+Also, it's not hard to create your own custom annotations to validate fields and entities, which we'll se in the [later sections](#bean-validation-with-custom-annotations).
 
 [Top](#content)
 
 ### JPA DB level constraints
 
-In [CUBA platform]() some of JPA annotation put constraints on DB level as table indexes or table column / multi-column constraints.
-Although there are only few of such annotations, they are only only one which acts on DB server level.
+Some of JPA annotation available in [CUBA platform](https://www.cuba-platform.com/) put constraints on DB level as table indexes or table column / multi-column constraints. Although there are only few of such annotations, they are only ones which act on DB server level.
 
 * `@Column(..., unique=true)` - sets SQL `unique` constraint on a table column for entity fields marked as **Unique**
-* `@Column(..., nullable=false)` - for fields marked in studio like **Mandatory** sets SQL `not null` constraint on table column (entity field). Acts together with `@NotNull` JPA annotation which works at UI and middleware level.
-* `@Column(..., length = 16)` - sets a length of `varchar` column, and limits the maximum input field length at UI level.
+* `@Column(..., nullable=false)` - sets SQL `not null` constraint on a table column (entity field) for fields marked as **Mandatory** in studio. Acts together with `@NotNull` JPA annotation which works at UI and middleware levels.
+* `@Column(..., length = 16)` - sets length of a `varchar` column, and limits the maximum input field length at UI level.
 * `@UniqueConstraint` - sets a multi column index with `unique` constraint.
 
 [Top](#content)
 
 #### Single column constraints
 
-Single column constraints could be applied from CUBA studio entity editor's UI during entity field creation or modification:
+Single column constraints could be applied from CUBA studio entity editor UI during entity field creation or modification:
 
 ![Figure 2: Setting column level DB constraints from CUBA](resources/db_constraints_column_level.png)
 
@@ -137,9 +143,9 @@ create table ORDERMAN_ORDER (
 create unique index IDX_ORDERMAN_ORDER_UNIQ_NUMBER_ on ORDERMAN_ORDER (NUMBER_)
 ```
 
-Note that CUBA studio automatically adds `@NotNull` constraint to the field marked as **Mandatory** in Entity designer. Hence, this validations is made on UI and middleware level as well.
+Note that CUBA studio automatically adds `@NotNull` constraint to the field marked as **Mandatory** in Entity designer. Hence, this validations are made on UI and middleware level as well.
 
-On the other hand, **Unique** constraint (reflected with `@Column(..., unique=true)` annotation) works only on DB level, because it can not be validated on the application level without reading whole SQL table which might be very expensive operation.
+On the other hand, **Unique** constraint (reflected with `@Column(..., unique=true)` annotation) works only on DB level, because it can not be validated on the application level without reading whole SQL table which might be quite expensive operation.
 
 [Top](#content)
 
@@ -151,7 +157,7 @@ This type of data constraint / validation acts on DB level only and is represent
 
 _**Figure 3:** Creating multi-column unique constraint._
 
-Or right in Java code:
+Or right in your Java code:
 
 ```java
 @NamePattern("%s|name")
@@ -166,15 +172,15 @@ public class Product extends StandardEntity {
 
 [Product.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/Product.java)
 
-Which is reflected as `create unique index IDX_ORDERMAN_PRODUCT_UNQ on ORDERMAN_PRODUCT (NAME, MEASURE)` in generated DDL.
+Which adds `create unique index IDX_ORDERMAN_PRODUCT_UNQ on ORDERMAN_PRODUCT (NAME, MEASURE)` to generated DDL.
 
 [Top](#content)
 
 ### Single field constraints
 
-Let's go through other standard JPA annotations that were designed for data validation. As I mentioned before most of them came from [`javax.validation.constraints` namespace](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html), although couple are from `javax.persistence`, `javax.validation` and `org.hibernate.validator.constraints`. You can take a look at [CUBA documentation section about bean validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html).
+Let's go through other standard JPA annotations that were designed for data validation. As I mentioned before most of them came from [`javax.validation.constraints` namespace](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html), although some are from `javax.persistence`, `javax.validation` and `org.hibernate.validator.constraints`. For details, you can take a look at [CUBA documentation section about bean validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html).
 
-Some of these annotations can be configured from CUBA studio in VALIDATION section (list of constraints available varies for different entity field's types).
+Some of these annotations can be configured from CUBA studio in VALIDATION section (list of constraints available varies for different entity field types).
 
 ![Figure 4: JPA validation tab](resources/jpa_validation_tab.png)
 
@@ -237,9 +243,9 @@ public class Order extends StandardEntity {
 There is no need to limit ourselves with the standard JPA annotations, if it's needed we can define our custom ones.
 [Custom annotations](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_custom_constraints) could be defined not just for entities fields but also for Entity classes, POJOs and service methods. Custom annotations can help you to express your validation logic clearer or implement custom checks that can even do the cross-field checks of an entity object.
 
-Let’s check out how to do that. In our sample application there were implemented [two custom constraints](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator):
+Let’s check out how to do that. In our sample application there at [two custom constraints](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator)  implemented:
 
-* `@UsPhoneNumber` - a constraint which is [implemented](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator/UsPhoneNumber.java) as a descendant of `@Pattern` annotation and does the simple regexp check for the phone format.
+* `@UsPhoneNumber` - a constraint [which](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator/UsPhoneNumber.java) is a descendant of `@Pattern` annotation and does the simple regexp check for the phone format.
 * `@CustomerContactsCheck` ensures that a customer entity has either phone number **or** email specified.
 
 `@UsPhoneNumber` validator is quite primitive and implemented as a custom interface:
@@ -266,8 +272,8 @@ public @interface UsPhoneNumber {
 
 Going through the code we should note the next:
 
-* `@Constraint(validatedBy = {})` says that there is no custom class implementing the validator.
-* `@Retention(RetentionPolicy.RUNTIME)` marks annotation as a runtime one, which all validators should be.
+* `@Constraint(validatedBy = {})` says that there is no actual class implementing the validator.
+* `@Retention(RetentionPolicy.RUNTIME)` marks the annotation as a runtime one, which all validators should be.
 * `@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })` specifies targets that this annotation can be applied to. Although, in our case, it would be possible to limit the scope only with `ElementType.FIELD`.
 * And finally, `@Pattern(...)` part specifies the actual validator's behavior.
 
@@ -287,9 +293,9 @@ public class Customer extends StandardEntity {
 
 [Customer.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/Customer.java)
 
-More complex example of a custom validator that uses a list of checks to validate data is an [org.hibernate.validator.constraints.br.CPF](https://github.com/hibernate/hibernate-validator/blob/master/engine/src/main/java/org/hibernate/validator/constraints/br/CPF.java).
+You can also check the more complex example of a custom validator that comes with hibername and uses a list of checks to validate data:  [org.hibernate.validator.constraints.br.CPF](https://github.com/hibernate/hibernate-validator/blob/master/engine/src/main/java/org/hibernate/validator/constraints/br/CPF.java).
 
-Now, it's time to take a look at more complex custom annotation that does cross-field check. `@CustomerContactsCheck` interface defines the constraint that could be applied to classes only:
+Now, it's time to take a look at more complex custom annotation that does cross-field check. `@CustomerContactsCheck` interface defines a constraint that could be applied to classes only:
 
 ```java
 /**
@@ -309,7 +315,7 @@ public @interface CustomerContactsCheck {
 
 [CustomerContactsCheck](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator/CustomerContactsCheck.java)
 
-and has the next implementation:
+This annotation using `@Constraint(validatedBy = CustomerContactsCheckValidator.class)` refers to the next implementation:
 
 ```java
 public class CustomerContactsCheckValidator implements ConstraintValidator<CustomerContactsCheck, Customer> {
@@ -330,7 +336,9 @@ public class CustomerContactsCheckValidator implements ConstraintValidator<Custo
 
 [CustomerContactsCheckValidator.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator/CustomerContactsCheckValidator.java)
 
-So far, nothing special, but if we want to get this annotation called and be able to do the cross-field check, we need to specify appropriate [constraint group.](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups) Editor screens perform validation against class-level constraints on commit if the constraint includes the `UiCrossFieldChecks` group and if all attribute-level checks are passed. You can turn off the validation of this kind using the `crossFieldValidate` property of the screen in the screen XML descriptor or in the controller.
+So far, we have seen nothing special, but if we want to get this annotation called and be able to do the cross-field check, we need to specify appropriate [constraint group](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups).
+
+ Editor screens perform validation against class-level constraints on commit if the constraint includes the `UiCrossFieldChecks` group and if all attribute-level checks are passed. You can turn off the validation of this kind using the `crossFieldValidate` property of the screen in the screen XML descriptor or in the controller.
 
 ```java
 @CustomerContactsCheck(groups = {Default.class, UiCrossFieldChecks.class})
@@ -352,13 +360,14 @@ public class Customer extends StandardEntity {
 
 By default, JPA annotations works:
 
-* AT UI level when method `validateAll` of the editor's controller is called automatically on the screen commit. _(But you need to override `postValidate` method to do the custom validation in the screen controller, see later sections)_.
+* At UI level when method `validateAll` of the editor's controller is called automatically on the screen commit. _(But you need to override `postValidate` method to do the custom validation in the screen controller, see [later section](#validation-in-ui-screen-controllers))_.
 * At REST level when Universal REST endpoints are called.
-* At middleware layer when validation is called manually.
+* At middleware layer when validating method marked with `@Validated1 annotation.
+* At client or middleware levels when validation is called manually using `BeanValidation` interface.
 
 #### Validation of related objects
 
-For cascade validation of related objects, mark the reference fields with `@Valid`:
+For cascade validation of related objects, we need to mark the reference fields with `@Valid`:
 
 ```java
 public class Order extends StandardEntity {
@@ -375,11 +384,11 @@ public class Order extends StandardEntity {
 }
 ```
 
-In the example above, when an instance of `Order` is validated, the list of items will be checked for the fact that it contains at least one instance, and all instances of Product in the list will also be validated.
+In the example above, when an instance of `Order` is validated, the list of `items` will be checked for the fact that it contains at least one instance (because of `@Size(min = 1)`), and all instances of Product in the list will be validated also.
 
 #### Custom messages in JPA constraints
 
-All JPA constraints can have custom messages (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages)), for example:
+All JPA constraints can have custom messages (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages)):
 
 ```java
 @Pattern(message = "Postal code should follow US ZIP codes format: 12345 or 12345-6789 or 12345 1234", regexp = "^\\d{5}(?:[-\\s]\\d{4})?$")
@@ -388,7 +397,7 @@ All JPA constraints can have custom messages (see [documentation](https://doc.cu
 protected String postalCode;
 ```
 
-Messages can contain parameters and expressions. Parameters are enclosed in `{}` and represent either localized messages or annotation parameters, e.g. `{min}, {max}, {value}`. Expressions are enclosed in `${}` and can include the validated value variable `validatedValue`, annotation parameters like `value` or `min`, and JSR-341 (EL 3.0) expressions. For example:
+Messages can contain parameters and expressions. Parameters are enclosed in `{}` and represent either localized messages or annotation parameters, e.g. `{min}, {max}, {value}`. Expressions are enclosed in `${}` and can include the validated value variable `validatedValue`, annotation parameters like `value` or `min`, and JSR-341 (EL 3.0) expressions:
 
 ```java
 @Column(name = "EMAIL")
@@ -417,7 +426,7 @@ protected String email;
 
 ### Universal REST
 
-CUBA by default makes all your entities available via REST protocol which follows Swagger specification and available at following URL: http://files.cuba-platform.com/swagger/ . This feature is called Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) and all JPA validations are applied to universal REST create and update actions automatically (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_rest) for details).
+In CUBA application all your entities are available via REST by default. Protocol follows Swagger specification and available here: http://files.cuba-platform.com/swagger/ . This feature is called Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html). JPA validations defined for entities are applied to universal REST **create** and **update** actions automatically (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_rest) for details).
 
 The CRUD entities operation (universal REST) are defined [here](http://files.cuba-platform.com/swagger/#/Entities) in swagger format.
 
@@ -425,7 +434,7 @@ The CRUD entities operation (universal REST) are defined [here](http://files.cub
 
 _**Figure 5:** [Universal REST swagger specification](http://files.cuba-platform.com/swagger/#/Entities)_
 
-Following [this steps](rest-commands.md), let's get OAuth2 access token and try to add a new customer using universal REST. However, let's make this test customer to have couple fields that shouldn't allow it to be added:
+Following [this steps](rest-commands.md), let's get OAuth2 access token and try to add a new customer using universal REST. To test validation let's make this test customer having couple fields that shouldn't allow it to pass JPA checks:
 
 ```json
 {
@@ -439,7 +448,7 @@ Following [this steps](rest-commands.md), let's get OAuth2 access token and try 
 }
 ```
 
-We can see that email is bad-formed and a phone number doesn't follow the requirements. So, let's run the command _(don't forget to set your own access token as it shown [here](rest-commands.md))._
+We can see that email is bad-formed and the phone number doesn't follow the requirements. So, after running the next command _(don't forget to set your own access token as it shown [here](rest-commands.md))._ We are getting expected error message in the format described in the [later section](#validation-errors-in-rest):
 
 ```bash
 $ http --json POST localhost:8080/app/rest/v2/entities/orderman\$Customer 'Authorization:Bearer 819fe70b-7881-43ca-98ef-b5749f417f49'  @rest/customer_john_smith.json
@@ -462,9 +471,7 @@ Content-Type: application/json;charset=UTF-8
 ]
 ```
 
-As we see, our JPA validation works just fine and returns the error messages we have expected to see.
-
-Let's make another check if our custom validation java class works as well. After making this try we see that it works just fine.
+Let's test if our custom validation java class works as well. After making this try we can see that it works just fine:
 
 ```bash
 $ http --json POST localhost:8080/app/rest/v2/entities/orderman\$Customer 'Authorization:Bearer 819fe70b-7881-43ca-98ef-b5749f417f49'  @rest/customer_mary_smith.json
@@ -485,20 +492,19 @@ Content-Type: application/json;charset=UTF-8
 
 ### REST queries validation
 
-Just for completeness, I need to say that [Predefined JPQL Queries](https://doc.cuba-platform.com/manual-6.9/rest_api_v2_queries_config.html) allows only `SELECT` methods, so they are 'searches' rather than 'data input' and hence, don't provide any methods to validate input parameters. 
-But of course they screen input data to protect the calls from SQL injection attack.
+Just for completeness, I need to say that because [predefined JPQL Queries](https://doc.cuba-platform.com/manual-6.9/rest_api_v2_queries_config.html) allow only `SELECT` methods, and so they do only read operations. Hence, they don't provide any methods to validate input parameters. But of course they screen input data to protect the calls from [SQL injection attack](https://en.wikipedia.org/wiki/SQL_injection).
 
 [Top](#content)
 
 ### Validation by contract
 
-Let's make the custom REST service and specify the limitation for method parameters returned values etc, in the way that is somewhat similar to contract programming approach.
+Let's make the custom REST service and specify limitations for method parameters and return values, in the way that is somewhat similar to contract programming approach.
 
 We want our service to:
 
 1. List all products in stock.
-1. Get Stock object by particular product by it's name (throw exception if there are more than one product with such name in stock).
-1. Add a new product to stock.
+1. Get a `Stock` object by particular product's name (and throw exception if there are zero or more than one product with such name in stock).
+1. Add a new `Product` to `Stock`.
 1. Increase amount of existing product in stock.
 
 To do that, let's create a new middleware service using CUBA studio and call it `StockApiService`.
@@ -507,12 +513,14 @@ To do that, let's create a new middleware service using CUBA studio and call it 
 
 _**Figure 6:** Adding a middleware service_
 
-The next steps of creation REST service would be opening [StockApiService.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/service/StockApiService.java) and creation of appropriate methods:
+The next step is opening [StockApiService.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/service/StockApiService.java) in IDE and creating appropriate methods:
 
-- `List<Stock> getProductsInStock();`
-- `Stock getStockForProductByName(String productName);`
-- `Stock addNewProduct(Product product, BigDecimal inStock, BigDecimal optimalLevel);`
-- `Stock increaseQuantityByProductName(String productName, BigDecimal increaseAmount);`
+```java
+List<Stock> getProductsInStock();
+Stock getStockForProductByName(String productName);
+Stock addNewProduct(Product product, BigDecimal inStock, BigDecimal optimalLevel);
+Stock increaseQuantityByProductName(String productName, BigDecimal increaseAmount);
+```
 
 Next, we need to mark these methods in CUBA studio as REST methods:
 
@@ -520,20 +528,20 @@ Next, we need to mark these methods in CUBA studio as REST methods:
 
 _**Figure 7:** Marking methods as REST available_
 
-Next, let's open `StockApiService` in our Java IDE again and annotate the methods for validation.
+Now, let's open `StockApiService` in our Java IDE again and annotate the methods properly.
 
-1. First, we need to know, that JPA validation will be applied **only** to the methods that are marked with `@Validated` annotation. (See [documentation here](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)). By default, `@Validated` uses the next [constraint groups](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups):
+1. First, we need to know, that JPA validations will be applied **only** to the methods that are marked with `@Validated` annotation. (See [documentation here](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)). By default, `@Validated` uses the next [constraint groups](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups):
     - `Default` and `ServiceParametersChecks` - for method parameters
     - `Default` and `ServiceResultChecks` - for method return value
     - As for [constraint group](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups) `RestApiChecks`, it could be used for those JPA validations that must be checked only when instance is passed to REST-API.
-2. [Annotation `@RequiredView` could be used](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_cuba_annotations) to ensure that input parameters of the method have fields that are corresponded to the specified [view](https://doc.cuba-platform.com/manual-6.9/views.html).
+2. [`@RequiredView` annotation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_cuba_annotations) could be used to ensure that input parameters of a method have fields that corresponding to the specified [view](https://doc.cuba-platform.com/manual-6.9/views.html).
     - `@RequiredView` validates that the validated Entity has **at least** those fields loaded that are required by the view. It doesn't fire an error if the Entity has extra fields loaded.
     - This annotation works with entity objects and their collections.
 3. All standard and custom JPA validations can be applied either to:
-    - **methods** - then the return value is checked)
-    - or to method **parameters** - which makes these parameters to be validated
-    - once again, this JPA validations will be used only to methods that are marked by `@Validated` annotation.
-4. Error messages can be provided with annotations either directly or using messages packs. (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages) for more details)
+    - **methods** - then the return value is checked.
+    - method **parameters** - which makes these parameters to be validated
+    - once again, this JPA validations used only if method is marked with `@Validated` annotation.
+4. Error messages can be provided with annotations either directly or by using messages packs. (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages) for more details)
 
 Here is a result of applying all our validations to the REST service interface:
 
@@ -588,15 +596,15 @@ Let's run [Postman REST client](https://www.getpostman.com/) and check how our v
 
 _**Figure 8:** JPA validation in REST service_
 
-The server returned `400 Bad Request` and an error message like it is specified in the later section [Validation errors in REST](#validation-errors-in-rest).
+The server returns `400 Bad Request` and an error message like it is specified in the later section [Validation errors in REST](#validation-errors-in-rest).
 
 [Top](#content)
 
 ### Programmatic Validation
 
-Sometimes, JPA validation is not enough for REST services. To validate the entities passed to the method or validate entities you have created at middleware or client tiers, we need to run JPA validations against some entity manually. in this case [programmatic validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_programmatic) can be used.
+Sometimes, pure JPA validations are not enough for REST services. To validate the entities passed to the method or validate entities have been created at middleware or client tiers, we need to run JPA validations against these entities manually. This is the case when [programmatic validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_programmatic) comes to play.
 
-You can perform bean validation  using the `BeanValidation` infrastructure interface, available on both middleware and client tier. It is used to obtain a `javax.validation.Validator` implementation which runs validation. The result of validation is a set of `ConstraintViolation` objects.
+You can perform bean validation  using the `BeanValidation` infrastructure interface, which is available on both middleware and client tiers. It is used to obtain a `javax.validation.Validator` implementation which runs validation and gives the result as a set of `ConstraintViolation` objects.
 
 If you perform some custom programmatic validation in a service, use `CustomValidationException` to inform clients about validation errors in the same format as the standard bean validation does.
 
@@ -663,7 +671,7 @@ Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) 
 - `MethodResultValidationException` and `ValidationException` cause `500 Server error` HTTP status
 - `MethodParametersValidationException`, `ConstraintViolationException` and `CustomValidationException` cause `400 Bad request` HTTP status
 
-Response body with Content-Type: application/json will contain a list of objects with message, messageTemplate, path and invalidValue properties, for example:
+Response body with `Content-Type: application/json` will contain a list of objects with message, messageTemplate, path and invalidValue properties:, for example:
 
 ```json
 [
@@ -685,12 +693,18 @@ Response body with Content-Type: application/json will contain a list of objects
 
 ## GUI Validator
 
-[CUBA platform](https://www.cuba-platform.com/) offers an UI-level mechanism to validate input data. Let's take a look at [gui validator documentation](https://doc.cuba-platform.com/manual-6.9/gui_validator.html). In a screen XML-descriptor, a component validator can be defined in a nested validator elements. The validator element can have the following attributes:
+[CUBA platform](https://www.cuba-platform.com/) offers an UI-level mechanism to verify input data. Let's take a look at [gui validator documentation](https://doc.cuba-platform.com/manual-6.9/gui_validator.html).
 
-* **class** − name of a Java class implementing the Field.Validator interface. You can use one of the [classes that come out of the box](http://files.cuba-platform.com/javadoc/cuba/6.9/com/haulmont/cuba/gui/components/validators/package-summary.html) or implement your own custom implementation of `Field.Validator` interface.
+_Validation and input type checking should be differentiated. If a given component (e.g. `TextField`) data type is set to anything different than string (this can happen when binding to an entity attribute or setting datatype), then the component will not allow the user to enter a value that does not comply with this data type. When the component loses focus or when the user presses Enter, the component will show the previous correct value._
+
+_On the other hand, validation does not act immediately on data entry or focus loss, but rather when the component’s `validate()` method is invoked. It means that the component (and the entity attribute that it is linked to) may temporarily contain a value, which does not comply with the conditions of validation. It should not be a problem because the validated fields are typically located in edit screens, which automatically invoke validation for all their fields before commit. If the component is located not in an edit screen, its `validate()` method should be invoked explicitly in the screen controller._
+
+In a screen XML-descriptor, a component validator can be defined in a nested `validator` elements. The validator element can have the following attributes:
+
+* **class** − name of a Java class implementing the `Field.Validator` interface. You can use one of the [classes that come out of the box](http://files.cuba-platform.com/javadoc/cuba/6.9/com/haulmont/cuba/gui/components/validators/package-summary.html) or implement your own custom implementation of this interface.
 * **script** − path to a Groovy script performing validation. Script could be embedded into a screen's XML-descriptor or be given as a separate groovy file.
 
-Groovy validator scripts and standard classes of Java validators, located in the [`com.haulmont.cuba.gui.components.validators`](http://files.cuba-platform.com/javadoc/cuba/6.9/com/haulmont/cuba/gui/components/validators/package-summary.html) package support message attribute − a message displayed to a user when validation fails. The attribute value should contain either a message or a message key from the [messages pack](https://doc.cuba-platform.com/manual-6.9/message_packs.html) of the current screen.
+Groovy validator scripts and standard classes of Java validators (that are located in the [`com.haulmont.cuba.gui.components.validators`](http://files.cuba-platform.com/javadoc/cuba/6.9/com/haulmont/cuba/gui/components/validators/package-summary.html) package) support `message` attribute − a message displayed to a user when validation fails. The attribute value should contain either a message or a message key from the [messages pack](https://doc.cuba-platform.com/manual-6.9/message_packs.html) of the current screen.
 
 This validation mechanism works only at UI-level (ran on server-side with error messages passed to user's browser) and is called when user submits the form or application calls validation programmatically by calling `AbstractWindow.validateAll()` method or `validate()` method of a component.
 
@@ -721,19 +735,21 @@ These validators could be added by hands to the screens' XML-descriptors, just l
 
 [customer-edit.xml](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/customer/customer-edit.xml)
 
-or, using CUBA studio UI, which will give exactly the same result:
+or the same could be done from CUBA studio UI:
 
 ![Figure 9: Standard UI validator](resources/standard_ui_validator.png)
 
 _**Figure 9:** Standard UI validator_
 
-A validator class can be assigned to a component not only using a screen XML-descriptor, but also programmatically – by submitting a validator instance into the component’s `addValidator()` method.
+A validator class can be assigned to a component not only using a screen XML-descriptor, but also programmatically which is discussed in the next section.
 
 [Top](#content)
 
 ### Setting validator programmatically
 
-It's also possible to set `Validator` programmatically for a component (in your screen controller, for example), which could be a good option if you need to modify your validation rules on the fly according to some conditions that can be determined only in run-time. Here is an example of adding `EmailValidator` programmatically in a screen controller which checks that OrderItem quantity is <= 1000 and if it is not reads the error message string from the current screen `messages.properties` file and throws `ValidationException`:
+It's possible to set `Validator` programmatically for a component (in your screen controller, for example), which could be a good option if you need to modify your validation rules on the fly according to some conditions that can be determined only in run-time.
+
+Here is an example of adding `EmailValidator` programmatically in a screen controller which checks that OrderItem quantity is <= 1000. It reads the error message string from the current screen `messages.properties` file and throws `ValidationException` in case of verification fail:
 
 ```java
 public class OrderItemEdit extends AbstractEditor<OrderItem> {
@@ -760,7 +776,7 @@ public class OrderItemEdit extends AbstractEditor<OrderItem> {
 }
 ```
 
-Or we can do the same thing using lambda-function syntax:
+Alternatively, we can do the same thing using lambda-function syntax:
 
 ```java
     @Override
@@ -782,14 +798,17 @@ Another example of adding `Field.Validator` in runtime can be found [here](https
 
 ### Custom Java class validator
 
-Creation of a custom `Field.Validator` is not rocket science as well. If a Java class is being used as a validator, it should have a default constructor without parameters or a constructor with the following set of parameters:
+Creation of a custom `Field.Validator` is not rocket science as well. If a Java class is used as a validator, it should have a default constructor without parameters or a constructor with the following set of parameters:
 
 * `org.dom4j.Element`, `String` – this constructor will receive the validator XML-element and the message pack name of the screen.
 * `org.dom4j.Element` – this constructor will receive the validator XML-element.
 
-If the validator is implemented as an internal class, it should be declared with a static modifier and its name should be separated by "$", for example: ```<validator class="com.sample.sales.gui.AddressEdit$ZipValidator"/>s```
+If the validator is implemented as an internal class, it should be declared with a static modifier and its name should be separated by "$", for example:
+```xml
+<validator class="com.sample.sales.gui.AddressEdit$ZipValidator"/>
+```
 
-As an exercise let's write a small java class to validate that product and description do not contain swear words. This can be done by creating a class in `gui` module that implements `Field.Validator` interface:
+As an exercise let's write a small Java class to validate that product name and description do not contain any swear words. This can be done by creating a class in `gui` module that implements `Field.Validator` interface:
 
 ```java
 public class ProductNameValidator implements Field.Validator {
@@ -831,7 +850,7 @@ public class ProductNameValidator implements Field.Validator {
 
 [ProductNameValidator.java](orderman/modules/gui/src/com/haulmont/dyakonoff/orderman/validation/ProductNameValidator.java)
 
-And setting it as a `validator` component in XML-descriptor of the screen for "name" and "description" fields:
+and then, setting it as a `validator` component in XML-descriptor of the screen for "name" and "description" fields:
 
 ```xml
 <field property="name">
@@ -870,20 +889,20 @@ or by editing XML screen layout directly:
 
 [order-item-edit.xml](orderman/modules/web/src/com/haulmont/dyakonoff/orderman/web/orderitem/order-item-edit.xml)
 
-However, this is not the approach I would recommend for complex cases, mainly because of difficulties with groovy script debugging and lack of support from an IDE. If you still chose to try that way I would say that keeping groovy script in a separate file and giving component reference to it would be a better option.
+However, this is not the approach I would recommend for complex cases, mainly because of difficulties with groovy script debugging and lack of support from  IDE. If you still chose to try this way I would say that keeping groovy script in a separate file and giving component a reference to it would be better option.
 
 [Top](#content)
 
 ## Validation in UI screen controllers
 
-This is a simple and intuitive approach that wold allow you to perform quite complex checks of your screen data. Here are pros and cons of this way:
+This is a simple and intuitive approach that allows you to perform quite complex checks of a screen data. Here are pros and cons of this way:
 
 **Pros:**
 
 * Easy to implement: you just need to override `postValidate` method in your screen controller.
-* Has access to Entity object, screen UI controls, middleware services etc...
-* Can do checks of arbitrary complexity.
-* Easy to debug.
+* It has access to Entity object, screen UI controls, middleware services etc...
+* It can do checks of arbitrary complexity.
+* It is easy to debug.
 
 **Cons:**
 
@@ -891,7 +910,7 @@ This is a simple and intuitive approach that wold allow you to perform quite com
 * Can't help with REST calls validation, even with [universal REST](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html).
 * Has difficulties with highlighting fields/components that contains incorrect data. (You'd have to do some CSS/JS magic to achieve that result.)
 
-However, combining this approach with static and dynamically added `Field.Validator` checks would negate the last flaw.
+However, combining this approach with statically and dynamically added `Field.Validator` checks would negate the last flaw.
 
 Let's look at the code:
 
@@ -943,16 +962,16 @@ public class OrderItemEdit extends AbstractEditor<OrderItem> {
 
 The last two validation methods I'm going to discuss in this article are based on [entity listeners](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) and [transaction listeners](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html). Which acts on the middle tier.
 
-These listeners are called when [DataManager](https://doc.cuba-platform.com/manual-6.9/dataManager.html) commits the data. However, transaction listener's `beforeCommit()` method is called before transaction commit after all entity listeners if the transaction is not read-only. The method accepts a current EntityManager and a collection of entities in the current persistence context. So,
+These listeners are called when [DataManager](https://doc.cuba-platform.com/manual-6.9/dataManager.html) commits the data. However, transaction listener's `beforeCommit()` method is called before transaction commit after all entity listeners if the transaction is not read-only. The method accepts a current `EntityManager` and a collection of entities in the current persistence context. So:
 
-* [**Entity listener**](https://doc.cuba-platform.com/manual-6.9/using_entity_listeners_recipe.html) allows you to execute your business logic each time an entity is added, updated or removed from the database. All it's methods get `Entity` object and `EntityManager`. Hence, entity listener is a good place to make the entity's field values single and cross-field checks.
-* [**Transaction listener**](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html) can be used to enforce complex business rules involving multiple entities, when all entities in the transaction are were processed by their entity listeners.
+* [**Entity listener**](https://doc.cuba-platform.com/manual-6.9/using_entity_listeners_recipe.html) allows you to execute your business logic each time an entity is added, updated or removed from the database. All it's methods get `Entity` object and `EntityManager`. Hence, entity listener is a good place to make single-field and cross-field checks of the entity.
+* [**Transaction listener**](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html) can be used to enforce complex business rules that involve multiple entities, after all entities in the transaction have been processed by their entity listeners.
 
 Power of this approach is based on the fact that incorrect data would not be able to pass your checks, doesn't matter from where they came.
 
-**Performance note:** please note that transaction listener is called for *ECERY* transaction commit (if it's not read-only), including the fact that transaction listener might have quite complex business logic and even make some extra-calls you'd have to program to make the validation logic possible. The transaction listener's approach might be quite expensive in terms of the application productivity.
+_**Performance note:** please note that transaction listener is called for **EVERY** transaction commit (if it's not read-only). Counting the fact that transaction listener might have quite complex business logic and even make some extra-calls to the DB, the transaction listener's approach might be quite expensive in terms of the application performance._
 
-For sending error messages to a user you can use standard `ValidationException`, or if you want to process these error messages with different [client-level exception handler](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html) (see the next [section](#presenting-error-messages-to-a-user) for details), you can define your custom `RuntimeException` class in global module and mark it with [@SupportedByClient](https://doc.cuba-platform.com/manual-6.9/remoteException.html) annotation to have your error messages transporting from middleware to client tier.
+To send error messages to a user you can use standard `ValidationException`, or if you want to process these error messages with different [client-level exception handler](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html) (see the next [section](#presenting-error-messages-to-a-user) for details), you can define your custom `RuntimeException` class in global module and mark it with [@SupportedByClient](https://doc.cuba-platform.com/manual-6.9/remoteException.html) annotation to have your error messages transported from middleware to client tier.
 
 Both entity and transaction listeners could be easily created from the CUBA studio:
 
@@ -960,7 +979,7 @@ Both entity and transaction listeners could be easily created from the CUBA stud
 
 _**Figure 11:** Creating listeners in CUBA studio_
 
-Which allows you to create both interfaces and managed beans for listeners with empty methods implementations.
+It allows you to create both interfaces and managed beans for listeners with empty methods implementations.
 
 For entity listeners you can specify what kind of [eight events](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) you'd like to process. However, for data validation `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` are the two most important.
 
@@ -968,9 +987,9 @@ For entity listeners you can specify what kind of [eight events](https://doc.cub
 
 _**Figure 12:** Entity listener designer_
 
-The **Use for entities** list typically contains only one entity. The same entity should be specified in the Entity type field. However, you may want to specify a `@MappedSuperclass` entity in the Entity type field and add its subclasses to the Use for entities list.
+At this screen the **Use for entities** list typically contains only one entity. The same entity should be specified in the **Entity type** field. However, you may want to specify a `@MappedSuperclass` entity in the **Entity type** field and add its subclasses to the **Use for entities** list.
 
-The `@Listeners` annotation is added to each class specified in the Use for entities list. If the Bean name is defined for the listener, it is used to refer to the listener in the annotation value. Otherwise, the fully qualified listener class name is used.
+The `@Listeners` annotation is added to each class specified in the **Use for entities** list. If the **Bean name** is defined for the listener, it is used to refer to the listener in the annotation value. Otherwise, the fully qualified listener class name is used.
 
 ```java
 @Listeners("orderman_OrderEntityListener")
@@ -1037,15 +1056,15 @@ public class OrderEntityListener implements BeforeInsertEntityListener<Order>, B
 
 [OrderEntityListener.java](orderman/modules/core/src/com/haulmont/dyakonoff/orderman/service/OrderEntityListener.java)
 
-Here [`UniqueNumbersAPI`](https://doc.cuba-platform.com/manual-6.9/uniqueNumbers.html) is used to generate sequential integer numbers for every day.
+The [`UniqueNumbersAPI`](https://doc.cuba-platform.com/manual-6.9/uniqueNumbers.html) is used to generate sequential integer numbers for every day.
 
 [Top](#content)
 
 ### Transactional Context example
 
-Transaction listener validation's idea is quite simple: check all changes in orders and order items that are going to be committed, calculate the products' quantities difference and compare these values with what does database has in `ORDERMAN_STOCK` table.
+This example uses transaction listener's validation. The idea is quite simple: check all changes in `Order` and `OrderItem` objects that are going to be committed, calculate the products' quantities difference and compare these values with what database has in the `ORDERMAN_STOCK` table.
 
-However, this leads to the pretty complex and computationally heavy business logic, which includes a SELECT query to the database and may even attach new Stock objects to the transaction. (see [TransactionListener.java](orderman/modules/core/src/com/haulmont/dyakonoff/orderman/service/TransactionListener.java) for full details)
+However, this leads to a pretty complex and computationally heavy business logic, which includes a `SELECT` query to the database and may attach new `Stock` objects to the transaction.
 
 ```java
 @Component("orderman_TransactionListener")
@@ -1080,13 +1099,13 @@ public class TransactionListener implements BeforeCommitTransactionListener {
 
 [TransactionListener.java](orderman/modules/core/src/com/haulmont/dyakonoff/orderman/service/TransactionListener.java)
 
-So, as we can see from this example, the [transaction listeners](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html) approach is very powerful, but may quite complex to implement and could be computationally heavy.
+We can see from this example that [transaction listeners](https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html) approach is very powerful, but may be quite complex to implement and could be computationally heavy.
 
 [Top](#content)
 
 ## Presenting error messages to a user
 
-As we have seen above, three of the methods we have discussed use exception mechanism to notify client that some field has inappropriate value:
+As we have seen, three of the methods we have discussed above use exception mechanism to notify client that some field has inappropriate value:
 
 * Field.Validator method
 * Transaction listeners
@@ -1094,20 +1113,21 @@ As we have seen above, three of the methods we have discussed use exception mech
 
 In most cases `ValidationException' is thrown to send a message to UI layer.
 
-However, by default, CUBA platform doesn't handle this exception in a special way and shows a standard 'Unexpected error' dialog as for any other exception. This dialog is more suited for presenting some kind of system and unexpected errors rather than showing user validation errors that you as a developer kind of expecting to happen from time to time as a part of your application's business logic.
-
-So, it's recommended to implement a [client level exception handler](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html) 
-doesn't look like a good method 
+However, by default CUBA platform doesn't handle this exception in a special way and shows a standard **'Unexpected error'** dialog as it does for any other exception. 
 
 ![Figure 13: Error message WITHOUT client-level exception handler](resources/no_client_exception_handler.png)
 
 _**Figure 13:** Error message WITHOUT client-level exception handler_
 
+This dialog is more suited for presenting some kind of system and unexpected errors rather than showing user validation errors that you as a developer kind of expecting to happen from time to time as a part of your application's business logic.
+
+So, it's recommended to implement a [client level exception handler](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html) to improve the validation error messages look and feel.
+
 ![Figure 14: Error message WITH client-level exception handler](resources/client_exception_handler.png)
 
 _**Figure 14:** Error message WITH client-level exception handler_
 
-The basic client-level exception handler is quite simple. You just need to make [managed bean](https://doc.cuba-platform.com/manual-6.9/managed_beans.html) that implements `AbstractGenericExceptionHandler interface` in your web (or desktop)module and implement `doHandle` method:
+The basic client-level exception handler is quite simple. You just need to write [managed bean](https://doc.cuba-platform.com/manual-6.9/managed_beans.html) that extends `AbstractGenericExceptionHandler` in your web (or desktop) module and implements `doHandle` method:
 
 ```java
 @Component("orderman_ValidationExceptionHandler")
@@ -1136,18 +1156,18 @@ We have covered most of the mechanisms that [CUBA platform](https://www.cuba-pla
 
 _**Table 1:** Validation levels_
 
-|                                   | Generic UI | Universal REST | Middleware | DataStore | Transaction | DB server |
-|-----------------------------------|:----------:|:--------------:|:----------:|:---------:|:-----------:|:---------:|
-| _DB level JPA constraints \*_     |            |                |            |           |             |    yes    |
-| _@NotNull constraint \*\*_        |     yes    |    yes\*\*\*   |    yes     |           |             |    yes    |
-| _Bean validation (annotations)_   |     yes    |    yes\*\*\*   |    yes     |           |             |           |
-| _UI validation (Field.Validator)_ |     yes    |                |            |           |             |           |
-| _Custom Field.Validator_          |     yes    |                |            |           |             |           |
-| _Screen controllers validation_   |     yes    |                |            |           |             |           |
-| _Entity listeners_                |            |                |            |    yes    |             |           |
-| _Transaction listeners_           |            |                |            |           |     yes     |           |
+|                                     | Generic UI | Universal REST | Middleware | DataStore | Transaction | DB server |
+| ----------------------------------- | :--------: | :------------: | :--------: | :-------: | :---------: | :-------: |
+| _DB level JPA constraints \*_       |            |                |            |           |             | yes       |
+| _@NotNull constraint \*\*_          | yes        | yes\*\*\*      | yes        |           |             | yes       |
+| _Bean validation (JPA validations)_ | yes        | yes\*\*\*      | yes        |           |             |           |
+| _UI validation (Field.Validator)_   | yes        |                |            |           |             |           |
+| _Custom Field.Validator_            | yes        |                |            |           |             |           |
+| _Screen controllers validation_     | yes        |                |            |           |             |           |
+| _Entity listeners_                  |            |                |            | yes       |             |           |
+| _Transaction listeners_             |            |                |            |           | yes         |           |
 
-\* - `@Table` and `@Column` annotations, see example: [Product.java]<br />(validation-with-custom-annotations/modules/global/src/io/dyakonoff/validationannotations/entity/Product.java)<br />
+\* - `@Table` and `@Column` annotations<br />
 \*\* - `@NotNull` that is accompanied with `@Column(nullable = false)`<br />
 \*\*\* - only for fields marked with `@Validated` annotations
 
@@ -1155,42 +1175,42 @@ You can read more about CUBA application tiers and blocks [here](https://doc.cub
 
 _**Table 2:** Validation implementation complexity_
 
-|                                             | Elementary | Simple | Average | Complex  |
-|---------------------------------------------|:----------:|:------:|:-------:|:--------:|
-| _DB level JPA constraints_                  |    yes     |        |         |          |
-| _Bean validation (JPA annotations)_         |    yes     |        |         |          |
-| _Bean validation (custom annotations)_      |            |        |   yes   |          |
-| _UI validation (standard Field.Validator)_  |    yes     |        |         |          |
-| _Custom Field.Validator (Java class)_       |            |        |   yes   |          |
-| _Custom Field.Validator (Groovy script)_    |            |  yes   |         |          |
-| _Screen controllers validation_             |            |  yes   |         |          |
-| _Entity listeners_                          |            |        |  yes    |          |
-| _Transaction listeners_                     |            |        |         |   yes    |
+|                                            | Elementary | Simple | Average | Complex |
+| ------------------------------------------ | :--------: | :----: | :-----: | :-----: |
+| _DB level JPA constraints_                 | yes        |        |         |         |
+| _Bean validation (JPA annotations)_        | yes        |        |         |         |
+| _Bean validation (custom annotations)_     |            |        | yes     |         |
+| _UI validation (standard Field.Validator)_ | yes        |        |         |         |
+| _Custom Field.Validator (Java class)_      |            |        | yes     |         |
+| _Custom Field.Validator (Groovy script)_   |            | yes    |         |         |
+| _Screen controllers validation_            |            | yes    |         |         |
+| _Entity listeners_                         |            |        | yes     |         |
+| _Transaction listeners_                    |            |        |         | yes     |
 
 _**Table 3:** Validation scope_
 
-|                                            | Single Field | Cross Field | DataStore | Transaction Context|
-|--------------------------------------------|:------------:|:-----------:|:---------:|:------------------:|
-| _DB level JPA constraints_                 |     yes      |   yes\*     |           |                    |
-| _Bean validation (JPA annotations)_        |     yes      |             |           |                    |
-| _Bean validation (custom annotations)_     |     yes      |    yes      |           |                    |
-| _UI validation (standard Field.Validator)_ |     yes      |             |           |                    |
-| _Custom Field.Validator (Java class)_      |     yes      |             |           |                    |
-| _Custom Field.Validator (Groovy script)_   |     yes      |             |           |                    |
-| _Screen controllers validation_            |     yes      |    yes      |           |                    |
-| _Entity listeners_                         |     yes      |    yes      |    yes    |                    |
-| _Transaction listeners_                    |     yes      |    yes      |    yes    |         yes        |
+|                                            | Single Field | Cross Field | DataStore | Transaction Context |
+| ------------------------------------------ | :----------: | :---------: | :-------: | :-----------------: |
+| _DB level JPA constraints_                 | yes          | yes\*       |           |                     |
+| _Bean validation (JPA annotations)_        | yes          |             |           |                     |
+| _Bean validation (custom annotations)_     | yes          | yes         |           |                     |
+| _UI validation (standard Field.Validator)_ | yes          |             |           |                     |
+| _Custom Field.Validator (Java class)_      | yes          |             |           |                     |
+| _Custom Field.Validator (Groovy script)_   | yes          |             |           |                     |
+| _Screen controllers validation_            | yes          | yes         |           |                     |
+| _Entity listeners_                         | yes          | yes         | yes       |                     |
+| _Transaction listeners_                    | yes          | yes         | yes       | yes                 |
 
-\* - for multi-column unique constraints (`@UniqueConstraint`), see example: [Product.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/Product.java)
+\* - multi-column unique constraints (`@UniqueConstraint`)
 
-1. Bean validation could use standard and custom annotations. It works on all tiers, so offers the best level of data security. Besides that it is reusable and gives good UI feedback to a user. The limitations of that approach:
+1. **Bean validation** could use standard and custom annotations. It works on all tiers and offers the best level of data security. Besides that it is reusable and gives good UI feedback. The limitations of this approach are:
     1. It can't be used for validating the whole data graph when you need to check state of more than one entity.
-    1. Business logic at middleware level can change the entities directly and they will not be validated by this mechanism even before saving them to DB.
-1. Defining custom Validator class and groovy scripts for UI components. Since it works at UI level only, this mechanism offers nice UI integration support (highlighting and pretty error messages formatting) but drawbacks are the same as for annotations, plus:
+    2. Business logic at middleware level can change the entities directly and they will not be validated by this mechanism even before saving them to the DB.
+2. Defining custom **`Validator`** class and groovy scripts for UI components. Since it works at UI level only, this mechanism offers nice UI integration support (highlighting and pretty error messages formatting) but drawbacks are the same as for annotations, plus:
     1. It won't be able to check Universal REST calls.
-    1. Groovy scripts are hard to debug.
-1. Validation in UI screen controllers - it is the simplest way to do validation if there are no standard annotations or `Validator` classes to do it. However, you get the checks done only at UI level and the code reusability is not at the best level.
-1. Entity and Transaction listeners give the best security level. Transaction listeners are capable to check the whole object graph. But this approach requires more coding, has not that good UI integration and doing data validation right before commit might lead to inability to fix the data because it could be too late to do something with data error. Also, complex listeners can degrade the system performance as they happen for **every** data commit.
+    2. Groovy scripts are hard to debug.
+3. **Validation in UI screen controllers** approach is the simplest way to do validation if there are no standard annotations or `Validator` classes to do it. However, you get the checks done only at UI level and the code reusability is not at the best level.
+4. **Entity and Transaction listeners** give the best security level. Transaction listeners are capable to check the whole object graph. But this approach requires more coding, has not that good UI integration and doing data validation right before commit which might lead to inability to fix the data because it could be too late to do something with the error. Also, complex transaction listeners can degrade the system performance as they happen for **every** data commit.
 
 [Top](#content)
 
@@ -1204,8 +1224,8 @@ _**Table 3:** Validation scope_
 
 ### Other reading
 
-1. There is an old version of this article that used different samples approach: one simple example per validation method. And which contains couple of small examples. It can be found [here](https://github.com/dyakonoff/cuba-validation-examples/tree/version-1).
-1. There is a good article [Improvements in CUBAs REST API v2](https://www.road-to-cuba-and-beyond.com/improvements-in-cubas-rest-api-v2/) by Mario David if you'd like to read more about REST in CUBA.
-1. Mario also wrote a god article [Security constraints in CUBA](https://www.road-to-cuba-and-beyond.com/security-constraints-in-cuba/) that you might want to look at to learn how use constraints and validations to implement access/security rules in the app.
+1. A previous version of this article that uses different samples approach: one simple example per validation method. It contains couple extra examples and can be found [here](https://github.com/dyakonoff/cuba-validation-examples/tree/version-1).
+2. There is a good article ["Improvements in CUBAs REST API v2"](https://www.road-to-cuba-and-beyond.com/improvements-in-cubas-rest-api-v2/) by Mario David if you'd like to read more about REST in CUBA.
+3. Mario also wrote a great article ["Security constraints in CUBA"](https://www.road-to-cuba-and-beyond.com/security-constraints-in-cuba/) that could help you to learn how to use constraints and validations to implement access/security rules in the CUBA app.
 
 [Top](#content)
