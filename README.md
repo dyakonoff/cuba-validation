@@ -485,11 +485,8 @@ Content-Type: application/json;charset=UTF-8
 
 ### REST queries validation
 
-https://doc.cuba-platform.com/manual-6.9/rest_api_v2_ex_query_get.html
-https://doc.cuba-platform.com/manual-6.9/rest_api_v2_ex_query_post.html
-https://doc.cuba-platform.com/manual-6.9/rest_api_v2_queries_config.html
-
-**IN PROGRESS**
+Just for completeness, I need to say that [Predefined JPQL Queries](https://doc.cuba-platform.com/manual-6.9/rest_api_v2_queries_config.html) allows only `SELECT` methods, so they are 'searches' rather than 'data input' and hence, don't provide any methods to validate input parameters. 
+But of course they screen input data to protect the calls from SQL injection attack.
 
 [Top](#content)
 
@@ -583,7 +580,7 @@ public interface StockApiService {
 
 [StockApiService.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/service/StockApiService.java)
 
-This REST interface methods are available at endpoint `http://localhost:8080/app/rest/v2/services/{serviceName}/{methodName}` as [swagger specification](http://files.cuba-platform.com/swagger/#/Services) says.
+This REST interface methods are available at endpoint `/app/rest/v2/services/{serviceName}/{methodName}` as [swagger specification](http://files.cuba-platform.com/swagger/#/Services) says.
 
 Let's run [Postman REST client](https://www.getpostman.com/) and check how our validation annotations works in `addNewProduct` method if `inStock` parameter is greater than 1000:
 
@@ -1199,7 +1196,9 @@ _**Table 3:** Validation scope_
 
 ## Appendix A
 
-There is a old version of this article that used different samples approach: one simple example per validation method. And which contains couple of small examples. It can be found [here](https://github.com/dyakonoff/cuba-validation-examples/tree/version-1).
+1. There is a old version of this article that used different samples approach: one simple example per validation method. And which contains couple of small examples. It can be found [here](https://github.com/dyakonoff/cuba-validation-examples/tree/version-1).
+1. There is a good article [Improvements in CUBAs REST API v2](https://www.road-to-cuba-and-beyond.com/improvements-in-cubas-rest-api-v2/) by Mario David if you'd like to read more about REST in CUBA.
+1. Mario also wrote a god article [Security constraints in CUBA](https://www.road-to-cuba-and-beyond.com/security-constraints-in-cuba/) that you might want to look at to learn how use constraints and validations to implement access/security rules in the app.
 
 ### CUBA Documentation articles, related to validation
 
