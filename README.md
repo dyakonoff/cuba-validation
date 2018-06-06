@@ -35,14 +35,14 @@
 - [Presenting error messages to a user](#presenting-error-messages-to-a-user)
 - [Summary](#summary)
 - [Appendix A](#appendix-a)
-    - [CUBA Documentation articles, related to validation](#cuba-documentation-articles--related-to-validation)
+    - [CUBA Documentation articles related to validation](#cuba-documentation-articles-related-to-validation)
     - [Other reading](#other-reading)
 
 ## Introduction
 
-Input validation is one of common tasks in everyday developer’s life. We need to check our data in many different situations: after getting data from UI, from API calls, before saving our model to the DB etc, etc.
+Input validation is one of the common tasks in everyday developer’s life. We need to check our data in many different situations: after getting data from UI, in API call handlers, before saving our model to the DB etc, etc.
 
-This article's goal is to summarize all validation methods common to [CUBA platform](https://www.cuba-platform.com/), give explanations and examples for all of them and talk about pros and cons of each of these methods. I hope that the article will be a good tutorial and reference for all questions related to data validation in [CUBA platform](https://www.cuba-platform.com/) based applications.
+Main goal of this article is to summarize all validation methods that are common to [CUBA platform](https://www.cuba-platform.com/), give detailed explanations and examples for all of them and talk a bit about pros and cons of each of these approaches. I hope that the article will be a good tutorial and reference for all the questions related to data validation in [CUBA platform](https://www.cuba-platform.com/) based applications.
 
 The sample application for this article could be downloaded from [here](https://github.com/dyakonoff/cuba-validation-examples). A list of additional examples and materials for further reading is in [Appendix A](#appendix_a).
 
@@ -421,9 +421,9 @@ CUBA by default makes all your entities available via REST protocol which follow
 
 The CRUD entities operation (universal REST) are defined [here](http://files.cuba-platform.com/swagger/#/Entities) in swagger format.
 
-![Figure XX: Universal REST swagger specification](resources/swagger_universal_rest.png)
+![Figure 5: Universal REST swagger specification](resources/swagger_universal_rest.png)
 
-_**Figure XX:** [Universal REST swagger specification](http://files.cuba-platform.com/swagger/#/Entities)_
+_**Figure 5:** [Universal REST swagger specification](http://files.cuba-platform.com/swagger/#/Entities)_
 
 Following [this steps](rest-commands.md), let's get OAuth2 access token and try to add a new customer using universal REST. However, let's make this test customer to have couple fields that shouldn't allow it to be added:
 
@@ -503,9 +503,9 @@ We want our service to:
 
 To do that, let's create a new middleware service using CUBA studio and call it `StockApiService`.
 
-![Figure 5: Adding a middleware service](resources/adding_a_service.png)
+![Figure 6: Adding a middleware service](resources/adding_a_service.png)
 
-_**Figure 5:** Adding a middleware service_
+_**Figure 6:** Adding a middleware service_
 
 The next steps of creation REST service would be opening [StockApiService.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/service/StockApiService.java) and creation of appropriate methods:
 
@@ -516,9 +516,9 @@ The next steps of creation REST service would be opening [StockApiService.java](
 
 Next, we need to mark these methods in CUBA studio as REST methods:
 
-![Figure 6: Marking methods as REST available](resources/service_designer.png)
+![Figure 7: Marking methods as REST available](resources/service_designer.png)
 
-_**Figure 6:** Marking methods as REST available_
+_**Figure 7:** Marking methods as REST available_
 
 Next, let's open `StockApiService` in our Java IDE again and annotate the methods for validation.
 
@@ -584,9 +584,9 @@ This REST interface methods are available at endpoint `/app/rest/v2/services/{se
 
 Let's run [Postman REST client](https://www.getpostman.com/) and check how our validation annotations works in `addNewProduct` method if `inStock` parameter is greater than 1000:
 
-![Figure XX: JPA validation in REST service](resources/postman_addNewProduct.png)
+![Figure 8: JPA validation in REST service](resources/postman_addNewProduct.png)
 
-_**Figure XX:** JPA validation in REST service_
+_**Figure 8:** JPA validation in REST service_
 
 The server returned `400 Bad Request` and an error message like it is specified in the later section [Validation errors in REST](#validation-errors-in-rest).
 
@@ -723,9 +723,9 @@ These validators could be added by hands to the screens' XML-descriptors, just l
 
 or, using CUBA studio UI, which will give exactly the same result:
 
-![Figure 7: Standard UI validator](resources/standard_ui_validator.png)
+![Figure 9: Standard UI validator](resources/standard_ui_validator.png)
 
-_**Figure 7:** Standard UI validator_
+_**Figure 9:** Standard UI validator_
 
 A validator class can be assigned to a component not only using a screen XML-descriptor, but also programmatically – by submitting a validator instance into the component’s `addValidator()` method.
 
@@ -856,9 +856,9 @@ Running [groovy](http://groovy-lang.org/) dynamically with [Scripting interface]
 
 This script can be specified either from CUBA studio UI:
 
-![Figure 8: Setting up a groovy script for field validation](resources/groovy_validator.png)
+![Figure 10: Setting up a groovy script for field validation](resources/groovy_validator.png)
 
-_**Figure 8:** Setting up a groovy script for field validation._
+_**Figure 10:** Setting up a groovy script for field validation._
 
 or by editing XML screen layout directly:
 
@@ -956,17 +956,17 @@ For sending error messages to a user you can use standard `ValidationException`,
 
 Both entity and transaction listeners could be easily created from the CUBA studio:
 
-![Figure 9: Creating listeners in CUBA studio](resources/listeners_creation.png)
+![Figure 11: Creating listeners in CUBA studio](resources/listeners_creation.png)
 
-_**Figure 9:** Creating listeners in CUBA studio_
+_**Figure 11:** Creating listeners in CUBA studio_
 
 Which allows you to create both interfaces and managed beans for listeners with empty methods implementations.
 
 For entity listeners you can specify what kind of [eight events](https://doc.cuba-platform.com/manual-6.9/entity_listeners.html) you'd like to process. However, for data validation `BeforeInsertEntityListener` and `BeforeUpdateEntityListener` are the two most important.
 
-![Figure 10: Entity listener designer](resources/entity_listener_editor.png)
+![Figure 12: Entity listener designer](resources/entity_listener_editor.png)
 
-_**Figure 10:** Entity listener designer_
+_**Figure 12:** Entity listener designer_
 
 The **Use for entities** list typically contains only one entity. The same entity should be specified in the Entity type field. However, you may want to specify a `@MappedSuperclass` entity in the Entity type field and add its subclasses to the Use for entities list.
 
@@ -1099,13 +1099,13 @@ However, by default, CUBA platform doesn't handle this exception in a special wa
 So, it's recommended to implement a [client level exception handler](https://doc.cuba-platform.com/manual-6.9/exceptionHandlers.html) 
 doesn't look like a good method 
 
-![Figure 111: Error message WITHOUT client-level exception handler](resources/no_client_exception_handler.png)
+![Figure 13: Error message WITHOUT client-level exception handler](resources/no_client_exception_handler.png)
 
-_**Figure 11:** Error message WITHOUT client-level exception handler_
+_**Figure 13:** Error message WITHOUT client-level exception handler_
 
-![Figure 12: Error message WITH client-level exception handler](resources/client_exception_handler.png)
+![Figure 14: Error message WITH client-level exception handler](resources/client_exception_handler.png)
 
-_**Figure 12:** Error message WITH client-level exception handler_
+_**Figure 14:** Error message WITH client-level exception handler_
 
 The basic client-level exception handler is quite simple. You just need to make [managed bean](https://doc.cuba-platform.com/manual-6.9/managed_beans.html) that implements `AbstractGenericExceptionHandler interface` in your web (or desktop)module and implement `doHandle` method:
 
@@ -1196,16 +1196,16 @@ _**Table 3:** Validation scope_
 
 ## Appendix A
 
-1. There is a old version of this article that used different samples approach: one simple example per validation method. And which contains couple of small examples. It can be found [here](https://github.com/dyakonoff/cuba-validation-examples/tree/version-1).
-1. There is a good article [Improvements in CUBAs REST API v2](https://www.road-to-cuba-and-beyond.com/improvements-in-cubas-rest-api-v2/) by Mario David if you'd like to read more about REST in CUBA.
-1. Mario also wrote a god article [Security constraints in CUBA](https://www.road-to-cuba-and-beyond.com/security-constraints-in-cuba/) that you might want to look at to learn how use constraints and validations to implement access/security rules in the app.
-
-### CUBA Documentation articles, related to validation
+### CUBA Documentation articles related to validation
 
 1. [Bean Validation](https://doc.cuba-platform.com/manual-6.9/bean_validation.html)
 1. [List of JPA constraints in CUBA applications](common_jpa_annotations.md)
 1. ["Using entity listeners" recipe](https://doc.cuba-platform.com/manual-6.9/using_entity_listeners_recipe.html)
 
 ### Other reading
+
+1. There is an old version of this article that used different samples approach: one simple example per validation method. And which contains couple of small examples. It can be found [here](https://github.com/dyakonoff/cuba-validation-examples/tree/version-1).
+1. There is a good article [Improvements in CUBAs REST API v2](https://www.road-to-cuba-and-beyond.com/improvements-in-cubas-rest-api-v2/) by Mario David if you'd like to read more about REST in CUBA.
+1. Mario also wrote a god article [Security constraints in CUBA](https://www.road-to-cuba-and-beyond.com/security-constraints-in-cuba/) that you might want to look at to learn how use constraints and validations to implement access/security rules in the app.
 
 [Top](#content)
