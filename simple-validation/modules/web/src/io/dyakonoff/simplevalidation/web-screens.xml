@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<screen-config xmlns="http://schemas.haulmont.com/cuba/screens.xsd">
-    <include file="io/dyakonoff/simplevalidation/screens.xml"/>
-    <screen id="simplevalidation$CargoBay.browse"
-            template="io/dyakonoff/simplevalidation/web/cargobay/cargo-bay-browse.xml"/>
-    <screen id="simplevalidation$CargoBay.edit"
-            template="io/dyakonoff/simplevalidation/web/cargobay/cargo-bay-edit.xml"/>
-</screen-config>

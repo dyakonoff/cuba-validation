@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<persistence xmlns="http://java.sun.com/xml/ns/persistence"
-             version="2.0">
-    <persistence-unit name="validationannotations"
-                      transaction-type="RESOURCE_LOCAL">
-        <class>io.dyakonoff.validationannotations.entity.Product</class>
-    </persistence-unit>
-</persistence>

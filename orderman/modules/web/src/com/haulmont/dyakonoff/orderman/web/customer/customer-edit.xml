@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="com.haulmont.dyakonoff.orderman.web.customer.CustomerEdit"
+        datasource="customerDs"
+        focusComponent="fieldGroup"
+        messagesPack="com.haulmont.dyakonoff.orderman.web.customer">
+    <dsContext>
+        <datasource id="customerDs"
+                    class="com.haulmont.dyakonoff.orderman.entity.Customer"
+                    view="customer-view"/>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <flowBox spacing="true">
+            <fieldGroup id="fieldGroup"
+                        datasource="customerDs">
+                <column width="250px">
+                    <field property="name"/>
+                <field property="email">
+                    <validator class="com.haulmont.cuba.gui.components.validators.EmailValidator"/>
+                </field>
+                    <field mask="+1 (###) ###-####"
+                           property="phone"/>
+                    <field property="addressLine1"/>
+                    <field property="addressLine2"/>
+                    <field property="addressLine3"/>
+                    <field property="postalCode"/>
+                    <field property="logoImage"/>
+                </column>
+            </fieldGroup>
+            <image id="logoImage"
+                   datasource="customerDs"
+                   property="logoImage"
+                   scaleMode="SCALE_DOWN"
+                   width="300px"/>
+        </flowBox>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>

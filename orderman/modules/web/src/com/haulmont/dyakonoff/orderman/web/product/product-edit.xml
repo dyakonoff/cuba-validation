@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        caption="msg://editorCaption"
+        class="com.haulmont.dyakonoff.orderman.web.product.ProductEdit"
+        datasource="productDs"
+        focusComponent="fieldGroup"
+        messagesPack="com.haulmont.dyakonoff.orderman.web.product">
+    <dsContext>
+        <datasource id="productDs"
+                    class="com.haulmont.dyakonoff.orderman.entity.Product"
+                    view="_local"/>
+    </dsContext>
+    <dialogMode height="600"
+                width="800"/>
+    <layout expand="windowActions"
+            spacing="true">
+        <fieldGroup id="fieldGroup"
+                    datasource="productDs">
+            <column width="250px">
+                <field property="name">
+                    <validator class="com.haulmont.dyakonoff.orderman.validation.ProductNameValidator"
+                               message="msg://badNameInProductName" />
+                </field>
+                <field property="description"
+                       rows="5">
+                    <validator class="com.haulmont.dyakonoff.orderman.validation.ProductNameValidator"
+                               message="msg://badNameInProductDescription" />
+                </field>
+                <field property="measure"/>
+                <field property="pricePerMeasure"/>
+            </column>
+        </fieldGroup>
+        <frame id="windowActions"
+               screen="editWindowActions"/>
+    </layout>
+</window>

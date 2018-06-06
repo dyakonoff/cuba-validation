@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<persistence xmlns="http://java.sun.com/xml/ns/persistence"
-             version="2.0">
-    <persistence-unit name="controllersvalidation"
-                      transaction-type="RESOURCE_LOCAL">
-        <class>io.dyakonoff.controllersvalidation.entity.Vendor</class>
-        <class>io.dyakonoff.controllersvalidation.entity.Product</class>
-    </persistence-unit>
-</persistence>

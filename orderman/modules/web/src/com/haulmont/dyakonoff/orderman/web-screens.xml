@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<screen-config xmlns="http://schemas.haulmont.com/cuba/screens.xsd">
+    <include file="com/haulmont/dyakonoff/orderman/screens.xml"/>
+    <screen id="orderman$Customer.browse"
+            template="com/haulmont/dyakonoff/orderman/web/customer/customer-browse.xml"/>
+    <screen id="orderman$Customer.edit"
+            template="com/haulmont/dyakonoff/orderman/web/customer/customer-edit.xml"/>
+    <screen id="orderman$Product.browse"
+            template="com/haulmont/dyakonoff/orderman/web/product/product-browse.xml"/>
+    <screen id="orderman$Product.edit"
+            template="com/haulmont/dyakonoff/orderman/web/product/product-edit.xml"/>
+    <screen id="orderman$Stock.browse"
+            template="com/haulmont/dyakonoff/orderman/web/stock/stock-browse.xml"/>
+    <screen id="orderman$Order.browse"
+            template="com/haulmont/dyakonoff/orderman/web/order/order-browse.xml"/>
+    <screen id="orderman$Order.edit"
+            template="com/haulmont/dyakonoff/orderman/web/order/order-edit.xml"/>
+    <screen id="orderman$OrderItem.edit"
+            template="com/haulmont/dyakonoff/orderman/web/orderitem/order-item-edit.xml"/>
+</screen-config>
