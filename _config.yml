@@ -1,1 +1,7 @@
+title: Data validation in CUBA applications
+description: Validating imput data from UI and REST in CUBA applications
 theme: jekyll-theme-cayman
+show_downloads: true
+locale: en-US
+words_per_minute: 200
+repository: dyakonoff/cuba-validation-examples
