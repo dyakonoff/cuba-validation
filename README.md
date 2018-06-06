@@ -36,6 +36,7 @@
 - [Summary](#summary)
 - [Appendix A](#appendix-a)
     - [CUBA Documentation articles, related to validation](#cuba-documentation-articles--related-to-validation)
+    - [Other reading](#other-reading)
 
 ## Introduction
 
@@ -418,7 +419,13 @@ protected String email;
 
 CUBA by default makes all your entities available via REST protocol which follows Swagger specification and available at following URL: http://files.cuba-platform.com/swagger/ . This feature is called Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) and all JPA validations are applied to universal REST create and update actions automatically (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_rest) for details).
 
-Following [this instruction](rest-commands.md), let's get OAuth2 access token and try to add a new customer using universal REST. However, let's make this test customer to have couple fields that shouldn't allow it to be added:
+The CRUD entities operation (universal REST) are defined [here](http://files.cuba-platform.com/swagger/#/Entities) in swagger format.
+
+![Figure XX: Universal REST swagger specification](resources/swagger_universal_rest.png)
+
+_**Figure XX:** [Universal REST swagger specification](http://files.cuba-platform.com/swagger/#/Entities)_
+
+Following [this steps](rest-commands.md), let's get OAuth2 access token and try to add a new customer using universal REST. However, let's make this test customer to have couple fields that shouldn't allow it to be added:
 
 ```json
 {
@@ -480,6 +487,7 @@ Content-Type: application/json;charset=UTF-8
 
 https://doc.cuba-platform.com/manual-6.9/rest_api_v2_ex_query_get.html
 https://doc.cuba-platform.com/manual-6.9/rest_api_v2_ex_query_post.html
+https://doc.cuba-platform.com/manual-6.9/rest_api_v2_queries_config.html
 
 **IN PROGRESS**
 
@@ -502,7 +510,7 @@ To do that, let's create a new middleware service using CUBA studio and call it 
 
 _**Figure 5:** Adding a middleware service_
 
-The next step of creation REST service would be opening [StockApiService.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/service/StockApiService.java) and creation of appropriate methods:
+The next steps of creation REST service would be opening [StockApiService.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/service/StockApiService.java) and creation of appropriate methods:
 
 - `List<Stock> getProductsInStock();`
 - `Stock getStockForProductByName(String productName);`
@@ -577,33 +585,104 @@ public interface StockApiService {
 
 This REST interface methods are available at endpoint `http://localhost:8080/app/rest/v2/services/{serviceName}/{methodName}` as [swagger specification](http://files.cuba-platform.com/swagger/#/Services) says.
 
-Let's run [Postman REST client](https://www.getpostman.com/) and check how our validation annotations works.
+Let's run [Postman REST client](https://www.getpostman.com/) and check how our validation annotations works in `addNewProduct` method if `inStock` parameter is greater than 1000:
 
-**IN PROGRESS**
+![Figure XX: JPA validation in REST service](resources/postman_addNewProduct.png)
+
+_**Figure XX:** JPA validation in REST service_
+
+The server returned `400 Bad Request` and an error message like it is specified in the later section [Validation errors in REST](#validation-errors-in-rest).
 
 [Top](#content)
 
-
 ### Programmatic Validation
 
-[Programmatic validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_programmatic) can be used to run JPA validation mechanism manually if you don't wont to rely on validation by contract for some reason.
+Sometimes, JPA validation is not enough for REST services. To validate the entities passed to the method or validate entities you have created at middleware or client tiers, we need to run JPA validations against some entity manually. in this case [programmatic validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_programmatic) can be used.
 
-You can perform bean validation programmatically using the `BeanValidation` infrastructure interface, available on both middleware and client tier. It is used to obtain a `javax.validation.Validator` implementation which runs validation. The result of validation is a set of `ConstraintViolation` objects.
+You can perform bean validation  using the `BeanValidation` infrastructure interface, available on both middleware and client tier. It is used to obtain a `javax.validation.Validator` implementation which runs validation. The result of validation is a set of `ConstraintViolation` objects.
 
-If you perform some custom programmatic validation in a service, use CustomValidationException to inform clients about validation errors in the same format as the standard bean validation does. It can be particularly relevant for REST API clients.
+If you perform some custom programmatic validation in a service, use `CustomValidationException` to inform clients about validation errors in the same format as the standard bean validation does.
 
-**IN PROGRESS**
+The sample application demonstrates this approach in `StockApiServiceBean.addNewProduct` method to validate parameter `product` passed into the method and `stock` object constructed inside it.
+
+```java
+@Service(StockApiService.NAME)
+public class StockApiServiceBean implements StockApiService {
+    ...
+
+    @Override
+    public Stock addNewProduct(Product product, BigDecimal inStock, BigDecimal optimalLevel) {
+        // validate the product provided
+        Validator validator = beanValidation.getValidator();
+        Set<ConstraintViolation<Product>> product_violations = validator.validate(product);
+        if (product_violations.size() > 0) {
+            StringBuilder strBuilder = new StringBuilder();
+            product_violations.stream().forEach(violation -> strBuilder.append(violation.getMessage()).append("; "));
+            throw new CustomValidationException(strBuilder.toString());
+        }
+
+        // check if product already exist in the db
+        // we don't check for soft-deleted Product and Stock entities here for simplicity
+        // if we'd like to do that might need to load entities and check them with isDeleted() method.
+        // see https://doc.cuba-platform.com/manual-6.9/soft_deletion_usage.html for details
+        Integer cnt = (Integer) dataManager
+                .loadValue("SELECT COUNT(p) FROM orderman$Product p WHERE p.name = :productName", Integer.class)
+                .parameter("productName", product.getName())
+                .one();
+        if (cnt > 0)
+            throw new CustomValidationException(messages.formatMainMessage("StockApiService.productExists", product.getName()));
+
+        Product savedProduct = dataManager.commit(product);
+
+        Stock stock = new Stock();
+        stock.setInStock(inStock);
+        stock.setOptimalStockLevel(optimalLevel);
+        stock.setProduct(savedProduct);
+
+        // validate the stock object
+        Set<ConstraintViolation<Stock>> stock_violations = validator.validate(stock);
+        if (stock_violations.size() > 0) {
+            StringBuilder strBuilder = new StringBuilder();
+            stock_violations.stream().forEach(violation -> strBuilder.append(violation.getMessage()).append("; "));
+            throw new CustomValidationException(strBuilder.toString());
+        }
+
+        return dataManager.commit(stock);
+    }
+
+    ...
+}
+```
+
+[StockApiServiceBean.java](orderman/modules/core/src/com/haulmont/dyakonoff/orderman/service/StockApiServiceBean.java)
 
 [Top](#content)
 
 ### Validation errors in REST
 
-Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) automatically performs bean validation for create and update actions. Validation errors are returned to the client in the following way:
-5. The `MethodParametersValidationException` and `MethodResultValidationException` exceptions are thrown on validation errors.
-    - `MethodResultValidationException` and `ValidationException` cause `500 Server error` HTTP status
-    - `MethodParametersValidationException`, `ConstraintViolationException` and `CustomValidationException` cause `400 Bad request` HTTP status
+Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) automatically performs bean validation for create and update actions. Validation errors are returned to the client in the [following way](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_rest):
 
-**IN PROGRESS**
+- The `MethodParametersValidationException` and `MethodResultValidationException` exceptions are thrown on validation errors.
+- `MethodResultValidationException` and `ValidationException` cause `500 Server error` HTTP status
+- `MethodParametersValidationException`, `ConstraintViolationException` and `CustomValidationException` cause `400 Bad request` HTTP status
+
+Response body with Content-Type: application/json will contain a list of objects with message, messageTemplate, path and invalidValue properties, for example:
+
+```json
+[
+    {
+        "message": "inStock value is limited to 1000",
+        "messageTemplate": "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.inStockLimit}",
+        "path": "addNewProduct.arg1",
+        "invalidValue": 500000
+    }
+]
+```
+
+- `path` indicates a path to the invalid attribute in the validated object graph.
+- `messageTemplate` contains a string which is defined in the message annotation attribute.
+- `message` contains an actual value of the validation message.
+- `invalidValue` is returned only if its type is one of the following: `String, Date, Number, Enum, UUID`.
 
 [Top](#content)
 
@@ -1127,5 +1206,7 @@ There is a old version of this article that used different samples approach: one
 1. [Bean Validation](https://doc.cuba-platform.com/manual-6.9/bean_validation.html)
 1. [List of JPA constraints in CUBA applications](common_jpa_annotations.md)
 1. ["Using entity listeners" recipe](https://doc.cuba-platform.com/manual-6.9/using_entity_listeners_recipe.html)
+
+### Other reading
 
 [Top](#content)
