@@ -50,7 +50,7 @@ A list of additional examples and materials for further reading is in [Appendix 
 
 Happy reading!
 
-![Mad scientist validates stuff](resources/mad_scientist.png)
+![Tags](resources/tags_cloud.png)
 
 [Top](#content)
 
