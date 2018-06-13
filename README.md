@@ -1,4 +1,4 @@
-<H1>Data validation in CUBA platform applications</H1>
+<H1>Validation cookbook for CUBA applications</H1>
 
 ## Content
 
@@ -60,7 +60,7 @@ Before discussing different validation methods available for us in [CUBA platfor
 
 For this article I'm going to use an application that demonstrates all validation methods mentioned here and how they work from different perspectives: code, user interface, CUBA studio IDE, REST endpoints etc.
 
-This application mimics a small order-management system for an US-based store that ships it's goods over the US. That's why this system uses imperial measurement units and enforces US phone numbers and ZIP codes formats.
+This application mimics a small order-management system for an US-based store that ships its goods over the US. That's why this system uses imperial measurement units and enforces US phone numbers and ZIP codes formats.
 
 The application's entities structure is shown below:
 
