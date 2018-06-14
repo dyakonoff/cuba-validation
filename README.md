@@ -1,48 +1,48 @@
-<H1>Validation cookbook for CUBA applications</H1>
+<h1>Validation cookbook for CUBA applications</h1>
 
 ## Content
 
-- [Content](#content)
-- [Introduction](#introduction)
-- [Model problem description](#model-problem-description)
-- [Sample application](#sample-application)
-- [Validation with JPA annotations](#validation-with-jpa-annotations)
-    - [JPA DB level constraints](#jpa-db-level-constraints)
-        - [Single column constraints](#single-column-constraints)
-        - [Multi-column constraints](#multi-column-constraints)
-    - [Single field constraints](#single-field-constraints)
-    - [Bean validation with custom annotations](#bean-validation-with-custom-annotations)
-    - [Notes on JPA validation](#notes-on-jpa-validation)
-        - [At what level JPA annotation works](#at-what-level-jpa-annotation-works)
-        - [Validation of related objects](#validation-of-related-objects)
-        - [Custom messages in JPA constraints](#custom-messages-in-jpa-constraints)
-        - [Message packs in JPA constraints](#message-packs-in-jpa-constraints)
-- [Validation in REST](#validation-in-rest)
-    - [Universal REST](#universal-rest)
-    - [REST queries validation](#rest-queries-validation)
-    - [Validation by contract](#validation-by-contract)
-    - [Programmatic Validation](#programmatic-validation)
-    - [Validation errors in REST](#validation-errors-in-rest)
-- [GUI Validator](#gui-validator)
-    - [Standard validators](#standard-validators)
-    - [Setting validator programmatically](#setting-validator-programmatically)
-    - [Custom Java class validator](#custom-java-class-validator)
-    - [Validating with Groovy scripts](#validating-with-groovy-scripts)
-- [Validation in UI screen controllers](#validation-in-ui-screen-controllers)
-- [Using middleware listeners for data validation](#using-middleware-listeners-for-data-validation)
-    - [Single Entity Context example](#single-entity-context-example)
-    - [Transactional Context example](#transactional-context-example)
-- [Presenting error messages to a user](#presenting-error-messages-to-a-user)
-- [Summary](#summary)
-- [Appendix A](#appendix-a)
-    - [CUBA Documentation articles related to validation](#cuba-documentation-articles-related-to-validation)
-    - [Other reading](#other-reading)
+* [Content](#content)
+* [Introduction](#introduction)
+* [Model problem description](#model-problem-description)
+* [Sample application](#sample-application)
+* [Bean validation](#bean-validation)
+    * [JPA constraints](#jpa-constraints)
+        * [Single column JPA constraints](#single-column-jpa-constraints)
+        * [Multi-column JPA constraints](#multi-column-jpa-constraints)
+    * [Single field constraints](#single-field-constraints)
+    * [Bean validation with custom annotations](#bean-validation-with-custom-annotations)
+    * [Notes on bean validation](#notes-on-bean-validation)
+        * [At what level bean annotation works](#at-what-level-bean-annotation-works)
+        * [Validation of related objects](#validation-of-related-objects)
+        * [Custom messages in bean validation constraints](#custom-messages-in-bean-validation-constraints)
+        * [Message packs in bean validation constraints](#message-packs-in-bean-validation-constraints)
+* [Validation in REST](#validation-in-rest)
+    * [Universal REST](#universal-rest)
+    * [REST queries validation](#rest-queries-validation)
+    * [Validation by contract](#validation-by-contract)
+    * [Programmatic Validation](#programmatic-validation)
+    * [Validation errors in REST](#validation-errors-in-rest)
+* [GUI Validator](#gui-validator)
+    * [Standard validators](#standard-validators)
+    * [Setting validator programmatically](#setting-validator-programmatically)
+    * [Custom Java class validator](#custom-java-class-validator)
+    * [Validating with Groovy scripts](#validating-with-groovy-scripts)
+* [Validation in UI screen controllers](#validation-in-ui-screen-controllers)
+* [Using middleware listeners for data validation](#using-middleware-listeners-for-data-validation)
+    * [Single Entity Context example](#single-entity-context-example)
+    * [Transactional Context example](#transactional-context-example)
+* [Presenting error messages to a user](#presenting-error-messages-to-a-user)
+* [Summary](#summary)
+* [Appendix A](#appendix-a)
+    * [CUBA Documentation articles related to validation](#cuba-documentation-articles-related-to-validation)
+    * [Other reading](#other-reading)
 
 ## Introduction
 
 Input validation is one of the common tasks in everyday developer’s life. We need to check our data in many different situations: after getting data from UI, in API call handlers, before saving our model to the DB etc, etc.
 
-Main goal of this article is to summarize all validation methods that are common to [CUBA platform](https://www.cuba-platform.com/), give detailed explanations with examples for all of them and talk a bit about pros and cons of each of these approaches. I hope that the article will be a good tutorial and reference for all the questions related to data validation in [CUBA platform](https://www.cuba-platform.com/) based applications.
+Main goal of this cookbook is to summarize all validation methods that are common to [CUBA platform](https://www.cuba-platform.com/), give detailed explanations with examples for all of them and talk a bit about pros and cons of each of these approaches. I hope that the article will be a good tutorial and reference for all the questions related to data validation in [CUBA platform](https://www.cuba-platform.com/) based applications.
 
 The sample application for this article could be downloaded from [here](https://github.com/dyakonoff/cuba-validation-examples).
 
@@ -50,7 +50,7 @@ A list of additional examples and materials for further reading is in [Appendix 
 
 Happy reading!
 
-![Tags](resources/tags_cloud.png)
+![Tags cloud](resources/tags_cloud.png)
 
 [Top](#content)
 
@@ -87,9 +87,9 @@ Or download sample app .zip archive from [here](https://github.com/dyakonoff/cub
 
 [Top](#content)
 
-## Validation with JPA annotations
+## Bean validation
 
-Let's start the review of validation methods with the simplest one that we have in our toolbox: JPA constraints. Annotation-based validators provide uniform approach to data checking on the middleware, [GUI](https://doc.cuba-platform.com/manual-6.9/gui_framework.html) and [universal REST services](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html). They are based on the JSR 349 - Bean Validation 1.1 and its reference implementation: [Hibernate Validator](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/?v=5.3).
+Let's start the review of validation methods with the simplest ones that we have in our toolbox: bean validations. Annotation-based validators provide uniform approach to data checking on the middleware, [GUI](https://doc.cuba-platform.com/manual-6.9/gui_framework.html) and [universal REST services](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html). They are based on the JSR 349 - Bean Validation 1.1 and its reference implementation: [Hibernate Validator](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/?v=5.3).
 
 [Documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation.html) says that this mechanism allows users to set limitations on entity fields, getters and classes. Most of the annotations are available from [`javax.validation.constraints` namespace](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html), although couple of them come from `javax.persistence`, `javax.validation` and `org.hibernate.validator.constraints`.
 
@@ -97,9 +97,9 @@ Also, it's not hard to create your own custom annotations to validate fields and
 
 [Top](#content)
 
-### JPA DB level constraints
+### JPA constraints
 
-Some of JPA annotation available in [CUBA platform](https://www.cuba-platform.com/) put constraints on DB level as table indexes or table column / multi-column constraints. Although there are only few of such annotations, they are only ones which act on DB server level.
+JPA annotations put constraints on DB level as table indexes or table column / multi-column constraints. Although there are only few of such annotations, they are only ones which act on DB server level.
 
 * `@Column(..., unique=true)` - sets SQL `unique` constraint on a table column for entity fields marked as **Unique**
 * `@Column(..., nullable=false)` - sets SQL `not null` constraint on a table column (entity field) for fields marked as **Mandatory** in studio. Acts together with `@NotNull` JPA annotation which works at UI and middleware levels.
@@ -108,7 +108,7 @@ Some of JPA annotation available in [CUBA platform](https://www.cuba-platform.co
 
 [Top](#content)
 
-#### Single column constraints
+#### Single column JPA constraints
 
 Single column constraints could be applied from CUBA studio entity editor UI during entity field creation or modification:
 
@@ -149,7 +149,7 @@ On the other hand, **Unique** constraint (reflected with `@Column(..., unique=tr
 
 [Top](#content)
 
-#### Multi-column constraints
+#### Multi-column JPA constraints
 
 This type of data constraint / validation acts on DB level only and is represented by multi-column index with unique constraint. It could be created from Entity designer in CUBA studio:
 
@@ -178,13 +178,13 @@ Which adds `create unique index IDX_ORDERMAN_PRODUCT_UNQ on ORDERMAN_PRODUCT (NA
 
 ### Single field constraints
 
-Let's go through other standard JPA annotations that were designed for data validation. As I mentioned before most of them came from [`javax.validation.constraints` namespace](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html), although some are from `javax.persistence`, `javax.validation` and `org.hibernate.validator.constraints`. For details, you can take a look at [CUBA documentation section about bean validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html).
+Let's go through other standard annotations that were designed for data validation. As I mentioned before most of them came from [`javax.validation.constraints` namespace](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html), although some are from `javax.persistence`, `javax.validation` and `org.hibernate.validator.constraints`. For details, you can take a look at [CUBA documentation section about bean validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html).
 
 Some of these annotations can be configured from CUBA studio in VALIDATION section (list of constraints available varies for different entity field types).
 
-![Figure 4: JPA validation tab](resources/jpa_validation_tab.png)
+![Figure 4: Bean validation tab](resources/jpa_validation_tab.png)
 
-_**Figure 4:** JPA validation tab._
+_**Figure 4:** Validation tab._
 
 From the code perspective these annotations look like that:
 
@@ -234,13 +234,13 @@ public class Order extends StandardEntity {
 
 [Order.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/Order.java)
 
-[Here](comon_jpa_annotations.md) you can find a list of common JPA annotations used in CUBA applications.
+[Here](common_constraints_annotations.md) you can find a list of common annotations used in CUBA applications.
 
 [Top](#content)
 
 ### Bean validation with custom annotations
 
-There is no need to limit ourselves with the standard JPA annotations, if it's needed we can define our custom ones.
+There is no need to limit ourselves with the standard constraint annotations, if it's needed we can define our custom ones. 
 [Custom annotations](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_custom_constraints) could be defined not just for entities fields but also for Entity classes, POJOs and service methods. Custom annotations can help you to express your validation logic clearer or implement custom checks that can even do the cross-field checks of an entity object.
 
 Let’s check out how to do that. In our sample application there at [two custom constraints](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/validator)  implemented:
@@ -293,7 +293,7 @@ public class Customer extends StandardEntity {
 
 [Customer.java](orderman/modules/global/src/com/haulmont/dyakonoff/orderman/entity/Customer.java)
 
-You can also check the more complex example of a custom validator that comes with hibername and uses a list of checks to validate data:  [org.hibernate.validator.constraints.br.CPF](https://github.com/hibernate/hibernate-validator/blob/master/engine/src/main/java/org/hibernate/validator/constraints/br/CPF.java).
+You can also check the more complex example of a custom validator that comes with hibernate and uses a list of checks to validate data:  [org.hibernate.validator.constraints.br.CPF](https://github.com/hibernate/hibernate-validator/blob/master/engine/src/main/java/org/hibernate/validator/constraints/br/CPF.java).
 
 Now, it's time to take a look at more complex custom annotation that does cross-field check. `@CustomerContactsCheck` interface defines a constraint that could be applied to classes only:
 
@@ -354,11 +354,11 @@ public class Customer extends StandardEntity {
 
 [Top](#content)
 
-### Notes on JPA validation
+### Notes on bean validation
 
-#### At what level JPA annotation works
+#### At what level bean annotation works
 
-By default, JPA annotations works:
+By default, constraint annotations works:
 
 * At UI level when method `validateAll` of the editor's controller is called automatically on the screen commit. _(But you need to override `postValidate` method to do the custom validation in the screen controller, see [later section](#validation-in-ui-screen-controllers))_.
 * At REST level when Universal REST endpoints are called.
@@ -386,9 +386,9 @@ public class Order extends StandardEntity {
 
 In the example above, when an instance of `Order` is validated, the list of `items` will be checked for the fact that it contains at least one instance (because of `@Size(min = 1)`), and all instances of Product in the list will be validated also.
 
-#### Custom messages in JPA constraints
+#### Custom messages in bean validation constraints
 
-All JPA constraints can have custom messages (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages)):
+All bean validation constraints can have custom messages (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages)):
 
 ```java
 @Pattern(message = "Postal code should follow US ZIP codes format: 12345 or 12345-6789 or 12345 1234", regexp = "^\\d{5}(?:[-\\s]\\d{4})?$")
@@ -410,7 +410,7 @@ protected String email;
 protected String addressLine1;
 ```
 
-#### Message packs in JPA constraints
+#### Message packs in bean validation constraints
 
 You can also place the message in a [localized messages pack](https://doc.cuba-platform.com/manual-6.9/message_packs.html) and use the following format to specify the message in an annotation: `{msg://message_pack/message_key}` or simply `{msg://message_key}` (for entities only). For example:
 
@@ -426,7 +426,7 @@ protected String email;
 
 ### Universal REST
 
-In CUBA application all your entities are available via REST by default. Protocol follows Swagger specification and available here: http://files.cuba-platform.com/swagger/ . This feature is called Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html). JPA validations defined for entities are applied to universal REST **create** and **update** actions automatically (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_rest) for details).
+In CUBA application all your entities are available via REST by default. Protocol follows Swagger specification and available here: http://files.cuba-platform.com/swagger/ . This feature is called Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html). Constraints defined for entities are applied to universal REST **create** and **update** actions automatically (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_rest) for details).
 
 The CRUD entities operation (universal REST) are defined [here](http://files.cuba-platform.com/swagger/#/Entities) in swagger format.
 
@@ -434,7 +434,7 @@ The CRUD entities operation (universal REST) are defined [here](http://files.cub
 
 _**Figure 5:** [Universal REST swagger specification](http://files.cuba-platform.com/swagger/#/Entities)_
 
-Following [this steps](rest-commands.md), let's get OAuth2 access token and try to add a new customer using universal REST. To test validation let's make this test customer having couple fields that shouldn't allow it to pass JPA checks:
+Following [this steps](rest-commands.md), let's get OAuth2 access token and try to add a new customer using universal REST. To test validation let's make this test customer having couple fields that shouldn't allow it to pass validation checks:
 
 ```json
 {
@@ -492,7 +492,7 @@ Content-Type: application/json;charset=UTF-8
 
 ### REST queries validation
 
-Just for completeness, I need to say that because [predefined JPQL Queries](https://doc.cuba-platform.com/manual-6.9/rest_api_v2_queries_config.html) allow only `SELECT` methods, and so they do only read operations. Hence, they don't provide any methods to validate input parameters. But of course they screen input data to protect the calls from [SQL injection attack](https://en.wikipedia.org/wiki/SQL_injection).
+Just for completeness, I need to say that because [predefined JPQL Queries](https://doc.cuba-platform.com/manual-6.9/rest_api_v2_queries_config.html) allow only `SELECT` methods, and so they do only read operations. Hence, they don't provide any methods to validate input parameters. But of course, they screen input data to protect the calls from [SQL injection attack](https://en.wikipedia.org/wiki/SQL_injection).
 
 [Top](#content)
 
@@ -530,17 +530,17 @@ _**Figure 7:** Marking methods as REST available_
 
 Now, let's open `StockApiService` in our Java IDE again and annotate the methods properly.
 
-1. First, we need to know, that JPA validations will be applied **only** to the methods that are marked with `@Validated` annotation. (See [documentation here](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)). By default, `@Validated` uses the next [constraint groups](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups):
+1. First, we need to know, that constraint validations will be applied **only** to the methods that are marked with `@Validated` annotation. (See [documentation here](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_in_services)). By default, `@Validated` uses the next [constraint groups](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups):
     - `Default` and `ServiceParametersChecks` - for method parameters
     - `Default` and `ServiceResultChecks` - for method return value
-    - As for [constraint group](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups) `RestApiChecks`, it could be used for those JPA validations that must be checked only when instance is passed to REST-API.
+    - As for [constraint group](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups) `RestApiChecks`, it could be used for those validations that must be checked only when instance is passed to REST-API.
 2. [`@RequiredView` annotation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_cuba_annotations) could be used to ensure that input parameters of a method have fields that corresponding to the specified [view](https://doc.cuba-platform.com/manual-6.9/views.html).
     - `@RequiredView` validates that the validated Entity has **at least** those fields loaded that are required by the view. It doesn't fire an error if the Entity has extra fields loaded.
     - This annotation works with entity objects and their collections.
-3. All standard and custom JPA validations can be applied either to:
+3. All standard and custom constrauint validations can be applied either to:
     - **methods** - then the return value is checked.
     - method **parameters** - which makes these parameters to be validated
-    - once again, this JPA validations used only if method is marked with `@Validated` annotation.
+    - once again, this constraint validations used only if method is marked with `@Validated` annotation.
 4. Error messages can be provided with annotations either directly or by using messages packs. (see [documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_messages) for more details)
 
 Here is a result of applying all our validations to the REST service interface:
@@ -592,9 +592,9 @@ This REST interface methods are available at endpoint `/app/rest/v2/services/{se
 
 Let's run [Postman REST client](https://www.getpostman.com/) and check how our validation annotations works in `addNewProduct` method if `inStock` parameter is greater than 1000:
 
-![Figure 8: JPA validation in REST service](resources/postman_addNewProduct.png)
+![Figure 8: Bean validation in REST service](resources/postman_addNewProduct.png)
 
-_**Figure 8:** JPA validation in REST service_
+_**Figure 8:** Bean validation in REST service_
 
 The server returns `400 Bad Request` and an error message like it is specified in the later section [Validation errors in REST](#validation-errors-in-rest).
 
@@ -602,7 +602,7 @@ The server returns `400 Bad Request` and an error message like it is specified i
 
 ### Programmatic Validation
 
-Sometimes, pure JPA validations are not enough for REST services. To validate the entities passed to the method or validate entities have been created at middleware or client tiers, we need to run JPA validations against these entities manually. This is the case when [programmatic validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_programmatic) comes to play.
+Sometimes, pure validations are not enough for REST services. To validate the entities passed to the method or validate entities have been created at middleware or client tiers, we need to run bean validations against these entities manually. This is the case when [programmatic validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_programmatic) comes to play.
 
 You can perform bean validation  using the `BeanValidation` infrastructure interface, which is available on both middleware and client tiers. It is used to obtain a `javax.validation.Validator` implementation which runs validation and gives the result as a set of `ConstraintViolation` objects.
 
@@ -671,7 +671,7 @@ Universal [REST API](https://doc.cuba-platform.com/manual-6.9/rest_api_v2.html) 
 - `MethodResultValidationException` and `ValidationException` cause `500 Server error` HTTP status
 - `MethodParametersValidationException`, `ConstraintViolationException` and `CustomValidationException` cause `400 Bad request` HTTP status
 
-Response body with `Content-Type: application/json` will contain a list of objects with message, messageTemplate, path and invalidValue properties:, for example:
+Response body with `Content-Type: application/json` will contain a list of objects with message, messageTemplate, path and invalidValue properties, for example:
 
 ```json
 [
@@ -687,7 +687,7 @@ Response body with `Content-Type: application/json` will contain a list of objec
 - `path` indicates a path to the invalid attribute in the validated object graph.
 - `messageTemplate` contains a string which is defined in the message annotation attribute.
 - `message` contains an actual value of the validation message.
-- `invalidValue` is returned only if its type is one of the following: `String, Date, Number, Enum, UUID`.
+- `invalidValue` is returned only if its type is one of the followings: `String, Date, Number, Enum, UUID`.
 
 [Top](#content)
 
@@ -714,7 +714,7 @@ Let's look at the examples.
 
 ### Standard validators
 
-There are set of `Validator` interface implementations that comes out of the box, although many of them repeat JPA annotation-based validators' functionality:
+There are set of `Validator` interface implementations that comes out of the box, although many of them repeat annotation-based validators' functionality:
 
 * DateValidator
 * DoubleValidator
@@ -1156,16 +1156,16 @@ We have covered most of the mechanisms that [CUBA platform](https://www.cuba-pla
 
 _**Table 1:** Validation levels_
 
-|                                     | Generic UI | Universal REST | Middleware | DataStore | Transaction | DB server |
-| ----------------------------------- | :--------: | :------------: | :--------: | :-------: | :---------: | :-------: |
-| _DB level JPA constraints \*_       |            |                |            |           |             | yes       |
-| _@NotNull constraint \*\*_          | yes        | yes\*\*\*      | yes        |           |             | yes       |
-| _Bean validation (JPA validations)_ | yes        | yes\*\*\*      | yes        |           |             |           |
-| _UI validation (Field.Validator)_   | yes        |                |            |           |             |           |
-| _Custom Field.Validator_            | yes        |                |            |           |             |           |
-| _Screen controllers validation_     | yes        |                |            |           |             |           |
-| _Entity listeners_                  |            |                |            | yes       |             |           |
-| _Transaction listeners_             |            |                |            |           | yes         |           |
+|                                   | Generic UI | Universal REST | Middleware | DataStore | Transaction | DB server |
+| --------------------------------- | :--------: | :------------: | :--------: | :-------: | :---------: | :-------: |
+| _DB level JPA constraints \*_     |            |                |            |           |             | yes       |
+| _@NotNull constraint \*\*_        | yes        | yes\*\*\*      | yes        |           |             | yes       |
+| _Bean validation_                 | yes        | yes\*\*\*      | yes        |           |             |           |
+| _UI validation (Field.Validator)_ | yes        |                |            |           |             |           |
+| _Custom Field.Validator_          | yes        |                |            |           |             |           |
+| _Screen controllers validation_   | yes        |                |            |           |             |           |
+| _Entity listeners_                |            |                |            | yes       |             |           |
+| _Transaction listeners_           |            |                |            |           | yes         |           |
 
 \* - `@Table` and `@Column` annotations<br />
 \*\* - `@NotNull` that is accompanied with `@Column(nullable = false)`<br />
@@ -1178,7 +1178,7 @@ _**Table 2:** Validation implementation complexity_
 |                                            | Elementary | Simple | Average | Complex |
 | ------------------------------------------ | :--------: | :----: | :-----: | :-----: |
 | _DB level JPA constraints_                 | yes        |        |         |         |
-| _Bean validation (JPA annotations)_        | yes        |        |         |         |
+| _Bean validation_                          | yes        |        |         |         |
 | _Bean validation (custom annotations)_     |            |        | yes     |         |
 | _UI validation (standard Field.Validator)_ | yes        |        |         |         |
 | _Custom Field.Validator (Java class)_      |            |        | yes     |         |
@@ -1192,7 +1192,7 @@ _**Table 3:** Validation scope_
 |                                            | Single Field | Cross Field | DataStore | Transaction Context |
 | ------------------------------------------ | :----------: | :---------: | :-------: | :-----------------: |
 | _DB level JPA constraints_                 | yes          | yes\*       |           |                     |
-| _Bean validation (JPA annotations)_        | yes          |             |           |                     |
+| _Bean validation_        | yes          |             |           |                     |
 | _Bean validation (custom annotations)_     | yes          | yes         |           |                     |
 | _UI validation (standard Field.Validator)_ | yes          |             |           |                     |
 | _Custom Field.Validator (Java class)_      | yes          |             |           |                     |
@@ -1219,7 +1219,7 @@ _**Table 3:** Validation scope_
 ### CUBA Documentation articles related to validation
 
 1. [Bean Validation](https://doc.cuba-platform.com/manual-6.9/bean_validation.html)
-1. [List of JPA constraints in CUBA applications](common_jpa_annotations.md)
+1. [List of annotation-based constraints in CUBA applications](common_constraints_annotations.md)
 1. ["Using entity listeners" recipe](https://doc.cuba-platform.com/manual-6.9/using_entity_listeners_recipe.html)
 
 ### Other reading

@@ -1,4 +1,4 @@
-## List of JPA annotations supported by CUBA studio
+## List of constraint annotations supported by CUBA studio
 
 | Annotation    | Types (Standard for CUBA entities) | Note  |
 |---------------|------------------------------------|-------|
