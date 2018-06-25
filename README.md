@@ -93,7 +93,7 @@ Let's start the review of validation methods with the simplest ones that we have
 
 [Documentation](https://doc.cuba-platform.com/manual-6.9/bean_validation.html) says that this mechanism allows users to set limitations on entity fields, getters and classes. Most of the annotations are available from [`javax.validation.constraints` namespace](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html), although couple of them come from `javax.persistence`, `javax.validation` and `org.hibernate.validator.constraints`.
 
-Also, it's not hard to create your own custom annotations to validate fields and entities, which we'll se in the [later sections](#bean-validation-with-custom-annotations).
+Also, it's not hard to create your own custom annotations to validate fields and entities, which we'll see in the [later sections](#bean-validation-with-custom-annotations).
 
 [Top](#content)
 
@@ -201,12 +201,12 @@ public class Order extends StandardEntity {
     protected Customer customer;
 
     @Temporal(TemporalType.DATE)
-    @Past(message = "Order date can't be in the futire")
+    @Past(message = "Order date can't be in the future")
     @NotNull
     @Column(name = "DATE_", nullable = false)
     protected Date date;
 
-    @Pattern(message = "Number format should be yyyy-MM-dd-<sequentional number>", regexp = "\\d{4}-\\d{2}-\\d{2}-\\d+")
+    @Pattern(message = "Number format should be yyyy-MM-dd-<sequential number>", regexp = "\\d{4}-\\d{2}-\\d{2}-\\d+")
     @NotNull
     @Column(name = "NUMBER_", nullable = false, unique = true, length = 20)
     protected String number;
@@ -1192,7 +1192,7 @@ _**Table 3:** Validation scope_
 |                                            | Single Field | Cross Field | DataStore | Transaction Context |
 | ------------------------------------------ | :----------: | :---------: | :-------: | :-----------------: |
 | _DB level JPA constraints_                 | yes          | yes\*       |           |                     |
-| _Bean validation_        | yes          |             |           |                     |
+| _Bean validation_                          | yes          |             |           |                     |
 | _Bean validation (custom annotations)_     | yes          | yes         |           |                     |
 | _UI validation (standard Field.Validator)_ | yes          |             |           |                     |
 | _Custom Field.Validator (Java class)_      | yes          |             |           |                     |

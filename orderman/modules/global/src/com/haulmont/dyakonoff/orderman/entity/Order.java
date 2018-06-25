@@ -38,13 +38,13 @@ public class Order extends StandardEntity {
     protected Customer customer;
 
     @Temporal(TemporalType.DATE)
-    @Past(message = "Order date can't be in the futire")
+    @Past(message = "Order date can't be in the future")
     @NotNull
     @Column(name = "DATE_", nullable = false)
     protected Date date;
 
     @Length(max = 20)
-    @Pattern(message = "Number format should be yyyy-MM-dd-<sequentional number>", regexp = "\\d{4}-\\d{2}-\\d{2}-\\d+")
+    @Pattern(message = "Number format should be yyyy-MM-dd-<sequential number>", regexp = "\\d{4}-\\d{2}-\\d{2}-\\d+")
     @NotNull
     @Column(name = "NUMBER_", nullable = false, unique = true, length = 20)
     protected String number;
