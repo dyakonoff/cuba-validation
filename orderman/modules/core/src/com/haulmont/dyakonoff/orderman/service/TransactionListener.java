@@ -36,20 +36,17 @@ public class TransactionListener implements BeforeCommitTransactionListener {
         // Check that stock has enough products to fulfill the transaction.
         // Reduces and increases quantity of products in stock accordingly
         // this is a pretty heavy operation with a DB query and couple loops inside
-
         // see https://doc.cuba-platform.com/manual-6.9/transaction_listeners.html for more examples
 
         Set<Order> ordersToCheck = buildListOfOrdersToCheck(entityManager, managedEntities);
-
         if (ordersToCheck.size() == 0)
             return;
 
         HashMap<UUID, BigDecimal> stockChanges = buildStockChangesSet(ordersToCheck);
-
         if (stockChanges.size() == 0)
             return;
 
-        validateStockHasEnoughGoods(stockChanges);
+        validateStockHasEnoughGoods(stockChanges); // throws ValidationException if validation fails
     }
 
 
@@ -213,5 +210,4 @@ public class TransactionListener implements BeforeCommitTransactionListener {
         log.error(msg);
         throw new ValidationException(msg);
     }
-
 }
