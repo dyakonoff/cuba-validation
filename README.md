@@ -362,7 +362,7 @@ By default, constraint annotations works:
 
 * At UI level when method `validateAll` of the editor's controller is called automatically on the screen commit. _(But you need to override `postValidate` method to do the custom validation in the screen controller, see [later section](#validation-in-ui-screen-controllers))_.
 * At REST level when Universal REST endpoints are called.
-* At middleware layer when validating method marked with `@Validated1 annotation.
+* At middleware layer when validating method marked with `@Validated` annotation.
 * At client or middleware levels when validation is called manually using `BeanValidation` interface.
 
 #### Validation of related objects
@@ -534,6 +534,7 @@ Now, let's open `StockApiService` in our Java IDE again and annotate the methods
     - `Default` and `ServiceParametersChecks` - for method parameters
     - `Default` and `ServiceResultChecks` - for method return value
     - As for [constraint group](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_constraint_groups) `RestApiChecks`, it could be used for those validations that must be checked only when instance is passed to REST-API.
+    - It's also possible to mark the whole class / interface with `@Validated` annotation to say CUBA that it needs to run bean validations for all methods and their input parameters and return values.
 2. [`@RequiredView` annotation](https://doc.cuba-platform.com/manual-6.9/bean_validation_constraints.html#bean_validation_cuba_annotations) could be used to ensure that input parameters of a method have fields that corresponding to the specified [view](https://doc.cuba-platform.com/manual-6.9/views.html).
     - `@RequiredView` validates that the validated Entity has **at least** those fields loaded that are required by the view. It doesn't fire an error if the Entity has extra fields loaded.
     - This annotation works with entity objects and their collections.
@@ -546,22 +547,20 @@ Now, let's open `StockApiService` in our Java IDE again and annotate the methods
 Here is a result of applying all our validations to the REST service interface:
 
 ```java
+@Validated
 public interface StockApiService {
     String NAME = "orderman_StockApiService";
 
-    @Validated
     @NotNull
     @RequiredView("stock-api-view")
     List<Stock> getProductsInStock();
 
-    @Validated
     @NotNull
     @RequiredView("stock-api-view")
     Stock getStockForProductByName(@NotNull(message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productNameMissing)")
                                    @Length(min = 1, max = 255, message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productName}")
                                            String productName);
 
-    @Validated
     @NotNull
     @RequiredView("_local")
     Stock addNewProduct(@RequiredView("_local")
@@ -573,7 +572,6 @@ public interface StockApiService {
                         @Min(0)
                                 BigDecimal optimalLevel);
 
-    @Validated
     @NotNull
     @RequiredView("stock-api-view")
     Stock increaseQuantityByProductName(@NotNull(message = "{msg://com.haulmont.dyakonoff.orderman.service/StockApiService.productNameMissing)")
@@ -602,7 +600,7 @@ The server returns `400 Bad Request` and an error message like it is specified i
 
 ### Programmatic Validation
 
-Sometimes, pure validations are not enough for REST services. To validate the entities passed to the method or validate entities have been created at middleware or client tiers, we need to run bean validations against these entities manually. This is the case when [programmatic validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_programmatic) comes to play.
+Sometimes, pure validations are not enough for REST services. To validate the entities passed to the method or validate entities have been created at middleware or client tiers, we may need to run bean validations against these entities manually. This is the case when [programmatic validation](https://doc.cuba-platform.com/manual-6.9/bean_validation_running.html#bean_validation_programmatic) comes to play.
 
 You can perform bean validation  using the `BeanValidation` infrastructure interface, which is available on both middleware and client tiers. It is used to obtain a `javax.validation.Validator` implementation which runs validation and gives the result as a set of `ConstraintViolation` objects.
 

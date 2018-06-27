@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 /**
  * Sets the serial number for the order and validates that price is correct
  */
+@Validated
 @Component("orderman_OrderEntityListener")
 public class OrderEntityListener implements BeforeInsertEntityListener<Order>, BeforeUpdateEntityListener<Order> {
     @Inject
@@ -30,7 +31,6 @@ public class OrderEntityListener implements BeforeInsertEntityListener<Order>, B
     @Inject
     private UniqueNumbersAPI uniqueNumbersAPI;
 
-    @Validated
     @Override
     public void onBeforeInsert(@RequiredView("order-edit") Order order, EntityManager entityManager) {
         validateOrderPrice(order);
@@ -45,7 +45,6 @@ public class OrderEntityListener implements BeforeInsertEntityListener<Order>, B
     }
 
     @Override
-    @Validated
     public void onBeforeUpdate(@RequiredView("order-edit") Order order, EntityManager entityManager) {
         validateOrderPrice(order);
     }
